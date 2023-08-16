@@ -4,7 +4,7 @@ const socket = io('/');
 const myPeer = new Peer(undefined, {
     host: window.location.hostname,
     port: 5000, // Use the port where your PeerJS server is running
-    path: 'https://stream-ochre.vercel.app:5000/' // Use the path where your PeerJS server is running
+    path: '/' // Use the path where your PeerJS server is running
 });
 
 
