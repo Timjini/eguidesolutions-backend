@@ -1,9 +1,14 @@
+
 const socket = io('/');
 
 const myPeer = new Peer(undefined, {
-    host: '/',
-    port: '3001'
+    host: window.location.hostname,
+    // port: window.location.port || (window.location.protocol === 'https:' ? 4000 : 5000), // Use the appropriate port based on the protocol
+    // host: '/',
+    port: 5000,
+    path: '/'
 });
+
 
 // Define the connectToNewUser function
 function connectToNewUser(userId, stream) {
