@@ -31,7 +31,7 @@ io.on('connection', socket => {
 });
 
 
-const peerServer = PeerServer({ port: 5000, path: '/' });
+// const peerServer = PeerServer({ port: 5000, path: '/' });
 
 
 server.listen(4000)
