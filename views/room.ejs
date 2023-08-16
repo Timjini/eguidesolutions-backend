@@ -58,70 +58,70 @@
     </section>
 
     <script>
-          const canvas = document.getElementById('visualizer');
-            const ctx = canvas.getContext('2d');
+        //   const canvas = document.getElementById('visualizer');
+        //     const ctx = canvas.getContext('2d');
 
-            // Set canvas size
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        //     // Set canvas size
+        //     canvas.width = window.innerWidth;
+        //     canvas.height = window.innerHeight;
 
-            // Create an audio context
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        //     // Create an audio context
+        //     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-            // Create an analyser node
-            const analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256; // Fast Fourier Transform size
+        //     // Create an analyser node
+        //     const analyser = audioContext.createAnalyser();
+        //     analyser.fftSize = 256; // Fast Fourier Transform size
 
-            // Connect the analyser to the audio context's destination (output)
-            analyser.connect(audioContext.destination);
+        //     // Connect the analyser to the audio context's destination (output)
+        //     analyser.connect(audioContext.destination);
 
-            // Create an array to store frequency data
-            const frequencyData = new Uint8Array(analyser.frequencyBinCount);
+        //     // Create an array to store frequency data
+        //     const frequencyData = new Uint8Array(analyser.frequencyBinCount);
 
-            // Create a shape
-            const shape = {
-                x: canvas.width / 2,
-                y: canvas.height / 2,
-                radius: 50,
-            };
+        //     // Create a shape
+        //     const shape = {
+        //         x: canvas.width / 2,
+        //         y: canvas.height / 2,
+        //         radius: 50,
+        //     };
 
-            // Start capturing audio from the user's microphone
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then((stream) => {
-                    const source = audioContext.createMediaStreamSource(stream);
-                    source.connect(analyser);
-                })
-                .catch((error) => {
-                    console.error('Error accessing microphone:', error);
-                });
+        //     // Start capturing audio from the user's microphone
+        //     navigator.mediaDevices.getUserMedia({ audio: true })
+        //         .then((stream) => {
+        //             const source = audioContext.createMediaStreamSource(stream);
+        //             source.connect(analyser);
+        //         })
+        //         .catch((error) => {
+        //             console.error('Error accessing microphone:', error);
+        //         });
 
-            // Main animation loop
-            function animate() {
-                // Update frequency data
-                analyser.getByteFrequencyData(frequencyData);
+        //     // Main animation loop
+        //     function animate() {
+        //         // Update frequency data
+        //         analyser.getByteFrequencyData(frequencyData);
 
-                // Calculate average frequency value
-                const averageFrequency = frequencyData.reduce((acc, val) => acc + val, 0) / frequencyData.length;
+        //         // Calculate average frequency value
+        //         const averageFrequency = frequencyData.reduce((acc, val) => acc + val, 0) / frequencyData.length;
 
-                // Map the average frequency to the shape's radius
-                shape.radius = averageFrequency;
+        //         // Map the average frequency to the shape's radius
+        //         shape.radius = averageFrequency;
 
-                // Clear canvas
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+        //         // Clear canvas
+        //         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Draw the shape
-                ctx.beginPath();
-                ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'blue';
-                ctx.fill();
-                ctx.closePath();
+        //         // Draw the shape
+        //         ctx.beginPath();
+        //         ctx.arc(shape.x, shape.y, shape.radius, 0, Math.PI * 2);
+        //         ctx.fillStyle = 'blue';
+        //         ctx.fill();
+        //         ctx.closePath();
 
-                // Request the next animation frame
-                requestAnimationFrame(animate);
-            }
+        //         // Request the next animation frame
+        //         requestAnimationFrame(animate);
+        //     }
 
-            // Start the animation loop
-            animate();
+        //     // Start the animation loop
+        //     animate();
     </script>
 </body>
 </html>
