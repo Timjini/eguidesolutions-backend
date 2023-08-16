@@ -3,9 +3,10 @@ const socket = io('/');
 
 const myPeer = new Peer(undefined, {
     host: window.location.hostname,
-    port: window.location.port || (window.location.protocol === 'https:' ? 443 : 80), // Use the appropriate port based on the protocol
-    path: '/api/peer' // The path to the PeerJS server on Vercel
+    port: 5000, // Use the port where your PeerJS server is running
+    path: '/' // The path to the PeerJS server
 });
+
 
 
 
