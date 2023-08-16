@@ -4,6 +4,7 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const cors = require('cors');
 const { v4: uuidV4 } = require('uuid');
+const { PeerServer } = require('peer'); // Import the PeerServer
 
 app.use(cors());
 
@@ -23,10 +24,11 @@ io.on('connection', socket => {
         console.log(roomId, userId);
        socket.join(roomId)
        socket.broadcast.to(roomId).emit('user-connected', userId);
-    //    socket.to(roomId).broadcast.emit('user-connected', userId)
     });
 });
 
+
+const peerServer = PeerServer({ port: 5000, path: '/' });
 
 
 server.listen(4000)
