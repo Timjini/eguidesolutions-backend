@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
   type: { type: String, required: true, enum: Object.values(UserType), default: UserType.LISTENER },
   status: { type: String, required: true , default: "offline"},
   name: { type: String, required: false },
+  avatar: { type: String, required: false },
+  createdAt: { type: Date, required: true, default: Date.now },
+  updatedAt: { type: Date, required: true, default: Date.now },
 });
 
 
