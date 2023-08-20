@@ -1,10 +1,8 @@
-// authenticationMiddleware.js
-
 const jwt = require('jsonwebtoken');
 const User = require('../models/Users'); // Adjust the path accordingly
 const secretKey = "f5a2d3689d92485dc11c43d788dd84b3e238e1a59b72d410e0b7dff3b57ea2ab"
 
-const authenticationMiddleware = (socket, next) => {
+const authenticationMiddleware = async (socket, next) => {
   const authToken = socket.handshake.query.authToken;
 
   if (!authToken) {
@@ -12,19 +10,19 @@ const authenticationMiddleware = (socket, next) => {
   }
 
   try {
-    const decoded = jwt.verify(authToken, 'secretKey');
+    const decoded = jwt.verify(authToken, secretKey);
     console.log(secretKey + "secretKey")
     const userId = decoded.userId;
 
-    User.findOne({ userId }).then(user => {
-      if (!user) {
-        return next(new Error('Authentication failed. User not found.'));
-      }
+    const user = await User.findOne({ userId });
 
-      // Attach user object to socket for further use
-      socket.user = user;
-      next();
-    });
+    if (!user) {
+      return next(new Error('Authentication failed. User not found.'));
+    }
+
+    // Attach user object to socket for further use
+    socket.user = user;
+    next();
   } catch (error) {
     return next(new Error('Authentication failed. Invalid authToken.'));
   }
