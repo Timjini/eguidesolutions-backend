@@ -1,6 +1,7 @@
 
 const socket = io('/');
 
+
 const myPeer = new Peer(undefined, {
     host: window.location.hostname,
     port: 5000, // Use the port where your PeerJS server is running
@@ -67,9 +68,14 @@ socket.on('user-disconnected', userId => {
     if (peers[userId]) peers[userId].close();
 });
 
+// myPeer.on('open', id => {
+//     socket.emit('join-room', ROOM_ID, id);
+// });
+
 myPeer.on('open', id => {
     socket.emit('join-room', ROOM_ID, id);
-});
+    socket.emit('create-room', ROOM_ID, id); // Emit a new event to create and save room data
+  });
 
 socket.on('user-connected', userId => {
     console.log('user connected: ' + userId);
