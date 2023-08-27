@@ -21,17 +21,17 @@ const secretKey = "f5a2d3689d92485dc11c43d788dd84b3e238e1a59b72d410e0b7dff3b57ea
 const path = require('path'); // Add this line
 const { error } = require('console');
 
-// const storage = multer.diskStorage({
-//   destination: path.join(__dirname, './public/uploads'),
-//   filename: (req, file, callback) => {
-//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-//     const extension = path.extname(file.originalname);
-//     callback(null, uniqueSuffix + extension);
-//   },
-// });
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, './public/uploads'),
+  filename: (req, file, callback) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const extension = path.extname(file.originalname);
+    callback(null, uniqueSuffix + extension);
+  },
+});
 
   
-// const upload = multer({ storage });
+const upload = multer({ storage });
   
 app.use(cors());
 app.set('views', path.join(__dirname, 'views')); // Update this line if necessary

@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, required: false },
   authToken: { type: String, required: true },
   type: { type: String, required: true, enum: Object.values(UserType), default: UserType.LISTENER },
+  username: { type: String, required: false },
   status: { type: String, required: true , default: "offline"},
   name: { type: String, required: false },
   avatar: { type: String, required: false },
