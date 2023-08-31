@@ -1,7 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const verifyToken = require('../../auth/authMiddleware');
-const secretKey = "f5a2d3689d92485dc11c43d788dd84b3e238e1a59b72d410e0b7dff3b57ea2ab"
+const secretKey = process.env.JWT_SECRET_KEY;
 // const { v4: uuidV4 } = require('uuid');
 const multer = require('multer');
 const uuid = require('uuid'); // Import the UUID library
@@ -102,7 +103,9 @@ router.post('/login', async (req, res) => {
 
     // Fetch the updated user with the new status from the database
     const updatedUser = await User.findOne({ _id: user._id });
-    const avatarFilePath = path.join(__dirname, '../public/uploads', updatedUser.avatar);
+    const userAvatar = updatedUser.avatar
+      ? path.join(__dirname, '../public/uploads', updatedUser.avatar)
+      : path.join(__dirname, '../public/uploads', 'user.png');
 
 
     try {
@@ -111,7 +114,7 @@ router.post('/login', async (req, res) => {
         jwt.verify(user.authToken, secretKey);
 
         // Use the existing token if it's still valid
-        res.json({ token: user.authToken, user: updatedUser , avatarFilePath });
+        res.json({ token: user.authToken, user: updatedUser , userAvatar });
       } else {
         // Generate a new token if the user doesn't have a token
         const tokenExpiration = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 60); // 2 months
@@ -178,6 +181,36 @@ router.post('/logout', verifyToken, async (req, res) => {
   }
 });
 
+
+router.get('/users', async function(req, res) {
+  const authToken = req.headers.authorization?.split(' ')[1];
+
+  if (!authToken) {
+      return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+      // Find the user based on the authToken
+      const user = await User.findOne({ authToken: authToken }).exec();
+      console.log(user);
+
+      if (!user) {
+          return res.status(401).json({ message: 'Invalid token' });
+      }
+
+      // Check if the user has necessary permissions (e.g., admin role)
+      if (user.type !== 'admin') {
+          return res.status(403).json({ message: 'Access forbidden' });
+      }
+
+      // Fetch all users from the database
+      const users = await User.find({}, '-password').exec();
+
+      res.status(200).json(users);
+  } catch (error) {
+      res.status(500).json({ message: 'Error processing request' });
+  }
+});
 
 // router.post('/upload-avatar', verifyToken, upload.single('avatar'), async (req, res) => {
 //     try {
