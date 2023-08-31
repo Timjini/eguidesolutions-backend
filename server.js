@@ -35,7 +35,8 @@ const upload = multer({ storage });
 const allowedOrigins = ['https://admin-eguide.vercel.app', 'http://localhost:3000'];
 app.use(cors(
   {
-    origin: '*',  
+    origin: 'https://admin-eguide.vercel.app/',  
+    credentials: true
   }
 ));
 app.set('views', path.join(__dirname, 'views')); // Update this line if necessary
