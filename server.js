@@ -16,7 +16,6 @@ const User = require('./models/Users');
 const usersRoutes = require('./api/users/usersRoutes'); // Import your route files
 
 // const secretKey = crypto.randomBytes(32).toString('hex');
-const secretKey = "f5a2d3689d92485dc11c43d788dd84b3e238e1a59b72d410e0b7dff3b57ea2ab"
 
 const path = require('path'); // Add this line
 const { error } = require('console');
