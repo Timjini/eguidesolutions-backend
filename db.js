@@ -1,6 +1,7 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb+srv://admin:9T69hsFlCpri4pNu@eguide-db.mtcke3w.mongodb.net/backend_db', {
+mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
