@@ -32,7 +32,7 @@ const storage = multer.diskStorage({
   
 const upload = multer({ storage });
   
-const allowedOrigins = ['https://admin-eguide.vercel.app', 'https://admin.e-guidesolutions.com'];
+const allowedOrigins = ['https://admin-eguide.vercel.app', 'https://admin.e-guidesolutions.com', 'http://localhost:3000'];
 
 app.use(cors({
   origin: allowedOrigins
