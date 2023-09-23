@@ -8,12 +8,13 @@ const { PeerServer } = require('peer'); // Import the PeerServer
 const crypto = require('crypto');
 const uuid = require('uuid'); // Import the UUID library
 const verifyToken = require("./auth/authMiddleware");
-const Room = require('./models/Rooms');
+const Room = require('./models/Channels');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('./models/Users'); 
-const usersRoutes = require('./api/users/usersRoutes'); // Import your route files
+const usersRoutes = require('./api/users/usersRoutes');
+const channelsRoutes = require('./api/channels/channelsRoutes');
 
 // const secretKey = crypto.randomBytes(32).toString('hex');
 
@@ -43,6 +44,7 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.json());
 app.use('/api/users', usersRoutes);
+app.use('/api/channels', channelsRoutes);
 
 app.post("/welcome", verifyToken, (req, res) => {
   res.json({ message: 'You have access to this secure route!', user: req.user });

@@ -237,6 +237,31 @@ router.get('/users', async function(req, res) {
 //     }
 //   });
 
+router.delete('/delete_account', async (req, res) => {
+  const authToken = req.headers.authorization?.split(' ')[1];
+
+  try {
+    // Find the user by ID
+    const user = await User.findOne({ authToken: authToken }).exec();
+    console.log(user);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Delete the user from the database
+    await User.deleteOne( { _id: user._id });
+
+    // Optionally, you can also revoke the user's authentication token here if needed
+    // await User.updateOne({ _id: userId }, { $unset: { authToken: 1 } });
+
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while deleting the user' });
+    console.error(error);
+  }
+});
+
   router.post("/user_data", verifyToken, async (req, res) => {
     try {
       // Decode the authToken from the request headers
