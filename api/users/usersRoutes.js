@@ -31,7 +31,7 @@ const upload = multer({ storage });
 
 router.post('/sign_up', upload.single('avatar'), async (req, res) => {
   const id = uuid.v4();
-  const { email, password, phone, username } = req.body;
+  const { email, password, phone, username,type } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = uuid.v4(); // Generate a unique user ID
   const authToken = jwt.sign({ userId }, secretKey, { expiresIn: '24h' });
@@ -42,6 +42,7 @@ router.post('/sign_up', upload.single('avatar'), async (req, res) => {
       email,
       password: hashedPassword,
       phone,
+      type,
       authToken,
       username,
       avatar: req.file ? req.file.filename : null, // Use the uploaded filename if available

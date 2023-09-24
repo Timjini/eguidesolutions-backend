@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const Channel = require('../../models/Channels');
 const User = require('../../models/Users');
+const Tour = require('../../models/Tours');
+const Guide = require('../../models/Guide');
+const Agency = require('../../models/Agency');
+
 
 // API endpoint to join a room
 router.post('/join', async (req, res) => {
