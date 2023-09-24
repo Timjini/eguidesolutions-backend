@@ -6,17 +6,15 @@ const cors = require('cors');
 const { v4: uuidV4 } = require('uuid');
 const { PeerServer } = require('peer'); // Import the PeerServer
 const crypto = require('crypto');
-const uuid = require('uuid'); // Import the UUID library
 const verifyToken = require("./auth/authMiddleware");
 const Room = require('./models/Channels');
 const multer = require('multer');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const User = require('./models/Users'); 
 const usersRoutes = require('./api/users/usersRoutes');
 const channelsRoutes = require('./api/channels/channelsRoutes');
+const agenciesRoutes = require('./api/agencies/agenciesRoutes');
+const toursRoutes = require('./api/tours/toursRoutes');
 
-// const secretKey = crypto.randomBytes(32).toString('hex');
 
 const path = require('path'); // Add this line
 const { error } = require('console');
@@ -45,6 +43,8 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use('/api/users', usersRoutes);
 app.use('/api/channels', channelsRoutes);
+// app.use('/api/tours', toursRoutes);
+app.use('/api/agencies', agenciesRoutes);
 
 app.post("/welcome", verifyToken, (req, res) => {
   res.json({ message: 'You have access to this secure route!', user: req.user });

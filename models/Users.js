@@ -2,8 +2,9 @@ const mongoose = require('../db');
 
 const UserType = {
   LISTENER: 'listener',
-  SPEAKER: 'speaker',
+  GUIDE: 'guide',
   ADMIN: 'admin',
+  AGENT: 'agent'
 };
 
 const userSchema = new mongoose.Schema({
@@ -17,6 +18,8 @@ const userSchema = new mongoose.Schema({
   status: { type: String, required: true , default: "offline"},
   name: { type: String, required: false },
   avatar: { type: String, required: false },
+  isAgencyOwner: { type: Boolean, default: false }, 
+  ownedAgency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency' }, 
   createdAt: { type: Date, required: true, default: Date.now },
   updatedAt: { type: Date, required: true, default: Date.now },
 });

@@ -12,6 +12,9 @@ const roomSchema = new mongoose.Schema({
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     type: { type: String, required: true, enum: Object.values(RoomType), default: RoomType.PUBLIC },
     code: { type: String, required: true, unique: true, default: generateChannelCode },
+    tour: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
+    guide: { type: mongoose.Schema.Types.ObjectId, ref: 'Guide', required: true },
+    agency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency', required: true },
     createdAt: { type: Date, required: true, default: Date.now },
     updatedAt: { type: Date, required: true, default: Date.now },
 });
