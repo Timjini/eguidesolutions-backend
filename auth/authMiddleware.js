@@ -1,9 +1,11 @@
+require('dotenv').config();
 const jwt = require("jsonwebtoken");
-const secretKey = "f5a2d3689d92485dc11c43d788dd84b3e238e1a59b72d410e0b7dff3b57ea2ab";
+const secretKey = process.env.TOKEN_KEY;
 
 const verifyToken = (req, res, next) => {
   const token =
     req.body.token || req.query.token || req.headers.authorization?.split(' ')[1];
+    console.log(req.headers);
 
   if (!token) {
     return res.status(403).send("A token is required for authentication");

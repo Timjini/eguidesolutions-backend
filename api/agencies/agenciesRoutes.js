@@ -4,6 +4,14 @@ const Agency = require('../../models/Agency');
 const User = require('../../models/Users');
 const multer = require('multer');
 const path = require('path');
+const { isAgencyOwner, isAdministrator } = require('../../auth/auth');
+const bcrypt = require('bcrypt');
+const uuid = require('uuid');
+const jwt = require('jsonwebtoken');
+const secretKey = process.env.TOKEN_KEY;
+
+
+
 
 // Define storage for uploaded images
 const storage = multer.diskStorage({
@@ -52,5 +60,65 @@ router.post('/create_agency', upload.single('image'), async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+
+router.post('/create_agent', isAgencyOwner, upload.single('avatar'), async (req, res) => {
+    try {
+        const { name, email, password, type, phone } = req.body;
+        const avatar = req.file.filename;
+        const agency = await Agency.findOne({ owner: req.user._id });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const id = uuid.v4();
+        const authToken = jwt.sign({ id }, secretKey, { expiresIn: '24h' });
+
+        // Create a new agent or guide user
+        const user = new User({
+            id,
+            name,
+            email,
+            password: hashedPassword,
+            type,
+            phone,
+            avatar,
+            authToken,
+        });
+
+        // Add the user to the agency's members array
+        agency.members.push(user._id);
+
+        // Save both the user and the agency
+        await Promise.all([user.save(), agency.save()]);
+
+        res.status(201).json({ message: 'User created successfully', user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+router.get('/members', isAgencyOwner, async (req, res) => {
+    try {
+        const agency = await Agency.findOne({ owner: req.user._id });
+
+        if (!agency) {
+            return res.status(404).json({ message: 'Agency not found' });
+        }
+
+        const memberIds = agency.members; // Array of user IDs
+
+        // Find user documents by their IDs 
+        const users = await User.find({ _id: { $in: memberIds } });
+
+
+
+        res.status(200).json({ message: 'Agency Users', members: users, agency: agency });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 
 module.exports = router;

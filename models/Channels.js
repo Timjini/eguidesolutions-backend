@@ -1,16 +1,16 @@
 const mongoose = require('../db');
 const uuid = require('uuid'); // Import the UUID library
 
-const RoomType = {
+const ChannelType = {
     PRIVATE: 'private',
     PUBLIC: 'public',
 };
 
-const roomSchema = new mongoose.Schema({
+const channelSchema = new mongoose.Schema({
     channelId: { type: String, required: true, unique: true, default: generateChannelId },
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    type: { type: String, required: true, enum: Object.values(RoomType), default: RoomType.PUBLIC },
+    type: { type: String, required: true, enum: Object.values(RoomType), default: ChannelType.PUBLIC },
     code: { type: String, required: true, unique: true, default: generateChannelCode },
     tour: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
     guide: { type: mongoose.Schema.Types.ObjectId, ref: 'Guide', required: true },
@@ -35,6 +35,6 @@ function generateChannelCode() {
 }
 
 
-const Room = mongoose.model('Room', roomSchema);
+const Room = mongoose.model('Channel', channelSchema);
 
 module.exports = Room;
