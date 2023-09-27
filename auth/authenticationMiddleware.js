@@ -1,6 +1,7 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const User = require('../models/Users'); // Adjust the path accordingly
-const secretKey = "f5a2d3689d92485dc11c43d788dd84b3e238e1a59b72d410e0b7dff3b57ea2ab"
+const secretKey = process.env.TOKEN_KEY;
 
 const authenticationMiddleware = async (socket, next) => {
   const authToken = socket.handshake.query.authToken;

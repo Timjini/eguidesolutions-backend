@@ -9,6 +9,7 @@ const uuid = require('uuid'); // Import the UUID library
 const User = require('../../models/Users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Agency = require('../../models/Agency');
 
 
 const path = require('path'); // Add this line
@@ -103,6 +104,7 @@ router.post('/login', async (req, res) => {
     );
 
     // Fetch the updated user with the new status from the database
+    const agency = await Agency.findOne({members: { _id: user._id}})
     const updatedUser = await User.findOne({ _id: user._id });
     const userAvatar = updatedUser.avatar
       ? path.join(__dirname, '../public/uploads', updatedUser.avatar)
@@ -115,7 +117,7 @@ router.post('/login', async (req, res) => {
         jwt.verify(user.authToken, secretKey);
 
         // Use the existing token if it's still valid
-        res.json({ token: user.authToken, user: updatedUser , userAvatar });
+        res.json({ token: user.authToken, user: { ...updatedUser._doc, agency: agency.name } , userAvatar , agency: agency });
       } else {
         // Generate a new token if the user doesn't have a token
         const tokenExpiration = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 60); // 2 months
@@ -141,7 +143,7 @@ router.post('/login', async (req, res) => {
         { $set: { authToken: token } }
       );
 
-      res.json({ token, user: updatedUser, avatarFilePath });
+      res.json({ token, user: updatedUser, avatarFilePath , agency: agency });
     }
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while logging in' });
@@ -153,12 +155,15 @@ router.post('/login', async (req, res) => {
 
 router.post('/logout', verifyToken, async (req, res) => {
   try {
+    console.log(req)
     // Decode the authToken from the request headers
     const authToken = req.headers.authorization?.split(' ')[1];
+    console.log(authToken);
     // const decodedToken = jwt.verify(authToken, secretKey);
 
     // Use the decoded userId to fetch user data  
     const user = await User.findOne({ authToken: authToken });
+    console.log(user);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
