@@ -10,7 +10,7 @@ const channelSchema = new mongoose.Schema({
     channelId: { type: String, required: true, unique: true, default: generateChannelId },
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    type: { type: String, required: true, enum: Object.values(RoomType), default: ChannelType.PUBLIC },
+    type: { type: String, required: true, enum: Object.values(ChannelType), default: ChannelType.PUBLIC },
     code: { type: String, required: true, unique: true, default: generateChannelCode },
     tour: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
     guide: { type: mongoose.Schema.Types.ObjectId, ref: 'Guide', required: true },

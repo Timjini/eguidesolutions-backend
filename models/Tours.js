@@ -4,8 +4,10 @@ const tourSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String, required: true },
     photo: { type: String, required: false }, // You can store the photo URL here
-    guide: { type: mongoose.Schema.Types.ObjectId, ref: 'Guide', required: true },
+    guide: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     agency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency', required: true },
+    starting_date: { type: Date, ref: 'Starting Date', required: false },
+    ending_date: { type: Date, ref: 'Ending Date', required: false },
 });
 
 
