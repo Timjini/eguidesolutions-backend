@@ -31,7 +31,7 @@ const storage = multer.diskStorage({
   
 const upload = multer({ storage });
   
-const allowedOrigins = ['https://admin-eguide.vercel.app', 'https://admin.e-guidesolutions.com', 'http://localhost:3000'];
+const allowedOrigins = ['https://admin-eguide.vercel.app', 'https://admin.e-guidesolutions.com', 'http://localhost:5173', 'http://localhost:3000'];
 
 app.use(cors({
   origin: allowedOrigins
@@ -44,7 +44,7 @@ app.use(express.json());
 // app.use(verifyToken); 
 app.use('/api/users', usersRoutes);
 app.use('/api/channels', channelsRoutes);
-// app.use('/api/tours', toursRoutes);
+app.use('/api/tours', toursRoutes);
 app.use('/api/agencies', agenciesRoutes);
 
 app.post("/welcome", verifyToken, (req, res) => {

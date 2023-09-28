@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Agency = require('../../models/Agency');
 const User = require('../../models/Users');
+const Guide = require('../../models/Guide');
 const multer = require('multer');
 const path = require('path');
 const { isAgencyOwner, isAdministrator } = require('../../auth/auth');
@@ -28,7 +29,7 @@ const upload = multer({ storage: storage });
 
 router.post('/create_agency', upload.single('image'), async (req, res) => {
     try {
-        console.log(req)
+        console.log(req.body)
         const { name, description } = req.body;
         const image = req.file.filename;
 
@@ -84,11 +85,19 @@ router.post('/create_agent', isAgencyOwner, upload.single('avatar'), async (req,
             authToken,
         });
 
+        const guide = new Guide({
+            agency: agency,
+            user: user,
+        })
+
+        console.log(guide);
+
         // Add the user to the agency's members array
         agency.members.push(user._id);
+        
 
         // Save both the user and the agency
-        await Promise.all([user.save(), agency.save()]);
+        await Promise.all([user.save(), agency.save(),guide.save()]);
 
         res.status(201).json({ message: 'User created successfully', user });
     } catch (error) {

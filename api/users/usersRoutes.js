@@ -35,7 +35,7 @@ router.post('/sign_up', upload.single('avatar'), async (req, res) => {
   const { email, password, phone, username,type } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = uuid.v4(); // Generate a unique user ID
-  const authToken = jwt.sign({ userId }, secretKey, { expiresIn: '24h' });
+  const authToken = jwt.sign({ userId }, secretKey, { expiresIn: '90d' });
 
   try {
     const user = new User({
@@ -104,47 +104,49 @@ router.post('/login', async (req, res) => {
     );
 
     // Fetch the updated user with the new status from the database
-    const agency = await Agency.findOne({members: { _id: user._id}})
+    const agency = await Agency.findOne({members: { _id: user._id}}) || null;
     const updatedUser = await User.findOne({ _id: user._id });
     const userAvatar = updatedUser.avatar
       ? path.join(__dirname, '../public/uploads', updatedUser.avatar)
       : path.join(__dirname, '../public/uploads', 'user.png');
 
 
-    try {
-      if (user.authToken) {
-        // Verify the existing token
-        jwt.verify(user.authToken, secretKey);
-
-        // Use the existing token if it's still valid
-        res.json({ token: user.authToken, user: { ...updatedUser._doc, agency: agency.name } , userAvatar , agency: agency });
-      } else {
-        // Generate a new token if the user doesn't have a token
-        const tokenExpiration = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 60); // 2 months
-        const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: tokenExpiration });
-
-        // Update the user's authToken field in the database
-        await User.updateOne(
-          { _id: user._id },
-          { $set: { authToken: token } }
-        );
-
-        res.json({ token, user: updatedUser });
+      try {
+        if (user.authToken) {
+          // Verify the existing token
+          jwt.verify(user.authToken, secretKey, (err, decoded) => {
+            if (err) {
+              // Token is invalid or expired, generate a new one
+              const tokenExpiration = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 60); // 2 months
+              const newToken = jwt.sign({ userId: user.id }, secretKey, { expiresIn: tokenExpiration });
+      
+              // Update the user's authToken field in the database
+              user.authToken = newToken;
+              user.save(); // Save the updated token to the user record in the database
+      
+              // Send the new token to the client
+              res.json({ token: newToken, user: { ...updatedUser._doc, agency: agency.name }, userAvatar, agency: agency });
+            } else {
+              // Use the existing token if it's still valid
+              res.json({ token: user.authToken, user: { ...updatedUser._doc, agency: agency }, userAvatar, agency: agency });
+            }
+          });
+        } else {
+          // Generate a new token if the user doesn't have a token
+          const tokenExpiration = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 60); // 2 months
+          const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: tokenExpiration });
+      
+          // Update the user's authToken field in the database
+          user.authToken = token;
+          user.save(); // Save the new token to the user record in the database
+      
+          res.json({ token, user: updatedUser });
+        }
+      } catch (error) {
+        // Handle other errors as needed
+        console.error(error);
       }
-    } catch (error) {
-      // If the token verification fails, generate a new token
-      const tokenExpiration = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 60); // 2 months
-      const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: tokenExpiration });
-      console.log(error);
-
-      // Update the user's authToken field in the database
-      await User.updateOne(
-        { _id: user._id },
-        { $set: { authToken: token } }
-      );
-
-      res.json({ token, user: updatedUser, avatarFilePath , agency: agency });
-    }
+      
   } catch (error) {
     res.status(500).json({ error: 'An error occurred while logging in' });
     console.log(error);
