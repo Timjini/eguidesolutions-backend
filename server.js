@@ -37,7 +37,7 @@ app.use(cors({
   origin: allowedOrigins
 }));
 
-app.use(express.static('public')); // Serve static files from the 'public' directory
+app.use(express.static(__dirname)); // Serve static files from the root directory
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 app.use(express.json());
