@@ -1,85 +1,71 @@
-
+console.log('peer');
+const ROOM_ID = window.location.pathname.replace('/', '');
 const socket = io('/');
-
 
 const myPeer = new Peer(undefined, {
     host: window.location.hostname,
-    port: 5000, // Use the port where your PeerJS server is running
-    path: '/' // Use the path where your PeerJS server is running
+    port: 5000,
+    path: '/'
 });
 
-
-
-
-// Define the connectToNewUser function
-function connectToNewUser(userId, stream) {
-    const call = myPeer.call(userId, stream);
-    const audio = document.createElement('audio');
-    
-    call.on('stream', userAudioStream => {
-        audio.srcObject = userAudioStream;
-        audio.play();
-    });
-
-    call.on('close', () => {
-        audio.remove();
-    });
-
-    peers[userId] = call;
-}
-
-// Initialize the peers object
-const peers = {}; // Create an empty object to store the WebRTC connections
-
-// Rest of your code
-const myAudio = document.createElement('audio');
-myAudio.muted = true;
-
-let isMuted = false; // Track mute state
+const peers = {}; // Store all connected peers
 
 navigator.mediaDevices.getUserMedia({
     video: false,
     audio: true
 }).then(stream => {
+    // Set up your own audio stream
+    const myAudio = document.createElement('audio');
     myAudio.srcObject = stream;
+    myAudio.play();
 
+    // When you receive a connection from a new user
     myPeer.on('call', call => {
-        call.answer(stream);
-        const audio = document.createElement('audio');
+        call.answer(stream); // Answer the call with your stream
+        const peerAudio = document.createElement('audio');
+
+        // When the remote user's stream is available, play it
         call.on('stream', userAudioStream => {
-            audio.srcObject = userAudioStream;
-            audio.play();
+            peerAudio.srcObject = userAudioStream;
+            peerAudio.play();
+        });
+
+        // Handle the call being closed
+        call.on('close', () => {
+            peerAudio.remove();
         });
     });
 
+    // When a new user connects, call them and send your stream
     socket.on('user-connected', userId => {
-        connectToNewUser(userId, stream);
+        const call = myPeer.call(userId, stream);
+        const peerAudio = document.createElement('audio');
+
+        // When the remote user's stream is available, play it
+        call.on('stream', userAudioStream => {
+            peerAudio.srcObject = userAudioStream;
+            peerAudio.play();
+        });
+
+        // Handle the call being closed
+        call.on('close', () => {
+            peerAudio.remove();
+        });
+
+        // Store the call object in your peers list
+        peers[userId] = call;
     });
 
-    // Toggle mute state when the mute button is clicked
-    const muteButton = document.getElementById('muteButton');
-    muteButton.addEventListener('click', () => {
-        myAudio.muted = true;
-        console.log('Mute state: ' + isMuted);
+    // When a user disconnects, close the call and remove their audio element
+    socket.on('user-disconnected', userId => {
+        if (peers[userId]) {
+            peers[userId].close();
+            delete peers[userId];
+        }
     });
 });
-
-socket.on('user-disconnected', userId => {
-    if (peers[userId]) peers[userId].close();
-});
-
-// myPeer.on('open', id => {
-//     socket.emit('join-room', ROOM_ID, id);
-// });
 
 myPeer.on('open', id => {
+    // Emit the room ID and peer ID to the server for tracking
     socket.emit('join-room', ROOM_ID, id);
-    socket.emit('create-room', ROOM_ID, id); // Emit a new event to create and save room data
-  });
-
-socket.on('user-connected', userId => {
-    console.log('user connected: ' + userId);
 });
-
-
-
