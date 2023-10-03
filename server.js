@@ -37,7 +37,8 @@ app.use(cors({
   origin: allowedOrigins
 }));
 
-app.set('views', path.join(__dirname, 'views')); // Update this line if necessary
+// app.set('views', path.join(__dirname, 'views')); // Update this line if necessary
+app.use(express.static(path.join(__dirname, "js")));
 app.use('/public', express.static('public'));
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
