@@ -42,6 +42,7 @@ app.use('/public', express.static('public'));
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.json());
+
 // app.use(verifyToken); 
 app.use('/api/users', usersRoutes);
 app.use('/api/channels', channelsRoutes);
