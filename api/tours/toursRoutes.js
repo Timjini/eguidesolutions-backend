@@ -62,7 +62,7 @@ router.get('/agency_tours' , async function(req, res) {
 
         const tourWithGuides = {
             title: tour.title,
-            description: tour.description,
+            description: tour.description,  
             image: tour.image,
           };
 
@@ -75,4 +75,4 @@ router.get('/agency_tours' , async function(req, res) {
 });
 
 
-module.exports = router;
+module.exports = router;    

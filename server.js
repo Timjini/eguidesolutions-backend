@@ -55,34 +55,41 @@ app.post("/welcome", verifyToken, (req, res) => {
 
 
 // io.use(authenticationMiddleware);
-io.on('connection', async socket => {
-    const authToken = socket.handshake.query.authToken;
+// io.on('connection', async socket => {
+//     const authToken = socket.handshake.query.authToken;
   
-    try {
-      const user = await User.findOne({ authToken }); 
+//     try {
+//       const user = await User.findOne({ authToken }); 
   
-      if (!user) {
-        return; 
-      }
+//       if (!user) {
+//         return; 
+//       }
   
-      // You can now access the user's properties, including user.email
-      console.log('User connected:', user.email);
+//       // You can now access the user's properties, including user.email
+//       console.log('User connected:', user.email);
   
-      socket.on('join-room', (roomId, userId) => {
-        console.log('Room joined:', roomId);
-        socket.join(roomId);
-        socket.broadcast.to(roomId).emit('user-connected', userId);
-      });
+//       socket.on('join-room', (roomId, userId) => {
+//         console.log('Room joined:', roomId);
+//         socket.join(roomId);
+//         socket.broadcast.to(roomId).emit('user-connected', userId);
+//       });
   
-      // Other socket event handlers here
+//       // Other socket event handlers here
   
-    } catch (error) {
-      // Handle any potential errors
-      console.error('Error while handling socket connection:', error);
-    }
-  });
-  
+//     } catch (error) {
+//       // Handle any potential errors
+//       console.error('Error while handling socket connection:', error);
+//     }
+//   });
 
+  
+app.get('/' , (req, res) => {
+  res.redirect(`/${uuidV4()}`)
+});
+
+app.get('/:room' , (req, res) => {
+  res.render('room', {roomId: req.params.room});
+});
 
 // const peerServer = PeerServer({ port: 5000, path: '/' });
 
