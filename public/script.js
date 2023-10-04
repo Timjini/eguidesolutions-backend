@@ -92,16 +92,13 @@ navigator.mediaDevices.getUserMedia({
 
     // Handle incoming calls and streams from peers
     myPeer.on('call', call => {
-        call.answer(stream); // Answer the call with your own video stream
-        const peerVideo = document.createElement('video'); // Element to display peer's video
-        call.on('stream', peerVideoStream => {
-            addVideoStream(peerVideo, peerVideoStream); // Add peer's video stream to the DOM
+        call.answer(stream); // Answer the call with your own stream
+        const peerVideo = document.createElement('video');
+        call.on('stream', userVideoStream => {
+            addVideoStream(peerVideo, userVideoStream);
         });
-        call.on('close', () => {
-            peerVideo.remove(); // Remove peer's video element when the call is closed
-        });
-        peers[call.peer] = call; // Store the call object in the peers dictionary
     });
+    
 
     // Handle user connections
     socket.on('user-connected', userId => {
@@ -146,4 +143,7 @@ navigator.mediaDevices.getUserMedia({
         console.log("new user count: ");
     });
 });
+
+
+console.log(stream.getTracks());
 
