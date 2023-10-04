@@ -63,5 +63,6 @@ navigator.mediaDevices.getUserMedia({
     // Update user count when a user joins or leaves
     socket.on('user-count', (count) => {
         userCountElement.textContent = `Users connected: ${count}`;
+        console.log("new user count: ");
     });
 });

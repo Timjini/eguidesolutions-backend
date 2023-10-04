@@ -33,6 +33,7 @@ const upload = multer({ storage });
   
 const allowedOrigins = ['https://admin-eguide.vercel.app', 'https://admin.e-guidesolutions.com', 'http://localhost:5173', 'http://localhost:3000'];
 
+
 app.use(cors({
   origin: allowedOrigins
 }));
