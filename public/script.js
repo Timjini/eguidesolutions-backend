@@ -9,19 +9,36 @@ const myPeer = new Peer(undefined, {
 });
 
 const peers = {}; // Store all connected peers
+let isMuted = false; // Flag to track audio mute status
 
 navigator.mediaDevices.getUserMedia({
     video: false,
     audio: true
 }).then(stream => {
-    const myAudio = document.createElement('audio');
-    myAudio.srcObject = stream;
-    myAudio.play();
+    const userCountElement = document.getElementById('userCount'); // Element to display user count
+
+    const muteButton = document.getElementById('muteButton');
+    muteButton.addEventListener('click', () => {
+        isMuted = !isMuted;
+        stream.getAudioTracks()[0].enabled = !isMuted;
+    });
 
     myPeer.on('call', call => {
         call.answer(stream);
-        const peerAudio = document.createElement('audio');
 
+        const peerAudio = document.createElement('audio');
+        peerAudio.srcObject = call.remoteStream; // Use the remote stream from the call
+        peerAudio.play();
+
+        call.on('close', () => {
+            peerAudio.remove();
+        });
+    });
+
+    socket.on('user-connected', userId => {
+        const call = myPeer.call(userId, stream);
+
+        const peerAudio = document.createElement('audio');
         call.on('stream', userAudioStream => {
             peerAudio.srcObject = userAudioStream;
             peerAudio.play();
@@ -32,34 +49,19 @@ navigator.mediaDevices.getUserMedia({
         });
     });
 
-    socket.on('user-connected', () => {
-        const call = myPeer.call(undefined, stream); // Call without specifying a user ID
-        const peerAudio = document.createElement('audio');
-
-        call.on('stream', userAudioStream => {
-            peerAudio.srcObject = userAudioStream;
-            peerAudio.play();
-        });
-
-        call.on('close', () => {
-            peerAudio.remove();
-        });
+    socket.on('user-disconnected', userId => {
+        if (peers[userId]) {
+            peers[userId].close();
+            delete peers[userId];
+        }
     });
 
-    socket.on('user-disconnected', () => {
-        const call = myPeer.call(undefined, stream);
+    myPeer.on('open', id => {
+        socket.emit('join-room', ROOM_ID, id);
+    });
 
+    // Update user count when a user joins or leaves
+    socket.on('user-count', (count) => {
+        userCountElement.textContent = `Users connected: ${count}`;
     });
 });
-
-
-const muteButton = document.getElementById('muteButton');
-muteButton.addEventListener('click', () => {
-    // Add logic to mute/unmute audio
-});
-
-
-myPeer.on('open', id => {
-    socket.emit('join-room', ROOM_ID, id);
-});
-
