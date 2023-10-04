@@ -116,26 +116,24 @@ navigator.mediaDevices.getUserMedia({
         }
     });
 
-    // Function to connect to a new user
     function connectToNewUser(userId, stream) {
-        const call = myPeer.call(userId, stream); // Call the new user with your own video stream
-        const peerVideo = document.createElement('video'); // Element to display new user's video
-        call.on('stream', peerVideoStream => {
-            addVideoStream(peerVideo, peerVideoStream); // Add new user's video stream to the DOM
+        const call = myPeer.call(userId, stream);
+        const peerVideo = document.createElement('video');
+        call.on('stream', userVideoStream => {
+            addVideoStream(peerVideo, userVideoStream); // Ensure userVideoStream is used here
         });
         call.on('close', () => {
-            peerVideo.remove(); // Remove new user's video element when the call is closed
+            peerVideo.remove();
         });
-        peers[userId] = call; // Store the call object in the peers dictionary
+        peers[userId] = call;
     }
-
-    // Function to add video stream to the DOM
+    
     function addVideoStream(videoElement, stream) {
         videoElement.srcObject = stream;
         videoElement.addEventListener('loadedmetadata', () => {
-            videoElement.play(); // Play the video once it's loaded
+            videoElement.play();
         });
-        document.body.append(videoElement); // Append the video element to the document body
+        document.body.append(videoElement);
     }
 
     myPeer.on('open', id => {
