@@ -71,21 +71,23 @@
 console.log('peer');
 const ROOM_ID = window.location.pathname.replace('/', ''); // Extract the room ID from the URL
 const socket = io('/');
+let stream; // Declare the stream variable in the global scope
 
 const generateRandomId = () => Math.floor(Math.random() * 1000) + 1;
-const myPeer = new Peer(generateRandomId().toString(), { // Convert the ID to string
+const myPeer = new Peer(generateRandomId().toString(), {
     host: window.location.hostname,
     port: 5000,
     path: '/'
 });
-
 const peers = {}; // Store all connected peers
 let isMuted = false; // Flag to track audio mute status
 
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
-}).then(stream => {
+}).then(mediaStream => {
+    stream = mediaStream; // Assign the media stream to the global stream variable
+
     const userVideo = document.createElement('video'); // Element to display your own video
     userVideo.muted = true; // Mute your own video to prevent feedback
     addVideoStream(userVideo, stream); // Add your own video stream to the DOM
@@ -98,7 +100,6 @@ navigator.mediaDevices.getUserMedia({
             addVideoStream(peerVideo, userVideoStream);
         });
     });
-    
 
     // Handle user connections
     socket.on('user-connected', userId => {
@@ -116,15 +117,24 @@ navigator.mediaDevices.getUserMedia({
     function connectToNewUser(userId, stream) {
         const call = myPeer.call(userId, stream);
         const peerVideo = document.createElement('video');
+
+        // Store the call object in the peers dictionary
+        peers[userId] = call;
+
+        // When a new user's video stream is received, add it to the peerVideo element
         call.on('stream', userVideoStream => {
-            addVideoStream(peerVideo, userVideoStream); // Ensure userVideoStream is used here
+            addVideoStream(peerVideo, userVideoStream);
         });
+
+        // When the call is closed, remove the corresponding video element
         call.on('close', () => {
             peerVideo.remove();
         });
-        peers[userId] = call;
+
+        // Append the peerVideo element to the videoGrid div (or any other container you prefer)
+        document.getElementById('videoGrid').append(peerVideo);
     }
-    
+
     function addVideoStream(videoElement, stream) {
         videoElement.srcObject = stream;
         videoElement.addEventListener('loadedmetadata', () => {
@@ -142,8 +152,6 @@ navigator.mediaDevices.getUserMedia({
         userCountElement.textContent = `Users connected: ${count}`;
         console.log("new user count: ");
     });
+}).catch(error => {
+    console.error('Error accessing media devices:', error);
 });
-
-
-console.log(stream.getTracks());
-
