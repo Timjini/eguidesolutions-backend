@@ -14,6 +14,8 @@ const usersRoutes = require('./api/users/usersRoutes');
 const channelsRoutes = require('./api/channels/channelsRoutes');
 const agenciesRoutes = require('./api/agencies/agenciesRoutes');
 const toursRoutes = require('./api/tours/toursRoutes');
+const http = require('http');
+const socketIo = require('socket.io');
 
 
 const path = require('path'); // Add this line
@@ -98,6 +100,18 @@ app.get('/' , (req, res) => {
 
 app.get('/:room' , (req, res) => {
   res.render('room', {roomId: req.params.room});
+});
+
+
+io.on('connection', socket => {
+  socket.on('join-room', (roomId, userId) => {
+      socket.join(roomId);
+      socket.to(roomId).broadcast.emit('user-connected', userId); // Broadcast the user connection to others in the room
+
+      socket.on('disconnect', () => {
+          socket.to(roomId).broadcast.emit('user-disconnected', userId); // Broadcast the user disconnection to others in the room
+      });
+  });
 });
 
 // const peerServer = PeerServer({ port: 5000, path: '/' });

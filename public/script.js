@@ -72,6 +72,7 @@ console.log('peer');
 const ROOM_ID = window.location.pathname.replace('/', ''); // Extract the room ID from the URL
 const socket = io('/');
 let stream; // Declare the stream variable in the global scope
+let myPeerId; 
 
 const generateRandomId = () => Math.floor(Math.random() * 1000) + 1;
 const myPeer = new Peer(generateRandomId().toString(), {
@@ -144,7 +145,8 @@ navigator.mediaDevices.getUserMedia({
     }
 
     myPeer.on('open', id => {
-        socket.emit('join-room', ROOM_ID, id);
+        myPeerId = id;
+        socket.emit('join-room', ROOM_ID, myPeerId);
     });
 
     // Update user count when a user joins or leaves
