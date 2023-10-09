@@ -6,17 +6,15 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-// Serve static files from the public directory
-app.use(express.static('views'));
+// Set EJS as the view engine
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
 
-// Add a middleware to set the Content Security Policy header
-app.use((req, res, next) => {
-    res.setHeader('Content-Security-Policy', "script-src 'self' https://vercel.live");
-    next();
-  });
+// Serve static files from the public directory
+app.use(express.static(__dirname + '/public'));
 
 app.get('/', (req, res) => {
-    res.render('index.html', {title : 'Welcome to Vercel Application Server'});
+  res.render('index'); // Renders views/index.ejs
 });
 
 wss.on('connection', (ws) => {
