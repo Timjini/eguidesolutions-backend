@@ -15,6 +15,10 @@ app.use((req, res, next) => {
     next();
   });
 
+app.get('/', (req, res) => {
+    res.render('index.html', {title : 'Welcome to Vercel Application Server'});
+});
+
 wss.on('connection', (ws) => {
   console.log('Client connected');
 
