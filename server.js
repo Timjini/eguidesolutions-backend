@@ -9,6 +9,12 @@ const wss = new WebSocket.Server({ server });
 // Serve static files from the public directory
 app.use(express.static('views'));
 
+// Add a middleware to set the Content Security Policy header
+app.use((req, res, next) => {
+    res.setHeader('Content-Security-Policy', "script-src 'self' https://vercel.live");
+    next();
+  });
+
 wss.on('connection', (ws) => {
   console.log('Client connected');
 
