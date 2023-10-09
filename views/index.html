@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Chat</title>
+</head>
+
+<body>
+    <h1>Audio Chat</h1>
+    <button id="startButton">Start Audio Chat</button>
+
+    <script>
+     const startButton = document.getElementById('startButton');
+        let mediaStream;
+
+        startButton.addEventListener('click', async () => {
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                // Play audio locally
+                const audioContext = new AudioContext();
+                const source = audioContext.createMediaStreamSource(mediaStream);
+                source.connect(audioContext.destination);
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+            }
+        });
+    </script>
+</body>
+
+</html>
