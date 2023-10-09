@@ -21,18 +21,20 @@ wss.on('connection', (ws) => {
   console.log('Client connected');
 
   ws.on('message', (message) => {
-    // Broadcast received audio data to all connected clients except the sender
+    console.log('Received audio data:', message); // Log received audio data
     wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
     });
-  });
+});
 
   ws.on('close', () => {
     console.log('Client disconnected');
   });
 });
+
+
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

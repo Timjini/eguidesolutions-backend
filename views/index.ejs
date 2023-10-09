@@ -13,20 +13,50 @@
 
     <script>
      const startButton = document.getElementById('startButton');
-        let mediaStream;
+        let localStream;
+        let peerConnection;
 
         startButton.addEventListener('click', async () => {
             try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // Get local audio stream
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log(localStream);
 
-                // Play audio locally
-                const audioContext = new AudioContext();
-                const source = audioContext.createMediaStreamSource(mediaStream);
-                source.connect(audioContext.destination);
+                // Mute the local audio track
+                localStream.getAudioTracks().forEach(track => {
+                    track.enabled = false;
+                });
+
+                // Initialize RTCPeerConnection
+                peerConnection = new RTCPeerConnection();
+
+                // Add the muted local audio stream to the peer connection
+                localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+                // Handle incoming audio stream from the remote peer
+                peerConnection.ontrack = event => {
+                    const remoteAudio = new Audio();
+                    remoteAudio.srcObject = event.streams[0];
+                    remoteAudio.play();
+                };
+
+                // Create an offer and set it as the local description
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+
+                // Send the offer to the other peer (you'll need to implement this part)
+                // For example, send the offer via WebSocket to the other peer
+
+                console.log('iceConnectionState:', peerConnection.iceConnectionState);
+                console.log('connectionState:', peerConnection.connectionState);
+                console.log('signalingState:', peerConnection.signalingState);
+
+
             } catch (error) {
                 console.error('Error accessing microphone:', error);
             }
         });
+
     </script>
 </body>
 
