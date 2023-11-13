@@ -9,7 +9,7 @@ const Agency = require('../../models/Agency');
 
   // API endpoint to create a room
   router.post('/create', async (req, res) => {
-    const { type, guide } = req.body;
+    const { type } = req.body;
     const authToken = req.headers.authorization?.split(' ')[1];
   
     if (!authToken) {
@@ -35,6 +35,7 @@ const Agency = require('../../models/Agency');
         return res.status(404).json({ message: 'Tour not found for the agency' });
       }
   
+      const guide = await Guide.findOne({_id: tour.guide})
       // Create a new channel with the owner set to the found user
       const newChannel = new Channel({
         type,
@@ -46,7 +47,7 @@ const Agency = require('../../models/Agency');
   
       await newChannel.save();
   
-      res.json({ message: 'Channel created successfully', channelId: newChannel.channelId, code: newChannel.code });
+      res.json({ message: 'Channel created successfully',  code: newChannel.code });
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Internal server error' });
@@ -104,13 +105,10 @@ router.post('/join', async (req, res) => {
       return res.status(404).json({ message: 'Channel not found' });
     }
 
-    // Add the user to the channel's participants array
-    // channel.participants.push(user._id);
-    // if user.id is already in the array, it will not be added again
     channel.participants.addToSet(user._id) 
     await channel.save();
 
-    res.json({ message: 'Joined the channel successfully' });
+    res.json({ message: 'Channel joined successfully', channel: { code: newChannel.code} });
     console.log(channel.participants);
   } catch (err) {
     console.error(err);
@@ -118,6 +116,43 @@ router.post('/join', async (req, res) => {
   }
 }
 );
+
+// get channel info using code and user auth token
+
+
+router.get('/channel', async (req, res) => {
+  const { code } = req.body;
+  const authToken = req.headers.authorization?.split(' ')[1];
+
+  if (!authToken) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    // Find the user by authToken
+    const user = await User.findOne({ authToken });
+    if (!user) {
+      return res.status(401).json({ message: 'User not found or invalid token' });
+    }
+
+    // Find the channel by code and populate the associated Guide and Tour data
+    const channel = await Channel.findOne({ code })
+      .populate({
+        path: 'guide',
+        populate: { path: 'user', select: 'name avatar' }
+      }) // Assuming 'guide' is the field in your Channel model that references the Guide model
+      .populate('tour'); // Assuming 'tour' is the field in your Channel model that references the Tour model
+
+    if (!channel) {
+      return res.status(404).json({ message: 'Channel not found' });
+    }
+
+    res.json({ message: 'Channel found', channel });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
 
 
 module.exports = router;
