@@ -65,46 +65,47 @@ router.post('/create_agency', upload.single('image'), async (req, res) => {
 
 router.post('/create_agent', isAgencyOwner, upload.single('avatar'), async (req, res) => {
     try {
-        const { name, email, password, type, phone } = req.body;
-        const avatar = req.file.filename;
-        const agency = await Agency.findOne({ owner: req.user._id });
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const id = uuid.v4();
-        const authToken = jwt.sign({ id }, secretKey, { expiresIn: '24h' });
-
-        // Create a new agent or guide user
-        const user = new User({
-            id,
-            name,
-            email,
-            password: hashedPassword,
-            type,
-            phone,
-            avatar,
-            authToken,
-        });
-
+      const { name, email, password, type, phone } = req.body;
+      const avatar = req.file.filename;
+      const agency = await Agency.findOne({ owner: req.user._id });
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const id = uuid.v4();
+      const authToken = jwt.sign({ id }, secretKey, { expiresIn: '24h' });
+  
+      // Create a new user
+      const user = new User({
+        id,
+        name,
+        email,
+        password: hashedPassword,
+        type,
+        phone,
+        avatar,
+        authToken,
+      });
+  
+      // Create a new guide if the user type is 'guide'
+      if (type === 'guide') {
         const guide = new Guide({
-            agency: agency,
-            user: user,
-        })
-
-        console.log(guide);
-
-        // Add the user to the agency's members array
-        agency.members.push(user._id);
-        
-
-        // Save both the user and the agency
-        await Promise.all([user.save(), agency.save(),guide.save()]);
-
-        res.status(201).json({ message: 'User created successfully', user });
+          agency: agency._id, // Assuming agency._id is the reference in Guide model
+          user: user._id, // Assuming user._id is the reference in Guide model
+        });
+        await guide.save();
+      }
+  
+      // Add the user to the agency's members array
+      agency.members.push(user._id);
+  
+      // Save both the user and the agency
+      await Promise.all([user.save(), agency.save()]);
+  
+      res.status(201).json({ message: 'User created successfully', user });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
     }
-});
+  });
 
 
 router.get('/members', isAgencyOwner, async (req, res) => {
