@@ -154,5 +154,34 @@ router.get('/channel', async (req, res) => {
   }
 });
 
+// get user's channels 
+router.get('/user_channels', async (req, res) => {
+  const authToken = req.headers.authorization?.split(' ')[1];
+  if (!authToken) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+
+    const user = await User.findOne({ authToken });
+    if (!user) {
+      return res.status(401).json({ message: 'User not found or invalid token' });
+    }
+
+    const channels = await Channel.find({ participants: user._id })
+      .populate({
+        path: 'guide',
+        populate: { path: 'user', select: 'name avatar' }
+      }) // Assuming 'guide' is the field in your Channel model that references the Guide model
+      .populate('tour'); // Assuming 'tour' is the field in your Channel model that references the Tour model
+
+    res.json({ message: 'User channels', channels });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+
+});
+
 
 module.exports = router;

@@ -19,6 +19,10 @@ const channelSchema = new mongoose.Schema({
     updatedAt: { type: Date, required: true, default: Date.now },
 });
 
+// define channel name as tour.title 
+
+
+
 function generateChannelId() {
   const channelId = uuid.v4().toString
   return channelId;
@@ -34,7 +38,13 @@ function generateChannelCode() {
   console.log(code);
 }
 
+channelSchema.virtual('channelName').get(function () {
+  // Access the title property from the populated tour field
+  return this.tour.title;
+});
 
-const Room = mongoose.model('Channel', channelSchema);
+channelSchema.set('toJSON', { virtuals: true });
 
-module.exports = Room;
+const Channel = mongoose.model('Channel', channelSchema);
+
+module.exports = Channel;
