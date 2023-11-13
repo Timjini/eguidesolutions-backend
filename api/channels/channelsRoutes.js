@@ -7,29 +7,6 @@ const Guide = require('../../models/Guide');
 const Agency = require('../../models/Agency');
 
 
-// API endpoint to join a room
-router.post('/join', async (req, res) => {
-  const { roomId, code } = req.body;
-
-  try {
-    // Find the room by roomId and code (if provided)
-    const channel = await Channel.findOne({ channelId, code });
-
-    if (!channel) {
-      return res.status(404).json({ message: 'Channel not found or invalid code' });
-    }
-
-    // Add the user to the room's participants array
-    channel.participants.push(req.user._id); // Assuming you have authentication middleware
-    await channel.save();
-
-    res.json({ message: 'Joined the room successfully' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
-
   // API endpoint to create a room
   router.post('/create', async (req, res) => {
     const { type, guide } = req.body;
@@ -104,6 +81,43 @@ router.post('/join', async (req, res) => {
     }
 });
 
+// get channel by channel code and update participants with user authtoken
+
+router.post('/join', async (req, res) => {
+  const { code } = req.body;
+  const authToken = req.headers.authorization?.split(' ')[1];
+
+  if (!authToken) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    // Find the user by authToken
+    const user = await User.findOne({ authToken });
+    if (!user) {
+      return res.status(401).json({ message: 'User not found or invalid token' });
+    }
+
+    // Find the channel by code
+    const channel = await Channel.findOne({ code });
+    if (!channel) {
+      return res.status(404).json({ message: 'Channel not found' });
+    }
+
+    // Add the user to the channel's participants array
+    // channel.participants.push(user._id);
+    // if user.id is already in the array, it will not be added again
+    channel.participants.addToSet(user._id) 
+    await channel.save();
+
+    res.json({ message: 'Joined the channel successfully' });
+    console.log(channel.participants);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+}
+);
 
 
 module.exports = router;
