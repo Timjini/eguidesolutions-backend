@@ -108,7 +108,7 @@ router.post('/join', async (req, res) => {
     channel.participants.addToSet(user._id) 
     await channel.save();
 
-    res.json({ message: 'Channel joined successfully', channel: { code: newChannel.code} });
+    res.json({ message: 'Channel joined successfully', channel: { code: code} });
     console.log(channel.participants);
   } catch (err) {
     console.error(err);
