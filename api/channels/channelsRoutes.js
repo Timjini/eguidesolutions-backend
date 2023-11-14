@@ -73,7 +73,14 @@ const Agency = require('../../models/Agency');
         }
 
         // Find all channels belonging to the agency using the agencyId field in the Channel schema
-        const channels = await Channel.find({ agency: agency._id }).populate('guide').exec();
+        // const channels = await Channel.find({ agency: agency._id }).populate('guide').exec();
+
+        const channels = await Channel.findOne({ agency: agency._id })
+        .populate({
+          path: 'guide',
+          populate: { path: 'user', select: 'name avatar' }
+        }) // Assuming 'guide' is the field in your Channel model that references the Guide model
+        .populate('tour'); // Assuming 'tour' is the field in your Channel model that references the Tour model
 
         res.status(200).json({ message: 'Agency Channels', channels: channels });
     } catch (error) {

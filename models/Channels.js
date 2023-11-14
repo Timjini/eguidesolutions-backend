@@ -17,6 +17,8 @@ const channelSchema = new mongoose.Schema({
     agency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency', required: true },
     createdAt: { type: Date, required: true, default: Date.now },
     updatedAt: { type: Date, required: true, default: Date.now },
+    starting_date: { type: Date },
+    ending_date: { type: Date },
 });
 
 // define channel name as tour.title 
@@ -38,6 +40,20 @@ function generateChannelCode() {
   console.log(code);
 }
 
+channelSchema.pre('save', async function (next) {
+  try {
+      // Assuming you have a reference to the associated Tour document
+      const tour = await Tour.findById(this.tour);
+
+      // Set starting_date and ending_date based on the associated Tour
+      this.starting_date = tour.starting_date;
+      this.ending_date = tour.ending_date;
+
+      next();
+  } catch (error) {
+      next(error);
+  }
+});
 channelSchema.virtual('channelName').get(function () {
   // Access the title property from the populated tour field
   return this.tour.title;
