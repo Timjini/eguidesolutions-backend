@@ -56,7 +56,7 @@ router.get('/agency_tours' , async function(req, res) {
         const user = await User.findOne({ authToken: authToken }).exec();
         const agency = await Agency.findOne({owner: user._id});
         const tour = await Tour.find({agency: agency});
-        const guides = await Guide.find({ agency: agency._id }).exec();
+        const guides = await Guide.find({ agency: agency }).exec();
         const userIDs = guides.map(guide => guide.user);
         const users = await User.find({ _id: { $in: userIDs } }).exec();
 
