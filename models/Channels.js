@@ -1,5 +1,6 @@
 const mongoose = require('../db');
 const uuid = require('uuid'); // Import the UUID library
+const Tour = require('./Tours');
 
 const ChannelType = {
     PRIVATE: 'private',
@@ -26,9 +27,10 @@ const channelSchema = new mongoose.Schema({
 
 
 function generateChannelId() {
-  const channelId = uuid.v4().toString
+  const channelId = uuid.v4().toString();
   return channelId;
 }
+
 
 function generateChannelCode() {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
