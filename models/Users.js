@@ -4,6 +4,7 @@ const UserType = {
   LISTENER: 'listener',
   GUIDE: 'guide',
   ADMIN: 'admin',
+  OWNER: 'owner',
   AGENT: 'agent'
 };
 
