@@ -57,9 +57,13 @@ channelSchema.pre('save', async function (next) {
   }
 });
 channelSchema.virtual('channelName').get(function () {
-  // Access the title property from the populated tour field
-  return this.tour.title;
+  if (this.tour && this.tour.title) {
+      return this.tour.title;
+  } else {
+      return null; 
+  }
 });
+
 
 channelSchema.set('toJSON', { virtuals: true });
 
