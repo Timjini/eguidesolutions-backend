@@ -10,7 +10,8 @@ const Agency = require('../../models/Agency');
   // API endpoint to create a room
   router.post('/create', async (req, res) => {
     const { type } = req.body;
-    const authToken = req.headers.authorization?.split(' ')[1];
+    // const authToken = req.headers.authorization?.split(' ')[1];
+    const authToken = req.body.authToken 
   
     if (!authToken) {
       return res.status(401).json({ message: 'Unauthorized' });

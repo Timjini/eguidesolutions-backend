@@ -315,5 +315,38 @@ router.post('/secure_route', verifyToken, async (req, res) => {
     }
   });
 
+  // router to get guides 
+  router.get('/guides', async function(req, res) {
+    const authToken = req.headers.authorization?.split(' ')[1];
+  
+    if (!authToken) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+  
+    try {
+        // Find the user based on the authToken
+        const user = await User.findOne({ authToken: authToken }).exec();
+        console.log(user);
+  
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+  
+        // Check if the user has necessary permissions (e.g., admin role)
+        if (user.type !== 'admin' && user.type !== 'owner') {
+            return res.status(403).json({ message: 'Access forbidden' });
+        }
+  
+        // Fetch all users from the database
+        const guides = await User.find({type: "guide"}, '-password').exec();
+        // populate with user information
+        // const guides = await Guide.find({ agency: agency }).exec();
+  
+        res.status(200).json(guides);
+    } catch (error) {
+        res.status(500).json({ message: 'Error processing request' });
+    }
+  });
+
 
   module.exports = router;
