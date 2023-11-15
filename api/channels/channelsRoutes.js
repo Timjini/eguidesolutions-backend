@@ -9,10 +9,20 @@ const Agency = require('../../models/Agency');
 
   // API endpoint to create a room
   router.post('/create', async (req, res) => {
+    console.log(req.body)
     const { type } = req.body;
     // const authToken = req.headers.authorization?.split(' ')[1];
     const authToken = req.body.authToken 
-  
+    const guideId = req.body.guide
+    const tourId = req.body.tour
+    const agencyId = req.body.agency
+
+    console.log("agencyId:" + agencyId) //
+    console.log("tourId:" + tourId) //
+    console.log("guideId:" + guideId) //
+    console.log("authToken:" + authToken) //
+
+
     if (!authToken) {
       return res.status(401).json({ message: 'Unauthorized' });
     }
@@ -25,24 +35,29 @@ const Agency = require('../../models/Agency');
       }
   
       // Find the agency owned by the user
-      const agency = await Agency.findOne({ owner: user._id });
+      const agency = await Agency.findById(agencyId);
       if (!agency) {
         return res.status(404).json({ message: 'Agency not found for the user' });
       }
 
       // Find the tour for the agency (assuming you have a proper query logic here)
-      const tour = await Tour.findOne({ agency: agency._id });
+      const tour = await Tour.findById(tourId);
       if (!tour) {
         return res.status(404).json({ message: 'Tour not found for the agency' });
       }
   
-      const guide = await Guide.findOne({_id: tour.guide})
+      const guide = await Guide.findById(guideId);
+      console.log('Retrieved Guide:', guide);
+      if (!guide) {
+        return res.status(404).json({ message: 'Guide not found for the agency' });
+      }
+
       // Create a new channel with the owner set to the found user
       const newChannel = new Channel({
         type,
-        owner: user._id,
-        agency: agency._id, // Assuming you want to store agency ID in the channel
-        tour: tour._id,     // Assuming you want to store tour ID in the channel
+        owner: user,
+        agency: agency, // Assuming you want to store agency ID in the channel
+        tour: tour,     // Assuming you want to store tour ID in the channel
         guide: guide
       });
   
@@ -67,21 +82,18 @@ const Agency = require('../../models/Agency');
         const user = await User.findOne({ authToken: authToken }).exec();
         const agency = await Agency.findOne({ owner: user._id });
         const tour = await Tour.findOne({ owner: user._id });
-        // const guide = await User.findOne({ id: tour.guide._id })
 
         if (!agency) {
             return res.status(404).json({ message: 'Agency not found for the user' });
         }
 
         // Find all channels belonging to the agency using the agencyId field in the Channel schema
-        // const channels = await Channel.find({ agency: agency._id }).populate('guide').exec();
-
-        const channels = await Channel.findOne({ agency: agency._id })
-        .populate({
-          path: 'guide',
-          populate: { path: 'user', select: 'name avatar' }
-        }) // Assuming 'guide' is the field in your Channel model that references the Guide model
-        .populate('tour'); // Assuming 'tour' is the field in your Channel model that references the Tour model
+        const channels = await Channel.find({ agency: agency._id })
+            .populate({
+              path: 'guide',
+              populate: { path: 'user', select: 'name avatar' }
+            })
+            .populate('tour'); // Assuming 'tour' is the field in your Channel model that references the Tour model
 
         res.status(200).json({ message: 'Agency Channels', channels: channels });
     } catch (error) {

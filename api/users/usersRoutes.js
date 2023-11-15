@@ -10,6 +10,7 @@ const User = require('../../models/Users');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Agency = require('../../models/Agency');
+const Guide = require('../../models/Guide');
 
 
 const path = require('path'); // Add this line
@@ -326,6 +327,7 @@ router.post('/secure_route', verifyToken, async (req, res) => {
     try {
         // Find the user based on the authToken
         const user = await User.findOne({ authToken: authToken }).exec();
+        const agency = await Agency.findOne({ owner: user._id });
         console.log(user);
   
         if (!user) {
@@ -338,9 +340,9 @@ router.post('/secure_route', verifyToken, async (req, res) => {
         }
   
         // Fetch all users from the database
-        const guides = await User.find({type: "guide"}, '-password').exec();
+        // const guides = await User.find({type: "guide"}, '-password').exec();
         // populate with user information
-        // const guides = await Guide.find({ agency: agency }).exec();
+        const guides = await Guide.find({ agency: agency }).populate('user').exec();
   
         res.status(200).json(guides);
     } catch (error) {
