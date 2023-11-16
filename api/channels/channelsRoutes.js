@@ -15,22 +15,22 @@ const APP_KEY = process.env.APP_KEY;
 
 async function generateAndStoreAgoraToken(channel) {
   try {
-      // Use Agora SDK to generate a token based on your Agora App ID and App Certificate
-      const token = RtcTokenBuilder.buildTokenWithUid(
-          APP_KEY,
-          APP_CERTIFICATE,
-          channel._id, 
-          channel.user._id, 
-          RtcRole.PUBLISHER,
-          Math.floor(Date.now() / 1000) + 3600 
-      );
+    // Use Agora SDK to generate a token based on your Agora App ID and App Certificate
+    const token = RtcTokenBuilder.buildTokenWithUid(
+      APP_KEY,
+      APP_CERTIFICATE,
+      channel._id, 
+      channel.user, 
+      RtcRole.PUBLISHER,
+      Math.floor(Date.now() / 1000) + 3600 
+    );
 
-      // Update the channel document with the new token
-      channel.agoraToken = token;
-      await channel.save();
+    // Update the channel document with the new token
+    channel.agoraToken = token;
+    await channel.save();
   } catch (error) {
-      console.error('Error generating and storing Agora token:', error);
-      throw error;
+    console.error('Error generating and storing Agora token:', error);
+    throw error;
   }
 }
 
