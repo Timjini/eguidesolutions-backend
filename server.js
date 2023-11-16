@@ -16,7 +16,8 @@ const channelsRoutes = require('./api/channels/channelsRoutes');
 const agenciesRoutes = require('./api/agencies/agenciesRoutes');
 const toursRoutes = require('./api/tours/toursRoutes');
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
-
+const APP_CERTIFICATE = process.env.APP_CERTIFICATE;
+const APP_KEY = process.env.APP_KEY;
 
 const path = require('path'); // Add this line
 const { error } = require('console');
@@ -94,8 +95,8 @@ io.on('connection', socket => {
 
 // Agora Token Generator
 app.get('/token', (req, res) => {
-  const appId = '9b956f69e297416a88316fa367de9fe9';
-  const appCertificate = '46c8da39a93b451cba5583d31c53be27';
+  const appId = APP_KEY;
+  const appCertificate = APP_CERTIFICATE;
 
   const channelName = req.query.channelName || 'demoChannel';
   const uid = req.query.uid || 0;
