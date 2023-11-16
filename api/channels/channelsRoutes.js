@@ -22,7 +22,7 @@ async function generateAndStoreAgoraToken(channel) {
       channel.code, 
       0, 
       RtcRole.PUBLISHER,
-      Math.floor(Date.now() / 1000) + 3600 
+      Math.floor(Date.now() / 1000) + 7 * 86400
     );
 
     // Update the channel document with the new token
