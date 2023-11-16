@@ -19,8 +19,8 @@ async function generateAndStoreAgoraToken(channel) {
     const token = RtcTokenBuilder.buildTokenWithUid(
       APP_KEY,
       APP_CERTIFICATE,
-      channel._id, 
-      channel.user, 
+      channel.code, 
+      0, 
       RtcRole.PUBLISHER,
       Math.floor(Date.now() / 1000) + 3600 
     );
