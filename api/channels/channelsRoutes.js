@@ -19,10 +19,10 @@ async function generateAndStoreAgoraToken(channel) {
       const token = RtcTokenBuilder.buildTokenWithUid(
           APP_KEY,
           APP_CERTIFICATE,
-          channel.channelId, // Use channel ID as the key
-          0, // Assuming uid is 0 for now, you can customize as needed
+          channel._id, 
+          channel.user._id, 
           RtcRole.PUBLISHER,
-          Math.floor(Date.now() / 1000) + 3600 // Token expiration time in seconds
+          Math.floor(Date.now() / 1000) + 3600 
       );
 
       // Update the channel document with the new token
