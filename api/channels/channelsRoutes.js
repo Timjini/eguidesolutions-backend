@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const Channel = require('../../models/Channels');
@@ -6,6 +7,8 @@ const Tour = require('../../models/Tours');
 const Guide = require('../../models/Guide');
 const Agency = require('../../models/Agency');
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
+const APP_CERTIFICATE = process.env.APP_CERTIFICATE;
+const APP_KEY = process.env.APP_KEY;
 
 
 
@@ -14,8 +17,8 @@ async function generateAndStoreAgoraToken(channel) {
   try {
       // Use Agora SDK to generate a token based on your Agora App ID and App Certificate
       const token = RtcTokenBuilder.buildTokenWithUid(
-          '9b956f69e297416a88316fa367de9fe9',
-          '46c8da39a93b451cba5583d31c53be27',
+          APP_KEY,
+          APP_CERTIFICATE,
           channel.channelId, // Use channel ID as the key
           0, // Assuming uid is 0 for now, you can customize as needed
           RtcRole.PUBLISHER,
