@@ -5,7 +5,31 @@ const User = require('../../models/Users');
 const Tour = require('../../models/Tours');
 const Guide = require('../../models/Guide');
 const Agency = require('../../models/Agency');
+const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
 
+
+
+
+async function generateAndStoreAgoraToken(channel) {
+  try {
+      // Use Agora SDK to generate a token based on your Agora App ID and App Certificate
+      const token = RtcTokenBuilder.buildTokenWithUid(
+          '9b956f69e297416a88316fa367de9fe9',
+          '46c8da39a93b451cba5583d31c53be27',
+          channel.channelId, // Use channel ID as the key
+          0, // Assuming uid is 0 for now, you can customize as needed
+          RtcRole.PUBLISHER,
+          Math.floor(Date.now() / 1000) + 3600 // Token expiration time in seconds
+      );
+
+      // Update the channel document with the new token
+      channel.agoraToken = token;
+      await channel.save();
+  } catch (error) {
+      console.error('Error generating and storing Agora token:', error);
+      throw error;
+  }
+}
 
   // API endpoint to create a room
   router.post('/create', async (req, res) => {
@@ -63,6 +87,8 @@ const Agency = require('../../models/Agency');
   
       await newChannel.save();
   
+      await generateAndStoreAgoraToken(newChannel);
+
       res.json({ message: 'Channel created successfully',  code: newChannel.code });
     } catch (err) {
       console.error(err);

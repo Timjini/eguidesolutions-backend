@@ -20,6 +20,7 @@ const channelSchema = new mongoose.Schema({
     updatedAt: { type: Date, required: true, default: Date.now },
     starting_date: { type: Date },
     ending_date: { type: Date },
+    agoraToken: { type: String },
 });
 
 // define channel name as tour.title 

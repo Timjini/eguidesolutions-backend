@@ -15,6 +15,7 @@ const usersRoutes = require('./api/users/usersRoutes');
 const channelsRoutes = require('./api/channels/channelsRoutes');
 const agenciesRoutes = require('./api/agencies/agenciesRoutes');
 const toursRoutes = require('./api/tours/toursRoutes');
+const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
 
 
 const path = require('path'); // Add this line
@@ -66,9 +67,9 @@ app.get('/' , (req, res) => {
   res.redirect(`/${uuidV4()}`)
 });
 
-app.get('/:room', (req,res)=>{
-  res.render('room', {roomId: req.params.room})
-})
+// app.get('/:room', (req,res)=>{
+//   res.render('room', {roomId: req.params.room})
+// })
 
 io.on('connection', socket => {
   socket.on('join-room', (roomId, userId) => {
@@ -91,6 +92,32 @@ io.on('connection', socket => {
 });
 
 
+// Agora Token Generator
+app.get('/token', (req, res) => {
+  const appId = '9b956f69e297416a88316fa367de9fe9';
+  const appCertificate = '46c8da39a93b451cba5583d31c53be27';
+
+  const channelName = req.query.channelName || 'demoChannel';
+  const uid = req.query.uid || 0;
+  const role = RtcRole.PUBLISHER;
+
+  const expirationTimeInSeconds = 3600;
+
+  const currentTimestamp = Math.floor(Date.now() / 1000);
+
+  const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+
+  const key = RtcTokenBuilder.buildTokenWithUid(
+    appId,
+    appCertificate,
+    channelName,
+    uid,
+    role,
+    privilegeExpiredTs
+  );
+
+  res.json({ key });
+});
 
 
 // const peerServer = PeerServer({ port: 5000, path: '/' });
