@@ -11,28 +11,15 @@ const channelsRoutes = require('./api/channels/channelsRoutes');
 const agenciesRoutes = require('./api/agencies/agenciesRoutes');
 const toursRoutes = require('./api/tours/toursRoutes');
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
+const path = require('path');
+const { upload, uploadToS3 } = require('./fileUploader');
+
 
 
 
 // =================================================================================================
 // ======================================== R2 BUCKET =============================================[]
 // =================================================================================================
-
-const path = require('path');
-const multer = require('multer');
-const multerS3 = require('multer-s3');
-const AWS = require('aws-sdk');
-
-const s3 = new AWS.S3({
-  accessKeyId: process.env.ACCESS_KEY,
-  secretAccessKey: process.env.SECRET_ACCESS_KEY,
-  endpoint: process.env.S3_API_ENDPOINT,
-  s3ForcePathStyle: true, 
-});
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-}).single('upload');
 
 app.post('/upload', async (req, res) => {
   try {
@@ -43,29 +30,15 @@ app.post('/upload', async (req, res) => {
       }
 
       const file = req.file;
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const extension = path.extname(file.originalname);
-      const uniqueFilename = uniqueSuffix + extension;
+      const result = await uploadToS3(file);
 
-      const params = {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: uniqueFilename, 
-        Body: file.buffer,
-      };
-
-      // Use the configured S3 instance to upload the file
-      const data = await s3.upload(params).promise();
-      console.log('File uploaded successfully. ETag:', data.ETag);
-
-      res.json({ originalname: file.originalname, file_name: uniqueFilename });
+      res.json(result);
     });
   } catch (err) {
     console.error('Error uploading file:', err);
     res.status(500).json({ error: 'Error uploading file.' });
   }
 });
-
-
 // =================================================================================================
 // =========================================== ROUTES =============================================[]
 // =================================================================================================
