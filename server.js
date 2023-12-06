@@ -4,99 +4,101 @@ const app = express();
 const server = http.createServer(app);
 const io = require('socket.io')(server);
 const cors = require('cors');
-const { v4: uuidV4 } = require('uuid');
-const { PeerServer } = require('peer'); // Import the PeerServer
-const crypto = require('crypto');
+// const { v4: uuidV4 } = require('uuid');
 const verifyToken = require("./auth/authMiddleware");
-const Room = require('./models/Channels');
-const multer = require('multer');
-const User = require('./models/Users'); 
 const usersRoutes = require('./api/users/usersRoutes');
 const channelsRoutes = require('./api/channels/channelsRoutes');
 const agenciesRoutes = require('./api/agencies/agenciesRoutes');
 const toursRoutes = require('./api/tours/toursRoutes');
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
-const APP_CERTIFICATE = process.env.APP_CERTIFICATE;
-const APP_KEY = process.env.APP_KEY;
 
-const path = require('path'); // Add this line
-const { error } = require('console');
 
-const storage = multer.diskStorage({
-  destination: path.join(__dirname, './public/uploads'),
-  filename: (req, file, callback) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const extension = path.extname(file.originalname);
-    callback(null, uniqueSuffix + extension);
-  },
+
+// =================================================================================================
+// ======================================== R2 BUCKET =============================================[]
+// =================================================================================================
+
+const path = require('path');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+const AWS = require('aws-sdk');
+
+const s3 = new AWS.S3({
+  accessKeyId: process.env.ACCESS_KEY,
+  secretAccessKey: process.env.SECRET_ACCESS_KEY,
+  endpoint: process.env.S3_API_ENDPOINT,
+  s3ForcePathStyle: true, 
 });
 
-  
-const upload = multer({ storage });
+const upload = multer({
+  storage: multer.memoryStorage(),
+}).single('upload');
+
+app.post('/upload', async (req, res) => {
+  try {
+    upload(req, res, async function (err) {
+      if (err) {
+        console.error('Error uploading file:', err);
+        return res.status(500).json({ error: 'Error uploading file.' });
+      }
+
+      const file = req.file;
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const extension = path.extname(file.originalname);
+      const uniqueFilename = uniqueSuffix + extension;
+
+      const params = {
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: uniqueFilename, 
+        Body: file.buffer,
+      };
+
+      // Use the configured S3 instance to upload the file
+      const data = await s3.upload(params).promise();
+      console.log('File uploaded successfully. ETag:', data.ETag);
+
+      res.json({ originalname: file.originalname, file_name: uniqueFilename });
+    });
+  } catch (err) {
+    console.error('Error uploading file:', err);
+    res.status(500).json({ error: 'Error uploading file.' });
+  }
+});
+
+
+// =================================================================================================
+// =========================================== ROUTES =============================================[]
+// =================================================================================================
+
   
 const allowedOrigins = ['https://admin-eguide.vercel.app', 'https://admin.e-guidesolutions.com', 'http://localhost:5173', 'http://localhost:3000'];
-
 
 app.use(cors({
   origin: allowedOrigins
 }));
 
-app.set('views', path.join(__dirname, 'views')); // Update this line if necessary
-// app.use('/public', express.static('public'));
+app.use(upload);
+
+app.set('views', path.join(__dirname, 'views')); 
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
-// app.use(express.static('public'));
 app.use(express.json());
 
-// app.use(express.static('public')); 
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'ejs');
-// app.use(express.json());
-
-// app.use(verifyToken); 
 app.use('/api/users', usersRoutes);
 app.use('/api/channels', channelsRoutes);
 app.use('/api/tours', toursRoutes);
 app.use('/api/agencies', agenciesRoutes);
 
-app.post("/welcome", verifyToken, (req, res) => {
-  res.json({ message: 'You have access to this secure route!', user: req.user });
-});
 
-
-app.get('/' , (req, res) => { 
-  res.redirect(`/${uuidV4()}`)
-});
-
-// app.get('/:room', (req,res)=>{
-//   res.render('room', {roomId: req.params.room})
-// })
-
-io.on('connection', socket => {
-  socket.on('join-room', (roomId, userId) => {
-    const room = io.sockets.adapter.rooms.get(roomId);
-
-    if (room && room.size > 1) {
-      // Room exists and has at least 2 clients (including the current client)
-      socket.join(roomId);
-      socket.to(roomId).broadcast.emit('user-connected', userId);
-    } else {
-      // Room doesn't exist or has only one client, create the room
-      socket.join(roomId);
-      socket.emit('room-created', roomId);
-    }
-
-    socket.on('disconnect', () => {
-      // Handle user disconnection if needed
-    });
-  });
-});
+// =================================================================================================
+// ========================================= GENERATE TOKEN ======================================[]
+// =================================================================================================
 
 
 // Agora Token Generator
 app.get('/token', (req, res) => {
-  const appId = APP_KEY;
-  const appCertificate = APP_CERTIFICATE;
+  const appId = process.env.APP_KEY;
+  const appCertificate = process.env.APP_CERTIFICATE;
 
   const channelName = req.query.channelName || 'demoChannel';
   const uid = req.query.uid || 0;
@@ -121,7 +123,6 @@ app.get('/token', (req, res) => {
 });
 
 
-// const peerServer = PeerServer({ port: 5000, path: '/' });
 
 
 server.listen(4000)
