@@ -15,6 +15,7 @@ router.post('/new_tour',async (req, res) => {
         // console.log(req)
         const { title, description,guide,agency,startingDate, endingDate } = req.body;
         const file = req.file;
+        const agencyId = req.body.agency
         const image = await uploadToS3(file);
 
         const authToken = req.headers.authorization?.split(' ')[1];
@@ -33,7 +34,12 @@ router.post('/new_tour',async (req, res) => {
         // Save the tour document to the database
         await tour.save();
 
-        const agencyTour = await Agency.findOne({_id: agency});
+        const agencyTour = await Agency.findOne({_id: agencyId});
+        console.log(agencyTour);
+
+        if (!agencyTour) {
+            return res.status(404).json({ error: 'Agency not found' });
+        }
 
         console.log(agencyTour);
         // Update the user's profile to include this new tour (assuming you have a user-tour relationship)
@@ -66,7 +72,7 @@ router.get('/agency_tours' , async function(req, res) {
             return {
               title: tour.title,
               description: tour.description,
-              image: `${process.env.S3_API_ENDPOINT}/${tour.photo}`, // Update with your S3 bucket URL
+              image: `uploads/${tour.photo}`, 
             };
           });
 
