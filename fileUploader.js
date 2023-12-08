@@ -20,7 +20,7 @@ const uploadToS3 = async (file) => {
   const uniqueFilename = uniqueSuffix + extension;
 
   const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: process.env.NEW_BUCKET_NAME,
     Key: uniqueFilename,
     Body: file.buffer,
     ContentType: file.mimetype,
@@ -35,7 +35,7 @@ const uploadToS3 = async (file) => {
 
 const getObjectFromS3 = async (fileName) => {
   const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: process.env.NEW_BUCKET_NAME,
     Key: fileName,
   };
 
