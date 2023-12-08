@@ -12,7 +12,7 @@ const agenciesRoutes = require('./api/agencies/agenciesRoutes');
 const toursRoutes = require('./api/tours/toursRoutes');
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
 const path = require('path');
-const { upload, uploadToS3 } = require('./fileUploader');
+const { upload, uploadToS3, getObjectFromS3 } = require('./fileUploader');
 
 
 
@@ -61,6 +61,21 @@ app.use('/api/users', usersRoutes);
 app.use('/api/channels', channelsRoutes);
 app.use('/api/tours', toursRoutes);
 app.use('/api/agencies', agenciesRoutes);
+
+
+app.get('/uploads/:file_name', async (req, res) => {
+  try {
+    const fileName = req.params.file_name;
+    const data = await getObjectFromS3(fileName);
+
+    res.writeHead(200, { 'Content-Type': data.ContentType });
+    res.end(data.Body);
+  } catch (error) {
+    console.error('Error retrieving file:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 
 // =================================================================================================

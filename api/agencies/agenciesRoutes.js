@@ -9,29 +9,19 @@ const { isAgencyOwner, isAdministrator } = require('../../auth/auth');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
+const { upload, uploadToS3 } = require('../../fileUploader');
 const secretKey = process.env.TOKEN_KEY;
 
 
 
 
-// Define storage for uploaded images
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'public/uploads/');
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    },
-});
-
-const upload = multer({ storage: storage });
-
-router.post('/create_agency', upload.single('image'), async (req, res) => {
+router.post('/create_agency', async (req, res) => {
     try {
         console.log(req.body)
         const { name, description } = req.body;
-        const image = req.file.filename;
+        const file = req.file;
+        console.log(req.body)
+        const photo = await uploadToS3(file);
 
         const authToken = req.headers.authorization?.split(' ')[1];
         const user = await User.findOne({ authToken: authToken });
@@ -49,7 +39,7 @@ router.post('/create_agency', upload.single('image'), async (req, res) => {
             name,
             owner: user._id,
             members: [user._id],
-            image,
+            image:photo.file_name, 
             description,
         });
 
@@ -63,10 +53,11 @@ router.post('/create_agency', upload.single('image'), async (req, res) => {
 });
 
 
-router.post('/create_agent', isAgencyOwner, upload.single('avatar'), async (req, res) => {
+router.post('/create_agent', isAgencyOwner, async (req, res) => {
     try {
       const { name, email, password, type, phone } = req.body;
-      const avatar = req.file.filename;
+      const file = req.file;
+      const avatar = await uploadToS3(file);
       const agency = await Agency.findOne({ owner: req.user._id });
   
       const hashedPassword = await bcrypt.hash(password, 10);
