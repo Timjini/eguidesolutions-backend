@@ -55,7 +55,8 @@ router.post('/create_agent', async (req, res) => {
       const { name, email, password, type, phone } = req.body;
       const file = req.file;
       const avatar = await uploadToS3(file);
-      const agency = await Agency.findOne({ owner: req.user._id });
+      const agency = await Agency.findOne({ _id: req.body.agencyId });
+      console.log(agency)
     
   
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -77,8 +78,8 @@ router.post('/create_agent', async (req, res) => {
       // Create a new guide if the user type is 'guide'
       if (type === 'guide') {
         const guide = new Guide({
-          agency: agency._id, // Assuming agency._id is the reference in Guide model
-          user: user._id, // Assuming user._id is the reference in Guide model
+          agency: agency._id, 
+          user: user._id, 
         });
         await guide.save();
       }
