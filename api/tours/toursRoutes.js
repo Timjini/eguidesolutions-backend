@@ -73,6 +73,7 @@ router.get('/agency_tours' , async function(req, res) {
               title: tour.title,
               description: tour.description,
               image: `uploads/${tour.photo}`, 
+              _id: tour._id,
             };
           });
 
