@@ -43,5 +43,12 @@ const getObjectFromS3 = async (fileName) => {
 };
 
 
+const getUserAvatarUrl = (user) => {
+  return user.avatar
+    ? `uploads/${user.avatar}`
+    : 'uploads/user.png'; 
+};
 
-module.exports = { upload, uploadToS3 , getObjectFromS3 };
+
+
+module.exports = { upload, uploadToS3 , getObjectFromS3,getUserAvatarUrl };

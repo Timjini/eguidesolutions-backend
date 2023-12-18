@@ -11,32 +11,20 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Agency = require('../../models/Agency');
 const Guide = require('../../models/Guide');
-
-
-const path = require('path'); // Add this line
-const { error } = require('console');
-
-const storage = multer.diskStorage({
-  destination: path.join(__dirname, '../../public/uploads'),
-  filename: (req, file, callback) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const extension = path.extname(file.originalname);
-    callback(null, uniqueSuffix + extension);
-  },
-});
-
-  
-const upload = multer({ storage });
+const { upload, uploadToS3, getUserAvatarUrl } = require('../../fileUploader');
 
 
 // ... Other imports and configurations
 
-router.post('/sign_up', upload.single('avatar'), async (req, res) => {
+router.post('/sign_up', async (req, res) => {
   const id = uuid.v4();
   const { email, password, phone, username,type } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = uuid.v4(); // Generate a unique user ID
   const authToken = jwt.sign({ userId }, secretKey, { expiresIn: '90d' });
+  const file = req.file;
+  const image = await uploadToS3(file);
+
 
   try {
     const user = new User({
@@ -47,7 +35,7 @@ router.post('/sign_up', upload.single('avatar'), async (req, res) => {
       type,
       authToken,
       username,
-      avatar: req.file ? req.file.filename : null, // Use the uploaded filename if available
+      avatar: image.file_name
     });
 
     await user.save();
@@ -60,8 +48,11 @@ router.post('/sign_up', upload.single('avatar'), async (req, res) => {
 });
 
 
-router.post('/upload-avatar', verifyToken, upload.single('avatar'), async (req, res) => {
+router.post('/upload-avatar', verifyToken, async (req, res) => {
   try {
+
+  const file = req.file;
+  const avatar = await uploadToS3(file);
 
     console.log('Uploaded File:', req.file);
     if (!req.file) {
@@ -71,9 +62,8 @@ router.post('/upload-avatar', verifyToken, upload.single('avatar'), async (req, 
     // Update the user's avatar field in the database with the file path
     await User.updateOne(
       { _id: req.user.userId }, // Assuming the userId is available in req.user
-      { avatar: req.file.filename }
+      { avatar: avatar.file_name }
     );
-    console.log(req.file.filename)
 
     res.status(200).json({ message: 'Avatar uploaded successfully' });
   } catch (error) {
@@ -107,9 +97,7 @@ router.post('/login', async (req, res) => {
     // Fetch the updated user with the new status from the database
     const agency = await Agency.findOne({members: { _id: user._id}}) || null;
     const updatedUser = await User.findOne({ _id: user._id });
-    const userAvatar = updatedUser.avatar
-      ? path.join(__dirname, '../public/uploads', updatedUser.avatar)
-      : path.join(__dirname, '../public/uploads', 'user.png');
+    const userAvatarUrl = getUserAvatarUrl(updatedUser);
 
 
       try {
@@ -117,6 +105,7 @@ router.post('/login', async (req, res) => {
           // Verify the existing token
           jwt.verify(user.authToken, secretKey, (err, decoded) => {
             if (err) {
+              console.log(err);
               // Token is invalid or expired, generate a new one
               const tokenExpiration = Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 60); // 2 months
               const newToken = jwt.sign({ userId: user.id }, secretKey, { expiresIn: tokenExpiration });
@@ -126,10 +115,11 @@ router.post('/login', async (req, res) => {
               user.save(); // Save the updated token to the user record in the database
       
               // Send the new token to the client
-              res.json({ token: newToken, user: { ...updatedUser._doc, agency: agency.name }, userAvatar, agency: agency });
+              res.json({ token: newToken, user: { ...updatedUser._doc, agency: agency.name }, userAvatarUrl, agency: agency });
             } else {
+              console.log("token is valid")
               // Use the existing token if it's still valid
-              res.json({ token: user.authToken, user: { ...updatedUser._doc, agency: agency }, userAvatar, agency: agency });
+              res.json({ token: user.authToken, user: { ...updatedUser._doc, agency: agency }, userAvatarUrl, agency: agency });
             }
           });
         } else {
@@ -221,30 +211,7 @@ router.get('/users', async function(req, res) {
   }
 });
 
-// router.post('/upload-avatar', verifyToken, upload.single('avatar'), async (req, res) => {
-//     try {
-//       if (!req.file) {
-//         return res.status(400).json({ error: 'No file uploaded' });
-//       }
-  
-//       // Update the user's avatar field in the database with the file path
-//       const user = await User.findByIdAndUpdate(
-//         req.user.userId, // Use req.user instead of req.userId
-//         { avatar: req.file.filename }, // Assuming your user model has an 'avatar' field
-//         { new: true },
-//       );
-//       console.log(user);
-  
-//       if (!user) {
-//         return res.status(404).json({ error: 'User not found' });
-//       }
-  
-//       res.status(200).json({ message: 'Avatar uploaded successfully' });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ error: 'An error occurred while uploading the avatar' });
-//     }
-//   });
+
 
 router.delete('/delete_account', async (req, res) => {
   const authToken = req.headers.authorization?.split(' ')[1];
