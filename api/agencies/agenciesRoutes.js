@@ -3,15 +3,11 @@ const router = express.Router();
 const Agency = require('../../models/Agency');
 const User = require('../../models/Users');
 const Guide = require('../../models/Guide');
-const multer = require('multer');
-const path = require('path');
 const { isAgencyOwner, isAdministrator } = require('../../auth/auth');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
 const { upload, uploadToS3 } = require('../../fileUploader');
-const secretKey = process.env.TOKEN_KEY;
-
 
 
 
@@ -53,16 +49,18 @@ router.post('/create_agency', async (req, res) => {
 });
 
 
-router.post('/create_agent', isAgencyOwner, async (req, res) => {
+router.post('/create_agent', async (req, res) => {
     try {
+      console.log(req.body)
       const { name, email, password, type, phone } = req.body;
       const file = req.file;
       const avatar = await uploadToS3(file);
       const agency = await Agency.findOne({ owner: req.user._id });
+    
   
       const hashedPassword = await bcrypt.hash(password, 10);
       const id = uuid.v4();
-      const authToken = jwt.sign({ id }, secretKey, { expiresIn: '24h' });
+      const authToken = jwt.sign({ id }, process.env.TOKEN_KEY, { expiresIn: '72h' });
   
       // Create a new user
       const user = new User({
@@ -72,7 +70,7 @@ router.post('/create_agent', isAgencyOwner, async (req, res) => {
         password: hashedPassword,
         type,
         phone,
-        avatar,
+        avatar: avatar.file_name,
         authToken,
       });
   
