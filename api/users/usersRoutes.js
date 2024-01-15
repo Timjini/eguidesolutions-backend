@@ -13,7 +13,7 @@ const Agency = require('../../models/Agency');
 const Guide = require('../../models/Guide');
 const { upload, uploadToS3, getUserAvatarUrl } = require('../../fileUploader');
 
-
+console.log(secretKey);
 // ... Other imports and configurations
 
 router.post('/sign_up', async (req, res) => {
