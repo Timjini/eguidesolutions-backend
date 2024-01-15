@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
 const { upload, uploadToS3 } = require('../../fileUploader');
+const Channel = require('../../models/Channels');
 
 
 
@@ -98,9 +99,12 @@ router.post('/create_agent', async (req, res) => {
   });
 
 
-router.get('/members', isAgencyOwner, async (req, res) => {
+router.get('/members', async (req, res) => {
+  const { agencyId } = req.query;
+  console.log("members method",agencyId)
     try {
-        const agency = await Agency.findOne({ owner: req.user._id });
+        const agency = await Agency.findOne({ _id: agencyId });
+        
 
         if (!agency) {
             return res.status(404).json({ message: 'Agency not found' });
@@ -112,13 +116,50 @@ router.get('/members', isAgencyOwner, async (req, res) => {
         const users = await User.find({ _id: { $in: memberIds } });
 
 
-
+        console.log(users)
         res.status(200).json({ message: 'Agency Users', members: users, agency: agency });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+router.get('/agency_channels', async function (req, res) {
+  
+  const { agencyId } = req.query;
+  console.log(agencyId)
+  const authToken = req.headers.authorization?.split(' ')[1];
+  if (!authToken) {
+      return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+      const user = await User.findOne({ authToken: authToken }).exec();
+      const agency = await Agency.findOne({ owner: user._id });
+      // const tour = await Tour.findOne({ owner: user._id });
+      console.log("---------------",agencyId)
+
+      if (!agency) {
+          return res.status(404).json({ message: 'Agency not found for the user' });
+      }
+
+      // Find all channels belonging to the agency using the agencyId field in the Channel schema
+      const channels = await Channel.find({ agency: agencyId })
+          .populate({
+            path: 'guide',
+            populate: { path: 'user', select: 'name avatar' }
+          })
+          .populate('tour'); // Assuming 'tour' is the field in your Channel model that references the Tour model
+
+      res.status(200).json({ message: 'Agency Channels', channels: channels });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'An error occurred while fetching the channels' });
+  }
+});
+
+
+
 
 
 module.exports = router;
