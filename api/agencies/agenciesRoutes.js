@@ -61,7 +61,7 @@ router.post('/create_agent', async (req, res) => {
   
       const hashedPassword = await bcrypt.hash(password, 10);
       const id = uuid.v4();
-      const authToken = jwt.sign({ id }, process.env.TOKEN_KEY, { expiresIn: '72h' });
+      const authToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, { expiresIn: '72h' });
   
       // Create a new user
       const user = new User({
