@@ -13,14 +13,14 @@ const Agency = require('../../models/Agency');
 const Guide = require('../../models/Guide');
 const { upload, uploadToS3, getUserAvatarUrl } = require('../../fileUploader');
 
-console.log(secretKey);
-// ... Other imports and configurations
+// Users and Profile routes
 
+// Sign up route  ===================================================>
 router.post('/sign_up', async (req, res) => {
   const id = uuid.v4();
   const { email, password, phone, username,type } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  const userId = uuid.v4(); // Generate a unique user ID
+  const userId = uuid.v4(); 
   const authToken = jwt.sign({ userId }, secretKey, { expiresIn: '90d' });
   const file = req.file;
   const image = await uploadToS3(file);
@@ -48,6 +48,7 @@ router.post('/sign_up', async (req, res) => {
 });
 
 
+// Upload avatar route =============================================================>
 router.post('/upload-avatar', verifyToken, async (req, res) => {
   try {
 
@@ -59,9 +60,8 @@ router.post('/upload-avatar', verifyToken, async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    // Update the user's avatar field in the database with the file path
     await User.updateOne(
-      { _id: req.user.userId }, // Assuming the userId is available in req.user
+      { _id: req.user.userId }, 
       { avatar: avatar.file_name }
     );
 
@@ -115,7 +115,11 @@ router.post('/login', async (req, res) => {
               user.save(); // Save the updated token to the user record in the database
       
               // Send the new token to the client
-              res.json({ token: newToken, user: { ...updatedUser._doc, agency: agency.name }, userAvatarUrl, agency: agency });
+              if (user.type === 'admin'){
+                res.json({ token: newToken, user: { ...updatedUser._doc }, userAvatarUrl });
+              } else {
+                res.json({ token: newToken, user: { ...updatedUser._doc, agency: agency.name }, userAvatarUrl, agency: agency });
+              }
             } else {
               console.log("token is valid")
               // Use the existing token if it's still valid
@@ -145,7 +149,7 @@ router.post('/login', async (req, res) => {
 });
 
 
-
+// Logout Method ==============================================================>
 router.post('/logout', verifyToken, async (req, res) => {
   try {
     console.log(req)
@@ -181,6 +185,7 @@ router.post('/logout', verifyToken, async (req, res) => {
 });
 
 
+// Get all users route ============================================================
 router.get('/users', async function(req, res) {
   const authToken = req.headers.authorization?.split(' ')[1];
 
@@ -191,7 +196,6 @@ router.get('/users', async function(req, res) {
   try {
       // Find the user based on the authToken
       const user = await User.findOne({ authToken: authToken }).exec();
-      console.log(user);
 
       if (!user) {
           return res.status(401).json({ message: 'Invalid token' });
@@ -212,7 +216,7 @@ router.get('/users', async function(req, res) {
 });
 
 
-
+// Delete a user ========================================================>
 router.delete('/delete_account', async (req, res) => {
   const authToken = req.headers.authorization?.split(' ')[1];
 
@@ -238,50 +242,6 @@ router.delete('/delete_account', async (req, res) => {
   }
 });
 
-  router.post("/user_data", verifyToken, async (req, res) => {
-    try {
-      // Decode the authToken from the request headers
-      const authToken = req.headers.authorization?.split(' ')[1];
-      // const decodedToken = jwt.verify(authToken, secretKey);
-  
-      // Use the decoded userId to fetch user data
-      const user = await User.findOne({ authToken: authToken });
-  
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-
-      const avatarFilePath = path.join(__dirname, '../public/uploads', user.avatar);
-  
-      // Return all user data
-      res.json({ message: 'User Data from database', user, avatarFilePath });
-    } catch (error) {
-      if (error.name === 'TokenExpiredError') {
-        return res.status(401).json({ message: 'Token expired' });
-      }
-      res.status(500).json({ error: 'An error occurred while fetching user data' });
-      console.log(error);
-    }
-  });
-  
-
-router.post('/secure_route', verifyToken, async (req, res) => {
-    try {
-      console.log(req.userId)
-  
-      const user = await User.findOne(req.userId); // Fetch user data based on userId
-      if (!user) {
-        console.log("not found")
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      // Return the user's data in the response
-      res.status(200).json({ message: 'You have access to this secure route!', user });
-    } catch (error) {
-      console.log(error)
-      res.status(500).json({ error: 'An error occurred while fetching user data' });
-    }
-  });
 
   // router to get guides 
   router.get('/guides', async function(req, res) {

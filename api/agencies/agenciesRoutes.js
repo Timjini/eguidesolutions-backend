@@ -99,62 +99,87 @@ router.post('/create_agent', async (req, res) => {
   });
 
 
-router.get('/members', async (req, res) => {
-  const { agencyId } = req.query;
-  console.log("members method",agencyId)
+  router.get('/members', async (req, res) => {
+    const { agencyId } = req.query;
+    console.log("members method", agencyId);
+  
     try {
-        const agency = await Agency.findOne({ _id: agencyId });
-        
-
-        if (!agency) {
-            return res.status(404).json({ message: 'Agency not found' });
-        }
-
-        const memberIds = agency.members; // Array of user IDs
-
-        // Find user documents by their IDs 
-        const users = await User.find({ _id: { $in: memberIds } });
-
-
-        console.log(users)
-        res.status(200).json({ message: 'Agency Users', members: users, agency: agency });
+      const authToken = req.headers.authorization?.split(' ')[1];
+  
+      if (!authToken) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+  
+      const user = await User.findOne({ authToken: authToken }).exec();
+  
+      // Check if the user is an admin and agencyId is null
+      if (user.type === 'admin' && agencyId === null || agencyId === undefined) {
+        const allUsers = await User.find();
+        return res.status(200).json({ message: 'All Users', members: allUsers });
+      }
+  
+      const agency = await Agency.findOne({ _id: agencyId });
+  
+      if (!agency) {
+        return res.status(404).json({ message: 'Agency not found' });
+      }
+  
+      const memberIds = agency.members; // Array of user IDs
+  
+      // Find user documents by their IDs 
+      const users = await User.find({ _id: { $in: memberIds } });
+  
+      console.log(users);
+      res.status(200).json({ message: 'Agency Users', members: users, agency: agency });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
     }
-});
+  });
+  
 
 router.get('/agency_channels', async function (req, res) {
-  
   const { agencyId } = req.query;
-  console.log(agencyId)
+  console.log(agencyId);
+
   const authToken = req.headers.authorization?.split(' ')[1];
   if (!authToken) {
-      return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 
   try {
-      const user = await User.findOne({ authToken: authToken }).exec();
-      const agency = await Agency.findOne({ owner: user._id });
-      // const tour = await Tour.findOne({ owner: user._id });
-      console.log("---------------",agencyId)
+    const user = await User.findOne({ authToken: authToken }).exec();
 
-      if (!agency) {
-          return res.status(404).json({ message: 'Agency not found for the user' });
-      }
+    // Check if the user is an admin and agencyId is null
+    if (user.type === 'admin' && agencyId === undefined || agencyId === null) {
+      const allChannels = await Channel.find()
+        .populate({
+          path: 'guide',
+          populate: { path: 'user', select: 'name avatar' }
+        })
+        .populate('tour');
+        
+      return res.status(200).json({ message: 'All Channels', channels: allChannels });
+    }
 
-      // Find all channels belonging to the agency using the agencyId field in the Channel schema
-      const channels = await Channel.find({ agency: agencyId })
-          .populate({
-            path: 'guide',
-            populate: { path: 'user', select: 'name avatar' }
-          })
-          .populate('tour'); // Assuming 'tour' is the field in your Channel model that references the Tour model
+    const agency = await Agency.findOne({ owner: user._id });
 
-      res.status(200).json({ message: 'Agency Channels', channels: channels });
+    if (!agency) {
+      return res.status(404).json({ message: 'Agency not found for the user' });
+    }
+
+    // Find channels based on the provided agencyId
+    const channels = await Channel.find({ agency: agencyId })
+      .populate({
+        path: 'guide',
+        populate: { path: 'user', select: 'name avatar' }
+      })
+      .populate('tour');
+
+    res.status(200).json({ message: 'Agency Channels', channels: channels });
   } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'An error occurred while fetching the channels' });
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching the channels' });
   }
 });
 
