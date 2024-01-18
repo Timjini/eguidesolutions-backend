@@ -86,17 +86,36 @@ router.get('/agency_tours', async function (req, res) {
         const userIDs = guides.map(guide => guide.user);
         const users = await User.find({ _id: { $in: userIDs } }).exec();
   
-        const toursWithGuides = tours.map((tour) => {
-          return {
-            title: tour.title,
-            description: tour.description,
-            image: `uploads/${tour.photo}`,
-            _id: tour._id,
-          };
-        });
+        const toursWithGuides = await Promise.all(tours.map(async (tour) => {
+          try {
+            const populatedTour = await Tour.findById(tour._id)
+            .populate('guide')
+            .populate('agency');
+            
+            return {
+              title: populatedTour.title,
+              description: populatedTour.description,
+              image: `uploads/${populatedTour.photo}`,
+              _id: populatedTour._id,
+              guide: populatedTour.guide, // This will contain the guide details
+              agency: populatedTour.agency,
+              starting_date: populatedTour.starting_date,
+              ending_date: populatedTour.ending_date,
+            };
+          } catch (error) {
+            console.error('Error populating guide for tour:', error);
+            return null; // Handle the error as needed
+          }
+        }));
+        
+        // Filter out any tours that failed to be populated
+        const validToursWithGuides = toursWithGuides.filter(tour => tour !== null);
+        
+        console.log(validToursWithGuides);
+        
   
         res.status(200).json({ message: 'Agency Tours', tours: toursWithGuides, agency: agency, guide: users });
-        console.log("Tours here ----" ,tours)
+        console.log("Tours here ----" ,toursWithGuides)
       }
     } catch (error) {
       console.error(error);
