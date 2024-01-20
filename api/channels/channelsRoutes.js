@@ -121,7 +121,7 @@ async function generateAndStoreAgoraToken(channel) {
               populate: { path: 'user', select: 'name avatar' }
             })
             .populate('tour'); // Assuming 'tour' is the field in your Channel model that references the Tour model
-
+        console.log("Fetched agency channels:", channels);
         res.status(200).json({ message: 'Agency Channels', channels: channels });
     } catch (error) {
         console.error(error);
