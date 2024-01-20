@@ -97,7 +97,7 @@ router.get('/agency_tours', async function (req, res) {
               description: populatedTour.description,
               image: `uploads/${populatedTour.photo}`,
               _id: populatedTour._id,
-              guide: populatedTour.guide, // This will contain the guide details
+              guide: populatedTour.guide, 
               agency: populatedTour.agency,
               starting_date: populatedTour.starting_date,
               ending_date: populatedTour.ending_date,
