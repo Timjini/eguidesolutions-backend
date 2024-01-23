@@ -3,6 +3,7 @@ const router = express.Router();
 const Agency = require('../../models/Agency');
 const User = require('../../models/Users');
 const Guide = require('../../models/Guide');
+const Tour = require('../../models/Tours');
 const { isAgencyOwner, isAdministrator } = require('../../auth/auth');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
@@ -183,6 +184,67 @@ router.get('/agency_channels', async function (req, res) {
   }
 });
 
+
+router.get('/all_agencies' , isAdministrator, async (req, res) => {
+
+    try {
+    const agencies = await Agency.find();
+
+    res.status(200).json({
+      message: 'Agencies fetched successfully',
+      agencies
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'Internal server error'
+    });
+  }
+});
+
+
+router.post('/agency_data', async function (req, res) {
+  const { agencyId } = req.body.body;
+  console.log("body", req.body)
+  console.log("agency fetch" , agencyId);
+
+  const authToken = req.body.headers.Authorization?.split(' ')[1];
+  console.log("authToken", authToken)
+  if (!authToken) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    // const user = await User.findOne({ authToken: authToken }).exec();
+
+    const agency = await Agency.findOne({ _id: agencyId });
+    console.log("agnecy here" ,agency);
+
+    if (!agency) {
+      return res.status(404).json({ message: 'Agency not found for the user' });
+    }
+
+    // Find channels based on the provided agencyId
+    //  return guide count 
+    const guidesCount = await Guide.find({agency: agency}).count();
+    console.log(guidesCount);
+    const channelsCount = await Channel.countDocuments({ agency: agencyId });
+    // const toursCount = await Tour.find({agency: agency }).count();
+     
+    const channels = await Channel.find({ agency: agencyId });
+    
+    // Filter channels with participants and get the total count
+    const touristsCount = channels
+      .filter((channel) => channel.participants.length)
+      .reduce((acc, channel) => acc + channel.participants.length, 0);
+
+    res.status(200).json({ message: 'Agency Data', guides: guidesCount, channels: channelsCount, tourists: touristsCount});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching the guides' });
+  }
+
+});
 
 
 
