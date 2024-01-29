@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   phone: { type: String, required: false },
   authToken: { type: String, required: true },
+  resetPasswordToken: { type: String },
   type: { type: String, required: true, enum: Object.values(UserType), default: UserType.LISTENER },
   username: { type: String, required: false },
   status: { type: String, required: true , default: "offline"},

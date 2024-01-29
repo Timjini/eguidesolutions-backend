@@ -277,5 +277,45 @@ router.delete('/delete_account', async (req, res) => {
     }
   });
 
+  router.post('/activate', async function (req, res) {
+    const password = req.body.password;
+    const token = req.body.token;
+  
+    console.log('Received token:', token);
+  
+    if (!token || token === null) {
+      return res.status(400).json({ message: 'Link Expired', status: 'error' });
+    }
+  
+    try {
+      // Log the token from the user object in the database
+      const user = await User.findOne({ resetPasswordToken: token }).exec();
+      // console.log('Token from database:', user?.resetPasswordToken);
+  
+      console.log('Found user:', user);
+  
+      if (!user) {
+        return res.status(400).json({ message: 'Please Contact admin', status: 'error' });
+      }
+  
+      const userId = user._id;
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const authToken = jwt.sign({ userId }, secretKey, { expiresIn: '90d' });
+  
+      if (password) {
+        user.password = hashedPassword;
+        user.authToken = authToken;
+        user.resetPasswordToken = '';
+  
+        await user.save();
+  
+        return res.status(200).json({ message: 'Password Updated Successfully', status: 'success', authToken, user:user });
+      }
+    } catch (error) {
+      console.error('Error updating password:', error);
+      return res.status(500).json({ message: 'Error updating password', status: 'error' });
+    }
+  });
+  
 
   module.exports = router;

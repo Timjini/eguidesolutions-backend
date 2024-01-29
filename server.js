@@ -10,15 +10,26 @@ const usersRoutes = require('./api/users/usersRoutes');
 const channelsRoutes = require('./api/channels/channelsRoutes');
 const agenciesRoutes = require('./api/agencies/agenciesRoutes');
 const toursRoutes = require('./api/tours/toursRoutes');
+const adminRoutes = require('./api/admin/adminRoutes');
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
 const path = require('path');
 const { upload, uploadToS3, getObjectFromS3 } = require('./fileUploader');
 
 
 
+// =================================================================================================
+// ========================================CORS POLICY =============================================[]
+// =================================================================================================
+
+const allowedOrigins = ['https://admin-eguide.vercel.app', 'https://admin.e-guidesolutions.com', 'http://localhost:5173', 'http://localhost:3000'];
+
+app.use(cors({
+  origin: allowedOrigins
+}));
+
 
 // =================================================================================================
-// ======================================== R2 BUCKET =============================================[]
+// ======================================== R2 BUCKET / FILE UPLOADS ==============================[]
 // =================================================================================================
 
 app.post('/upload', async (req, res) => {
@@ -40,15 +51,9 @@ app.post('/upload', async (req, res) => {
   }
 });
 // =================================================================================================
-// =========================================== ROUTES =============================================[]
+// =========================================== APP's ROUTES =======================================[]
 // =================================================================================================
 
-  
-const allowedOrigins = ['https://admin-eguide.vercel.app', 'https://admin.e-guidesolutions.com', 'http://localhost:5173', 'http://localhost:3000'];
-
-app.use(cors({
-  origin: allowedOrigins
-}));
 
 app.use(upload);
 
@@ -57,10 +62,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.use(express.json());
 
+// Use these Routes for Agency users (Owner, Guide, Agent) and Travelers
 app.use('/api/users', usersRoutes);
 app.use('/api/channels', channelsRoutes);
 app.use('/api/tours', toursRoutes);
 app.use('/api/agencies', agenciesRoutes);
+
+// Use This for Admin user (administrator) requests
+app.use('/api/admin', adminRoutes);
 
 
 app.get('/uploads/:file_name', async (req, res) => {
@@ -79,7 +88,7 @@ app.get('/uploads/:file_name', async (req, res) => {
 
 
 // =================================================================================================
-// ========================================= GENERATE TOKEN ======================================[]
+// =================================== AGORA CHANNEL GENERATE TOKEN ===============================[]
 // =================================================================================================
 
 
