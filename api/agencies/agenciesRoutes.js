@@ -12,6 +12,11 @@ const { upload, uploadToS3 } = require('../../fileUploader');
 const Channel = require('../../models/Channels');
 
 
+// #### ALL POST REQUESTS 
+
+// =======================================================================================================================================
+//==============> Creating agency currently available only on postman ========================>
+// =======================================================================================================================================
 
 router.post('/create_agency', async (req, res) => {
     try {
@@ -24,9 +29,7 @@ router.post('/create_agency', async (req, res) => {
         const authToken = req.headers.authorization?.split(' ')[1];
         const user = await User.findOne({ authToken: authToken });
 
-        // Update user to agency owner
         if (!user.isAgencyOwner) {
-            // Update the user's isAgencyOwner field to true
             user.isAgencyOwner = true;
             await user.save();
         }
@@ -50,6 +53,9 @@ router.post('/create_agency', async (req, res) => {
     }
 });
 
+// =======================================================================================================================================
+//==========================================================> Creating an agent/ Guide by Agency Admin User (agency/owner)
+// =======================================================================================================================================
 
 router.post('/create_agent', async (req, res) => {
     try {
@@ -77,7 +83,6 @@ router.post('/create_agent', async (req, res) => {
         authToken,
       });
   
-      // Create a new guide if the user type is 'guide'
       if (type === 'guide') {
         const guide = new Guide({
           agency: agency._id, 
@@ -86,10 +91,8 @@ router.post('/create_agent', async (req, res) => {
         await guide.save();
       }
   
-      // Add the user to the agency's members array
       agency.members.push(user._id);
   
-      // Save both the user and the agency
       await Promise.all([user.save(), agency.save()]);
   
       res.status(201).json({ message: 'User created successfully', user });
@@ -98,6 +101,60 @@ router.post('/create_agent', async (req, res) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   });
+
+
+// =======================================================================================================================================
+//==========================================================> Agency Data for the Dashboard Cards 
+// =======================================================================================================================================
+
+
+router.post('/agency_data', async function (req, res) {
+  const { agencyId } = req.body.body;
+  console.log("body", req.body)
+  console.log("agency fetch" , agencyId);
+
+  const authToken = req.body.headers.Authorization?.split(' ')[1];
+  console.log("authToken", authToken)
+  if (!authToken) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+
+    const agency = await Agency.findOne({ _id: agencyId });
+    console.log("agnecy here" ,agency);
+
+    if (!agency) {
+      return res.status(404).json({ message: 'Agency not found for the user' });
+    }
+
+    const guidesCount = await Guide.find({agency: agency}).count();
+    console.log(guidesCount);
+    const channelsCount = await Channel.countDocuments({ agency: agencyId });
+     
+    const channels = await Channel.find({ agency: agencyId });
+    
+    const touristsCount = channels
+      .filter((channel) => channel.participants.length)
+      .reduce((acc, channel) => acc + channel.participants.length, 0);
+
+    res.status(200).json({ message: 'Agency Data', guides: guidesCount, channels: channelsCount, tourists: touristsCount});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching the guides' });
+  }
+
+});
+
+
+
+
+// #### ALL GET REQUESTS 
+
+// =======================================================================================================================================
+//==========================================================> Getting all needed members using agency Id
+// =======================================================================================================================================
+
 
 
   router.get('/members', async (req, res) => {
@@ -138,6 +195,11 @@ router.post('/create_agent', async (req, res) => {
     }
   });
   
+
+// =======================================================================================================================================
+//==========================================================> Creating a channel for agency using Agency ID
+// =======================================================================================================================================
+
 
 router.get('/agency_channels', async function (req, res) {
   const { agencyId } = req.query;
@@ -185,6 +247,11 @@ router.get('/agency_channels', async function (req, res) {
 });
 
 
+// =======================================================================================================================================
+//==========================================================> Getting All Agencies for App Administrator
+// =======================================================================================================================================
+
+
 router.get('/all_agencies' , isAdministrator, async (req, res) => {
 
     try {
@@ -202,49 +269,6 @@ router.get('/all_agencies' , isAdministrator, async (req, res) => {
   }
 });
 
-
-router.post('/agency_data', async function (req, res) {
-  const { agencyId } = req.body.body;
-  console.log("body", req.body)
-  console.log("agency fetch" , agencyId);
-
-  const authToken = req.body.headers.Authorization?.split(' ')[1];
-  console.log("authToken", authToken)
-  if (!authToken) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-
-  try {
-    // const user = await User.findOne({ authToken: authToken }).exec();
-
-    const agency = await Agency.findOne({ _id: agencyId });
-    console.log("agnecy here" ,agency);
-
-    if (!agency) {
-      return res.status(404).json({ message: 'Agency not found for the user' });
-    }
-
-    // Find channels based on the provided agencyId
-    //  return guide count 
-    const guidesCount = await Guide.find({agency: agency}).count();
-    console.log(guidesCount);
-    const channelsCount = await Channel.countDocuments({ agency: agencyId });
-    // const toursCount = await Tour.find({agency: agency }).count();
-     
-    const channels = await Channel.find({ agency: agencyId });
-    
-    // Filter channels with participants and get the total count
-    const touristsCount = channels
-      .filter((channel) => channel.participants.length)
-      .reduce((acc, channel) => acc + channel.participants.length, 0);
-
-    res.status(200).json({ message: 'Agency Data', guides: guidesCount, channels: channelsCount, tourists: touristsCount});
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'An error occurred while fetching the guides' });
-  }
-
-});
 
 
 
