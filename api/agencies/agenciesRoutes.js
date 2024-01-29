@@ -20,7 +20,7 @@ const Channel = require('../../models/Channels');
 
 router.post('/create_agency', async (req, res) => {
     try {
-        console.log(req.body)
+        console.log(req.headers)
         const { name, description } = req.body;
         const file = req.file;
         console.log(req.body)
@@ -28,7 +28,7 @@ router.post('/create_agency', async (req, res) => {
 
         const authToken = req.headers.authorization?.split(' ')[1];
         const user = await User.findOne({ authToken: authToken });
-
+        console.log(user)
         if (!user.isAgencyOwner) {
             user.isAgencyOwner = true;
             await user.save();
@@ -44,9 +44,13 @@ router.post('/create_agency', async (req, res) => {
             description,
         });
 
-        await agency.save();
+        console.log(agency)
 
-        res.status(201).json({ message: 'Agency created successfully', agency });
+        await agency.save();
+        await User.updateOne({ _id: user._id }, { ownedAgency: agency._id });
+
+
+        res.status(201).json({ message: 'Agency created successfully', agency , user:user });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal server error' });
