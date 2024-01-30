@@ -10,6 +10,8 @@ const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
 const { upload, uploadToS3 } = require('../../fileUploader');
 const Channel = require('../../models/Channels');
+const sendPasswordResetEmail = require('../../mailer/resetPassword');
+const crypto = require('crypto');
 
 
 // #### ALL POST REQUESTS 
@@ -71,7 +73,8 @@ router.post('/create_agent', async (req, res) => {
       console.log(agency)
     
   
-      const hashedPassword = await bcrypt.hash(password, 10);
+      // Generate a unique token
+      const token = crypto.randomBytes(32).toString('hex');
       const id = uuid.v4();
       const authToken = jwt.sign({ id }, process.env.JWT_SECRET_KEY, { expiresIn: '72h' });
   
@@ -80,11 +83,12 @@ router.post('/create_agent', async (req, res) => {
         id,
         name,
         email,
-        password: hashedPassword,
+        password: '$43$!^^&@',
         type,
         phone,
         avatar: avatar.file_name,
         authToken,
+        resetPasswordToken: token,
       });
   
       if (type === 'guide') {
@@ -96,7 +100,8 @@ router.post('/create_agent', async (req, res) => {
       }
   
       agency.members.push(user._id);
-  
+
+      await sendPasswordResetEmail(user);
       await Promise.all([user.save(), agency.save()]);
   
       res.status(201).json({ message: 'User created successfully', user });
