@@ -127,8 +127,8 @@ router.post('/create_agency_owner', isAdministrator, async (req, res) => {
     console.log(req.file)
     try {
 
-    // const file = req.file;
-    // const avatar = await uploadToS3(file);
+    const file = req.file;
+    const avatar = await uploadToS3(file);
 
     console.log(req.body)
 
@@ -160,7 +160,7 @@ router.post('/create_agency_owner', isAdministrator, async (req, res) => {
         password:"null",
         isAgencyOwner: true,
         phone,
-        // avatar: avatar.file_name,
+        avatar: avatar.file_name,
         authToken,
         resetPasswordToken: token,
     });
