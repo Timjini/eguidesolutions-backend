@@ -58,7 +58,7 @@ app.post('/upload', async (req, res) => {
 app.use(upload);
 
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'http://your-frontend-domain.com');
+  res.header('Access-Control-Allow-Origin', 'https://admin.e-guidesolutions.com/');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
