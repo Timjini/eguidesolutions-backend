@@ -1,6 +1,6 @@
 require('dotenv').config();
 const jwt = require("jsonwebtoken");
-const secretKey = process.env.TOKEN_KEY;
+const secretKey = process.env.JWT_SECRET_KEY;
 const User = require("../models/Users");
 
 // const verifyToken = (req, res, next) => {
@@ -41,9 +41,10 @@ const isAgencyOwner = async (req, res, next) => {
 
 const isAdministrator = async (req, res, next) => {
   try {
-    const authToken = req.headers.authorization?.split('')[1];
-    const user = await User.findOne({authToken: authToken});
+    const authToken = req.headers.authorization?.split(' ')[1];
+    console.log(req.headers);
 
+    const user = await User.findOne({authToken: authToken});
         if (user && user.type == "admin"){
           req.user = user;
           next();
