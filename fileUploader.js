@@ -20,7 +20,7 @@ const uploadToS3 = async (file) => {
   const uniqueFilename = uniqueSuffix + extension;
 
   const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: process.env.NEW_BUCKET_NAME,
     Key: uniqueFilename,
     Body: file.buffer,
     ContentType: file.mimetype,
@@ -35,7 +35,7 @@ const uploadToS3 = async (file) => {
 
 const getObjectFromS3 = async (fileName) => {
   const params = {
-    Bucket: process.env.AWS_BUCKET_NAME,
+    Bucket: process.env.NEW_BUCKET_NAME,
     Key: fileName,
   };
 
@@ -43,5 +43,12 @@ const getObjectFromS3 = async (fileName) => {
 };
 
 
+const getUserAvatarUrl = (user) => {
+  return user.avatar
+    ? `uploads/${user.avatar}`
+    : 'uploads/user.png'; 
+};
 
-module.exports = { upload, uploadToS3 , getObjectFromS3 };
+
+
+module.exports = { upload, uploadToS3 , getObjectFromS3,getUserAvatarUrl };

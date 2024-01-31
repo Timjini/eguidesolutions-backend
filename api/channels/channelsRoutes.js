@@ -7,8 +7,6 @@ const Tour = require('../../models/Tours');
 const Guide = require('../../models/Guide');
 const Agency = require('../../models/Agency');
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
-const APP_CERTIFICATE = process.env.APP_CERTIFICATE;
-const APP_KEY = process.env.APP_KEY;
 
 
 
@@ -17,14 +15,14 @@ async function generateAndStoreAgoraToken(channel) {
   try {
     // Use Agora SDK to generate a token based on your Agora App ID and App Certificate
     const token = RtcTokenBuilder.buildTokenWithUid(
-      APP_KEY,
-      APP_CERTIFICATE,
+      process.env.APP_KEY,
+      process.env.APP_CERTIFICATE,
       channel.code, 
       0, 
       RtcRole.PUBLISHER,
       Math.floor(Date.now() / 1000) + 7 * 86400
     );
-
+      console.log('Generated Agora token:', token)
     // Update the channel document with the new token
     channel.agoraToken = token;
     await channel.save();
@@ -123,7 +121,7 @@ async function generateAndStoreAgoraToken(channel) {
               populate: { path: 'user', select: 'name avatar' }
             })
             .populate('tour'); // Assuming 'tour' is the field in your Channel model that references the Tour model
-
+        console.log("Fetched agency channels:", channels);
         res.status(200).json({ message: 'Agency Channels', channels: channels });
     } catch (error) {
         console.error(error);
