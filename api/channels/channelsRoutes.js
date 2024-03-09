@@ -81,8 +81,8 @@ async function generateAndStoreAgoraToken(channel) {
       const newChannel = new Channel({
         type,
         owner: user,
-        agency: agency, // Assuming you want to store agency ID in the channel
-        tour: tour,     // Assuming you want to store tour ID in the channel
+        agency: agency, 
+        tour: tour,     
         guide: guide
       });
   
