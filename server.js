@@ -11,6 +11,7 @@ const channelsRoutes = require('./api/channels/channelsRoutes');
 const agenciesRoutes = require('./api/agencies/agenciesRoutes');
 const toursRoutes = require('./api/tours/toursRoutes');
 const adminRoutes = require('./api/admin/adminRoutes');
+const touristToursRoutes = require('./api/v1/tours/touristToursRoutes');
 const { RtcTokenBuilder, RtcRole } = require('agora-access-token');
 const path = require('path');
 const { upload, uploadToS3, getObjectFromS3 } = require('./fileUploader');
@@ -68,6 +69,11 @@ app.use('/api/users', usersRoutes);
 app.use('/api/channels', channelsRoutes);
 app.use('/api/tours', toursRoutes);
 app.use('/api/agencies', agenciesRoutes);
+
+// Mobile Client routes
+// app.use('api/v1/auth', authRoutes);
+// app.use('api/v1/channels', touristChannelsRoutes);
+app.use('/api/v1/tours', touristToursRoutes);
 
 // Use This for Admin user (administrator) requests
 app.use('/api/admin', adminRoutes);
