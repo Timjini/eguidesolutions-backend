@@ -1,17 +1,19 @@
 class TourSerializer {
-    static serialize(tour){
-        return {
-            _id: tour._id,
-            description: tour.description,
-            image: `uploads/${tour.photo}`,
-            starting_date: tour.starting_date,
-            ending_date: tour.ending_date,
-        };
-    }
+  static serialize(tour) {
+    return {
+      _id: tour._id,
+      id: tour.id,
+      title: tour.title,
+      description: tour.description,
+      image: `/uploads/${tour.photo}` ?? "/uploads/1709835166036-44599960.jpg",
+      starting_date: tour.starting_date,
+      ending_date: tour.ending_date,
+    };
+  }
 
-    static serializeMany(tours) {
-        return tours.map(this.serialize);
-      }
+  static serializeMany(tours) {
+    return tours.map(this.serialize);
+  }
 }
 
 module.exports = TourSerializer;

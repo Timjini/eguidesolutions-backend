@@ -17,13 +17,18 @@ const { upload, uploadToS3, getUserAvatarUrl } = require("../../fileUploader");
 
 // Sign up route  ===================================================>
 router.post("/sign_up", async (req, res) => {
+  console.log(req.body);
   const id = uuid.v4();
   const { email, password, phone, username, type } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = uuid.v4();
   const authToken = jwt.sign({ userId }, secretKey, { expiresIn: "90d" });
   const file = req.file;
-  const image = await uploadToS3(file);
+  const imageName = "";
+  if (file) {
+    const image = await uploadToS3(file);
+    const imageName = image.file_name;
+  }
 
   try {
     const user = new User({
@@ -34,7 +39,7 @@ router.post("/sign_up", async (req, res) => {
       type,
       authToken,
       username,
-      avatar: image.file_name,
+      avatar: imageName ?? "",
     });
 
     await user.save();
@@ -139,16 +144,14 @@ router.post("/login", async (req, res) => {
             //   agency: agency,
             //   status: "ok",
             // });
-            res
-              .status(200)
-              .json({
-                message: "User logged in successfully",
-                token: user.authToken,
-                user: { ...updatedUser._doc, agency: agency },
-                userAvatarUrl,
-                agency: agency,
-                status: "ok",
-              });
+            res.status(200).json({
+              message: "User logged in successfully",
+              token: user.authToken,
+              user: { ...updatedUser._doc, agency: agency },
+              userAvatarUrl,
+              agency: agency,
+              status: "ok",
+            });
           }
         });
       } else {
