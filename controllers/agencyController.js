@@ -1,4 +1,4 @@
-const Agency = require("../models/agency");
+const Agency = require("../models/Agency");
 
 async function createAgency(req, res) {
   try {

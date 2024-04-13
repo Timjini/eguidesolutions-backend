@@ -1,21 +1,24 @@
-const mongoose = require('../db');
-
+const mongoose = require("../db");
 
 const guideSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    agency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency', required: true },
-    name: { type: String, required: false },
-    avatar: { type: String },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  agency: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Agency",
+    required: true,
+  },
+  name: { type: String, required: false },
+  avatar: { type: String },
 });
 
-const Guide = mongoose.model('Guide', guideSchema);
+const Guide = mongoose.model("Guide", guideSchema);
 
 // Create a static method to create a new Guide with user's name and avatar
 Guide.createGuideWithUserData = async function (userId, agencyId) {
   try {
-    const user = await User.findById(userId); // Assuming you have a User model
+    const user = await User.findById(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     const newGuide = new Guide({

@@ -8,6 +8,7 @@ class TourSerializer {
       image: `/uploads/${tour.photo}` ?? "/uploads/1709835166036-44599960.jpg",
       starting_date: tour.starting_date,
       ending_date: tour.ending_date,
+      favorite: tour.favorite ?? false,
     };
   }
 
