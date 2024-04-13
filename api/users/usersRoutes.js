@@ -19,7 +19,7 @@ const { upload, uploadToS3, getUserAvatarUrl } = require("../../fileUploader");
 router.post("/sign_up", async (req, res) => {
   console.log(req.body);
   const id = uuid.v4();
-  const { email, password, phone, username, type } = req.body;
+  const { email, password, phone, username, name, type } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = uuid.v4();
   const authToken = jwt.sign({ userId }, secretKey, { expiresIn: "90d" });
@@ -39,6 +39,7 @@ router.post("/sign_up", async (req, res) => {
       type,
       authToken,
       username,
+      name,
       avatar: imageName ?? "",
     });
 
@@ -149,6 +150,7 @@ router.post("/login", async (req, res) => {
               token: user.authToken,
               user: { ...updatedUser._doc, agency: agency },
               userAvatarUrl,
+              name: user.name,
               agency: agency,
               status: "ok",
             });
