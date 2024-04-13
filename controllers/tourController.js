@@ -5,23 +5,27 @@ const TourSerializer = require("../serializers/tourSerializer");
 class TourController {
   static async getAllTours(req, res) {
     try {
+      console.log(req.body);
       const userId = req.body.user_id;
       const tours = await Tour.find();
-      const serializedTours = TourSerializer.serializeMany(tours);
+      console.log(tours.length);
 
-      for (const tour of tours) {
-        const favoriteRecord = await Favorite.findOne({
-          user: userId,
-          tour: tour._id,
-        });
+      const serializedTours = await Promise.all(
+        tours.map(async (tour) => {
+          const favoriteRecord = await Favorite.findOne({
+            user: userId,
+            tour: tour._id,
+          });
 
-        const isFavorite = !!favoriteRecord;
+          const isFavorite = !!favoriteRecord;
 
-        serializedTours.push({
-          ...TourSerializer.serialize(tour),
-          favorite: isFavorite,
-        });
-      }
+          return {
+            ...TourSerializer.serialize(tour),
+            favorite: isFavorite,
+          };
+        })
+      );
+      console.log("Serialized Tours:", serializedTours.length);
       return res.status(200).json({
         status: "success",
         message: "Tours fetched successfully",

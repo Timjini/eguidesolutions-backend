@@ -2,10 +2,11 @@ const Favorite = require("../models/Favorite");
 
 async function addToFavorite(req, res) {
   try {
-    const { userId, tourId } = req.body;
+    const { user_id, tour_id } = req.body;
+    console.log("Tour", tour_id);
     const favorite = new Favorite({
-      user: userId,
-      tour: tourId,
+      user: user_id,
+      tour: tour_id,
       isFavorite: true,
     });
     await favorite.save();
@@ -33,9 +34,9 @@ async function addToFavorite(req, res) {
 
 async function removeFromFavorite(req, res) {
   try {
-    const { userId, tourId } = req.body;
+    const { user_id, tour_id } = req.body;
     const favorite = await Favorite.findOneAndUpdate(
-      { user: userId, tour: tourId },
+      { user: user_id, tour: tour_id },
       { $set: { isFavorite: false } }
     );
 
