@@ -5,7 +5,6 @@ const TourSerializer = require("../serializers/tourSerializer");
 class TourController {
   static async getAllTours(req, res) {
     try {
-      console.log(req.body);
       const userId = req.body.user_id;
       const tours = await Tour.find();
       console.log(tours.length);
@@ -17,11 +16,11 @@ class TourController {
             tour: tour._id,
           });
 
-          const isFavorite = !!favoriteRecord;
+          // const isFavorite = !!favoriteRecord;
 
           return {
             ...TourSerializer.serialize(tour),
-            favorite: isFavorite,
+            favorite: favoriteRecord.isFavorite,
           };
         })
       );
