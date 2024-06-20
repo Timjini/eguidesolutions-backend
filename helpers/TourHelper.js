@@ -22,12 +22,12 @@ export const createAddress = (data) => {
   return address;
 };
 
-export const createItinerary = (addresses, tour) => {
+export const createItinerary = (address, tour) => {
   let start_point = null;
   let end_point = null;
   let stops = [];
 
-  addresses.forEach(address => {
+  address.forEach(address => {
     if (address.address_type === 0) {
       start_point = { lang: address.coordinates.lang, lat: address.coordinates.lat };
     } else if (address.address_type === 1) {
