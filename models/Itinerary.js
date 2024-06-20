@@ -1,20 +1,16 @@
 const mongoose = require('../db');
-
-const pointSchema = mongoose.Schema({
-    lat: { type: Number, required: true },
-    lng: { type: Number, required: true },
-});
+const addressSchema = require('../models/Address').schema;
 
 const itinerarySchema = mongoose.Schema({
     tour: { type: mongoose.Schema.Types.ObjectId, ref: 'Tour', required: true },
     agency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency', required: true },
-    start_point: { type: pointSchema, required: true },
-    end_point: { type: pointSchema, required: true },
-    stops: { type: [pointSchema] },
+    start_point: { type: addressSchema, required: true },
+    end_point: { type: addressSchema, required: true },
+    stops: { type: [addressSchema] },
     createdAt: { type: Date, required: true, default: Date.now },
     updatedAt: { type: Date, required: true, default: Date.now },
 });
 
-const Itinerary = mongoose.Model('Itinerary', itinerarySchema);
+const Itinerary = mongoose.model('Itinerary', itinerarySchema);
 
 module.exports = Itinerary;
