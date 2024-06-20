@@ -22,12 +22,27 @@ export const createAddress = (data) => {
   return address;
 };
 
-export const createItinerary = (address, tour) => {
+export const createItinerary = (addresses, tour) => {
+  let start_point = null;
+  let end_point = null;
+  let stops = [];
+
+  addresses.forEach(address => {
+    if (address.address_type === 0) {
+      start_point = { lang: address.coordinates.lang, lat: address.coordinates.lat };
+    } else if (address.address_type === 1) {
+      end_point = { lang: address.coordinates.lang, lat: address.coordinates.lat };
+    } else if (address.address_type === 2) {
+      stops.push({ lang: address.coordinates.lang, lat: address.coordinates.lat });
+    }
+  });
+
   const itinerary = new Itinerary({
-    tour_id: tour.id,
-    tour: data.tour,
-    agency_id: tour.agency.id,
-    address: address,
+    tour: tour.id,
+    agency: tour.agency.id,
+    start_point: start_point,
+    end_point: end_point,
+    stops: stops,
   });
 
   itinerary.save();
@@ -35,4 +50,3 @@ export const createItinerary = (address, tour) => {
 
   return itinerary;
 };
-
