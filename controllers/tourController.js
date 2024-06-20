@@ -69,7 +69,7 @@ class TourController {
       await tour.save();
 
       // create itinerary
-      const adresses = [];
+      const addresses = [];
       const startPointAddress = createAddress(startPoint);
       const endPointAddress = createAddress(endPoint);
       const stopPointAddresses = [];
@@ -79,7 +79,7 @@ class TourController {
       addresses.push(startPointAddress);
       addresses.push(endPointAddress);
 
-      createItinerary(adresses, tour);
+      createItinerary(addresses, tour);
 
       // Save the tour document to the database
 
