@@ -7,7 +7,7 @@ const Agency = require("../models/Agency");
 const Guide = require("../models/Guide");
 const Tour = require("../models/Tours");
 const { upload, uploadToS3 } = require("../fileUploader");
-const { createAddress } = require("../helpers/TourHelper");
+const { createAddress, createItinerary } = require("../helpers/TourHelper");
 
 class TourController {
   static async getAllTours(req, res) {
@@ -52,6 +52,7 @@ class TourController {
       const { title, description, guide, agency, startingDate, endingDate, startPoint, endPoint, stops } =
         req.body;
       const file = req.file;
+      console.log("===================>", file)
       const agencyId = req.body.agency;
       const image = await uploadToS3(file);
 
@@ -72,7 +73,7 @@ class TourController {
       const addresses = [];
       const startPointAddress = createAddress(startPoint);
       const endPointAddress = createAddress(endPoint);
-      const stopPointAddresses = [];
+ 
       stops.map((stop) => {
         addresses.push(createAddress(stop))
       });
