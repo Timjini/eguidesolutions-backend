@@ -8,6 +8,9 @@ const tourSchema = new mongoose.Schema({
     agency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency', required: true },
     starting_date: { type: Date, ref: 'Starting Date', required: false },
     ending_date: { type: Date, ref: 'Ending Date', required: false },
+    start_point: { type: String, ref: 'Start Point', required: true},
+    end_point: { type: String, ref: 'End Point', required: true},
+    stops: { type: Array, required: false}
 });
 
 
