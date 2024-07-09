@@ -14,7 +14,6 @@ class TourController {
     try {
       const userId = req.body.user_id;
       const tours = await Tour.find();
-      console.log(tours.length);
 
       const serializedTours = await Promise.all(
         tours.map(async (tour) => {
@@ -51,8 +50,6 @@ class TourController {
       const file = req.file;
       const agencyId = req.body.agency;
 
-      console.log("Request", req.body);
-
       if (!file) {
         return res.status(400).json({ error: "File is required" });
       }
@@ -86,10 +83,10 @@ class TourController {
           addresses.push(await createAddress(stop));
         }
       }
-
+      
       addresses.push(startPointAddress);
       addresses.push(endPointAddress);
-
+      
       await tour.save();
       await createItinerary(addresses, tour);
 

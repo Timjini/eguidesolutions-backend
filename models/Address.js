@@ -1,6 +1,6 @@
 const mongoose = require('../db');
 
-const addressSchema = mongoose.Schema({
+const addressSchema = new mongoose.Schema({
     street_1: {
         type: String,
         required: true
@@ -42,5 +42,5 @@ const addressSchema = mongoose.Schema({
     }
 });
 
-const Adress = mongoose.model('Address', addressSchema);
-module.exports = Adress;
+const Address = mongoose.model('Address', addressSchema);
+module.exports = Address;
