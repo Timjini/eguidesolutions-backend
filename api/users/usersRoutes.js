@@ -29,6 +29,11 @@ router.post("/sign_up", async (req, res) => {
     const image = await uploadToS3(file);
     const imageName = image.file_name;
   }
+  
+  let formattedName = name;
+  if (Array.isArray(name)) {
+    formattedName = name.join(' '); 
+  }
 
   try {
     const user = new User({
@@ -39,9 +44,10 @@ router.post("/sign_up", async (req, res) => {
       type,
       authToken,
       username,
-      name,
+      name: formattedName,
       avatar: imageName ?? "",
     });
+
 
     await user.save();
     res
