@@ -46,7 +46,11 @@ class TourController {
 
   static async createNewTour(req, res) {
     try {
-      const { title, description, guide, agency, starting_date, ending_date, start_point, end_point, stops } = req.body;
+      const { title, description, guide, agency, starting_date, ending_date } = req.body;
+      const start_point = JSON.parse(req.body.start_point);
+      const end_point = JSON.parse(req.body.end_point);
+      const stops = JSON.parse(req.body.stops);
+      console.log("req.body", req.body);
       const file = req.file;
       const agencyId = req.body.agency;
 

@@ -1,3 +1,4 @@
+const sendWelcomeEmail = require("../mailer/welcomeUser");
 const User = require("../models/Users");
 const authSerializer = require("../serializers/authSerializer");
 const bcrypt = require("bcrypt");
@@ -58,6 +59,9 @@ async function signUpAuth(req, res) {
     res
       .status(201)
       .json({ message: "User registered successfully", authToken });
+
+    await sendWelcomeEmail(user);
+
     console.log(user);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while registering user" });
