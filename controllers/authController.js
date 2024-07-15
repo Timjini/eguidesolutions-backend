@@ -60,9 +60,7 @@ async function signUpAuth(req, res) {
       .status(201)
       .json({ message: "User registered successfully", authToken });
 
-    sendWelcomeEmail(user)
-      .then(res => console.log("Send Welcome Email Response", res))
-      .catch(err => console.log("Send Welcome Email Error", err));
+    await sendWelcomeEmail(user);
 
     console.log(user);
   } catch (error) {
