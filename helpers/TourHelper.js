@@ -4,13 +4,14 @@ const Itinerary = require('../models/Itinerary');
 
 class TourHelper {
   static async createAddress(data) {
+    console.log("REQUIRED DATA --------------------> " , data)
     const address = new Address({
-      street_1: data.street_1,
-      street_2: data.street_2,
-      city: data.city,
-      state: data.state,
-      country: data.country,
-      postal_code: data.postal_code,
+      street_1: data.street_1 ?? "",
+      street_2: data.street_2 ?? "",
+      city: data.city ?? "",
+      state: data.state ?? "",
+      country: data.country ?? "",
+      postal_code: data.postal_code ?? "",
       coordinates: {
         lng: data.coordinates.lng,
         lat: data.coordinates.lat,
@@ -30,12 +31,12 @@ class TourHelper {
 
     for (const address of addresses) {
       const addressObject = {
-        street_1: address.street_1,
-        street_2: address.street_2,
-        city: address.city,
-        state: address.state,
-        country: address.country,
-        postal_code: address.postal_code,
+        street_1: address.street_1 ?? "",
+        street_2: address.street_2 ?? "",
+        city: address.city ?? "",
+        state: address.state ?? "",
+        country: address.country ?? "",
+        postal_code: address.postal_code ?? "",
         coordinates: {
           lat: address.coordinates.lat,
           lng: address.coordinates.lng,
