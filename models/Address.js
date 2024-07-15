@@ -3,7 +3,7 @@ const mongoose = require('../db');
 const addressSchema = new mongoose.Schema({
     street_1: {
         type: String,
-        required: true
+        required: false
     },
     street_2: {
         type: String,
@@ -11,7 +11,7 @@ const addressSchema = new mongoose.Schema({
     },
     city: {
         type: String,
-        required: true
+        required: false
     },
     state: {
         type: String,

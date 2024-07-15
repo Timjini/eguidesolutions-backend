@@ -12,6 +12,7 @@ const jwt = require("jsonwebtoken");
 const Agency = require("../../models/Agency");
 const Guide = require("../../models/Guide");
 const { upload, uploadToS3, getUserAvatarUrl } = require("../../fileUploader");
+const sendWelcomeEmail = require("../../mailer/welcomeUser");
 
 // Users and Profile routes
 
@@ -47,6 +48,8 @@ router.post("/sign_up", async (req, res) => {
     res
       .status(201)
       .json({ message: "User registered successfully", authToken });
+
+    await sendWelcomeEmail(user);
     console.log(user);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while registering user" });
