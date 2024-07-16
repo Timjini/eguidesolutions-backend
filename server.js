@@ -18,10 +18,12 @@ const touristChannelRoutes = require("./api/v1/channels/touristChannelsRoutes");
 const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
 const path = require("path");
 const { upload, uploadToS3, getObjectFromS3 } = require("./fileUploader");
+const { removeExpiredChannels } = require("./jobs/DailyJobs");
 
 // =================================================================================================
 // ========================================CORS POLICY =============================================[]
 // =================================================================================================
+removeExpiredChannels();
 
 const allowedOrigins = [
   "https://admin-eguide.vercel.app",
