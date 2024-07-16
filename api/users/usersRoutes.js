@@ -16,10 +16,56 @@ const { upload, uploadToS3, getUserAvatarUrl } = require("../../fileUploader");
 // Users and Profile routes
 
 // Sign up route  ===================================================>
+// router.post("/sign_up", async (req, res) => {
+//   console.log(req.body);
+//   const id = uuid.v4();
+//   const { email, password, phone, username, name, type } = req.body;
+//   console.log("type", req.body);
+//   const hashedPassword = await bcrypt.hash(password, 10);
+//   const userId = uuid.v4();
+//   const authToken = jwt.sign({ userId }, secretKey, { expiresIn: "90d" });
+//   const file = req.file;
+//   const imageName = "";
+//   if (file) {
+//     const image = await uploadToS3(file);
+//     const imageName = image.file_name;
+//   }
+
+//   let formattedName = name;
+//   if (Array.isArray(name)) {
+//     formattedName = name.join(' '); 
+//   }
+
+//   try {
+//     const user = new User({
+//       id,
+//       email,
+//       password: hashedPassword,
+//       phone,
+//       type,
+//       authToken,
+//       username,
+//       name: formattedName,
+//       avatar: imageName ?? "",
+//     });
+
+
+//     await user.save();
+//     res
+//       .status(201)
+//       .json({ message: "User registered successfully", authToken });
+//     console.log(user);
+//   } catch (error) {
+//     res.status(500).json({ error: "An error occurred while registering user" });
+//     console.log(error);
+//   }
+// });
+
 router.post("/sign_up", async (req, res) => {
   console.log(req.body);
   const id = uuid.v4();
   const { email, password, phone, username, name, type } = req.body;
+  console.log("type", req.body);
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = uuid.v4();
   const authToken = jwt.sign({ userId }, secretKey, { expiresIn: "90d" });
@@ -29,7 +75,7 @@ router.post("/sign_up", async (req, res) => {
     const image = await uploadToS3(file);
     const imageName = image.file_name;
   }
-  
+
   let formattedName = name;
   if (Array.isArray(name)) {
     formattedName = name.join(' '); 
@@ -55,7 +101,7 @@ router.post("/sign_up", async (req, res) => {
       .json({ message: "User registered successfully", authToken });
     console.log(user);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while registering user" });
+    res.status(500).json({ error: error });
     console.log(error);
   }
 });
@@ -91,6 +137,7 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ message: "User not found" });
+      
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
