@@ -1,9 +1,8 @@
 const cron = require("node-cron");
 const Channel = require("../models/Channels");
-const { } = require("agora-access-token");
 
 const removeExpiredChannels = () => {
-    cron.schedule('* * * * *', async () => {
+    cron.schedule('0 0 * * *', async () => {
         try {
             const allChannels = await Channel.find();
             console.log("All Channels: ", allChannels);

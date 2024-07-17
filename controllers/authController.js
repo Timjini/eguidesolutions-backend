@@ -1,7 +1,15 @@
-const sendWelcomeEmail = require("../mailer/welcomeUser");
+require("dotenv").config();
+const express = require("express");
+const router = express.Router();
+const verifyToken = require("../auth/authMiddleware");
 const User = require("../models/Users");
 const authSerializer = require("../serializers/authSerializer");
 const bcrypt = require("bcrypt");
+const uuid = require("uuid");
+const jwt = require("jsonwebtoken");
+const { upload, uploadToS3, getUserAvatarUrl } = require("../fileUploader");
+const sendWelcomeEmail = require("../mailer/welcomeUser");
+const secretKey = process.env.JWT_SECRET_KEY;
 
 async function loginAuth(req, res) {
   try {
@@ -41,7 +49,10 @@ async function signUpAuth(req, res) {
     const image = await uploadToS3(file);
     const imageName = image.file_name;
   }
-
+  const existingUser = await User.findOne({ email: email });
+  if(existingUser) {
+    return res.status(409).json({message: "This email is already taken!"});
+  }
   try {
     const user = new User({
       id,
@@ -62,7 +73,7 @@ async function signUpAuth(req, res) {
 
     await sendWelcomeEmail(user);
 
-    console.log(user);
+    console.log("USER", user);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while registering user" });
     console.log(error);
