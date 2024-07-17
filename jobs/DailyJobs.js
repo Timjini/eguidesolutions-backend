@@ -3,31 +3,21 @@ const Channel = require("../models/Channels");
 const User = require("../models/Users");
 
 const removeExpiredChannels = () => {
-    cron.schedule('0 0 * * *', async () => {
+    cron.schedule('0 0 * * *', async () => { // This runs the task every day at midnight
         try {
-            const allChannels = await Channel.find();
-            const existingUser = await User.findOne({ email: "info@e-guidesolutions.com" });
+            const now = new Date();
+            const expiredChannels = await Channel.find({ ending_date: { $lt: now } });
 
-            if (!existingUser) {
-                console.log("User not found!");
-                return;
-            }
-
-            if (allChannels.length > 0) {
-                for (const channel of allChannels) {
-                    const res = channel.participants.addToSet(existingUser._id);
-                    console.log("Channel Response: ", res);
-
-                    await channel.save();
-
-                    console.log("Updated Channel: ", channel);
-                    console.log("Participants: ", channel.participants);
+            if (expiredChannels.length > 0) {
+                for (const channel of expiredChannels) {
+                    await Channel.deleteOne({ _id: channel._id });
+                    console.log("Deleted Channel: ", channel);
                 }
             } else {
-                console.log("No channel found!");
+                console.log("No expired channels found!");
             }
         } catch (error) {
-            console.error("Error fetching channels: ", error);
+            console.error("Error fetching or deleting channels: ", error);
         }
     });
 };
