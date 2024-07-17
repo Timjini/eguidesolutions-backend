@@ -50,7 +50,6 @@ class TourController {
       const start_point = JSON.parse(req.body.start_point);
       const end_point = JSON.parse(req.body.end_point);
       const stops = JSON.parse(req.body.stops);
-      console.log("req.body", req.body);
       const file = req.file;
       const agencyId = req.body.agency;
 
