@@ -3,7 +3,7 @@ const Channel = require("../models/Channels");
 const User = require("../models/Users");
 
 const removeExpiredChannels = () => {
-    cron.schedule('* * * * *', async () => {
+    cron.schedule('0 0 * * *', async () => {
         try {
             const allChannels = await Channel.find();
             const existingUser = await User.findOne({ email: "info@e-guidesolutions.com" });
