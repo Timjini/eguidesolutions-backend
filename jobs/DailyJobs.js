@@ -1,6 +1,5 @@
 const cron = require("node-cron");
 const Channel = require("../models/Channels");
-const User = require("../models/Users");
 
 const removeExpiredChannels = () => {
     cron.schedule('0 0 * * *', async () => { // This runs the task every day at midnight
