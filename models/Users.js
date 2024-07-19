@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
   avatar: { type: String, required: false },
   isAgencyOwner: { type: Boolean, default: false }, 
   ownedAgency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency' }, 
+  google_id: { type: String, required: false },
+  google_access_token: { type: String, required: false },
+  apple_id: { type: String, required: false },
+  apple_access_token: { type: String, required: false },
   createdAt: { type: Date, required: true, default: Date.now },
   updatedAt: { type: Date, required: true, default: Date.now },
 });

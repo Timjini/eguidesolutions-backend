@@ -25,19 +25,20 @@ const { removeExpiredChannels } = require("./jobs/DailyJobs");
 // =================================================================================================
 removeExpiredChannels();
 
-const allowedOrigins = [
-  "https://admin-eguide.vercel.app",
-  "https://admin.e-guidesolutions.com",
-  "http://localhost:5173",
-  "http://localhost:3000",
-];
+// const allowedOrigins = [
+//   "https://admin-eguide.vercel.app",
+//   "https://admin.e-guidesolutions.com",
+//   "http://localhost:5173",
+//   "http://localhost:3000",
+//   "http://localhost:8081"
+// ];
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-  })
-);
-
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 // =================================================================================================
 // ======================================== R2 BUCKET / FILE UPLOADS ==============================[]
 // =================================================================================================
