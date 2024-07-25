@@ -79,7 +79,7 @@ router.post("/sign_up", async (req, res) => {
 
   let formattedName = name;
   if (Array.isArray(name)) {
-    formattedName = name.join(' '); 
+    formattedName = name.join(' ');
   }
 
   try {
@@ -135,19 +135,22 @@ router.post("/upload-avatar", verifyToken, async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, google_id } = req.body;
   try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: "User not found" });
-      
-    }
+    const user = null;
+    if (google_id) {
+      user = await User.findOne({ google_id });
+    } else {
+      user = await User.findOne({ email });
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      const passwordMatch = await bcrypt.compare(password, user.password);
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-
-    if (!passwordMatch) {
-      console.log("Password does not match");
-      return res.status(401).json({ message: "Invalid credentials" });
+      if (!passwordMatch) {
+        console.log("Password does not match");
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
     }
 
     // Update the user's status to "online" in the database
