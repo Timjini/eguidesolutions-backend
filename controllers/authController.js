@@ -39,7 +39,7 @@ async function loginAuth(req, res) {
 
 async function signUpAuth(req, res) {
   const id = uuid.v4();
-  const { email, password, phone, username, name, type } = req.body;
+  const { email, password, phone, username, name, type, google_id, google_access_token } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = uuid.v4();
   const authToken = jwt.sign({ userId }, secretKey, { expiresIn: "90d" });
@@ -51,7 +51,10 @@ async function signUpAuth(req, res) {
   }
   const existingUser = await User.findOne({ email: email });
   if(existingUser) {
-    return res.status(409).json({message: "This email is already taken!"});
+    if(google_id) {
+      loginAuth({email, google_id})
+    }
+    // return res.status(409).json({message: "This email is already taken!"});
   }
   try {
     const user = new User({
@@ -63,6 +66,8 @@ async function signUpAuth(req, res) {
       authToken,
       username,
       name,
+      google_id,
+      google_access_token,
       avatar: imageName ?? "",
     });
 
