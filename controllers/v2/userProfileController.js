@@ -37,7 +37,7 @@ async function createUserProfile(req, res) {
     const address = await createAddress(addressData);
     const userProfile = new UserProfile({
         ...req.body,
-      address: address._id,
+      address: address,
     });
     await userProfile.save();
 
