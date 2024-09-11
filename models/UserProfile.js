@@ -23,6 +23,6 @@ const userProfileSchema = new mongoose.Schema({
 });
 
 // Create the model using the correct schema name
-const User = mongoose.model('User', userProfileSchema);
+const UserProfile = mongoose.model('User', userProfileSchema);
 
-module.exports = User;
+module.exports = UserProfile;
