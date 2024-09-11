@@ -7,9 +7,12 @@ const userProfileSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  email: { type: String, required: true, unique: true },
+  avatar: { type: String, required: false },
   country: { type: String, required: false },
   city: { type: String, required: false },
   address: { type: String, required: false },
+  phone: { type: String, required: false },
   coordinates: {
     lng: { type: Number },
     lat: { type: Number },
