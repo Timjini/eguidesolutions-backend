@@ -13,6 +13,7 @@ const Agency = require("../../models/Agency");
 const Guide = require("../../models/Guide");
 const { upload, uploadToS3, getUserAvatarUrl } = require("../../fileUploader");
 const sendWelcomeEmail = require("../../mailer/welcomeUser");
+// const checkUser = require("../../utils/auth/checkUser");
 
 // Users and Profile routes
 
@@ -269,12 +270,8 @@ router.post("/logout", verifyToken, async (req, res) => {
 
 // Get all users route ============================================================
 router.get("/users", async function (req, res) {
-  const authToken = req.headers.authorization?.split(" ")[1];
-
-  if (!authToken) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
+ 
+  // checkUser(req,res)
   try {
     // Find the user based on the authToken
     const user = await User.findOne({ authToken: authToken }).exec();
