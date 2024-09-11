@@ -1,19 +1,22 @@
-// class userProfileSerializer {
-//     static serialize(userProfile) {
-//       return {
-//         _id: user._id,
-//         id: user.id,
-//         name: user.name,
-//         username: user.username ?? "null",
-//         phone: user.phone,
-//         email: user.email,
-//         type: user.type,
-//         avatar: user.avatar ?? "/uploads/default-avatar.jpg",
-//         token: user.authToken,
-//         status: user.status,
-//       };
-//     }
-//   }
+class UserProfileSerializer {
+    static serialize(userProfile) {
+      return {
+        _id: userProfile._id,
+        id: userProfile.id,
+        country: userProfile.country ?? null,
+        city: userProfile.city ?? null,
+        address: userProfile.address ?? null,
+        coordinates: userProfile.coordinates ?? { lat: null, lng: null },
+        dob: userProfile.dob ?? null,
+        department: userProfile.department ?? null,
+        selectedLanguage: userProfile.selectedLanguage ?? null,
+        timeZone: userProfile.timeZone ?? null,
+        createdAt: userProfile.createdAt,
+        updatedAt: userProfile.updatedAt,
+      };
+    }
+  }
   
-//   module.exports = authSerializer;
+  module.exports = UserProfileSerializer;
+  
   
