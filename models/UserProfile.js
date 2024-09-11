@@ -10,7 +10,6 @@ const userProfileSchema = new mongoose.Schema({
   },
   email: { type: String, required: true, unique: true },
   avatar: { type: String, required: false },
-  address: { type: String, required: false },
   phone: { type: String, required: false },
   dob: { type: Date, required: false },
   department: { type: String, required: false },
