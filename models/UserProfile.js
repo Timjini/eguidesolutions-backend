@@ -5,8 +5,7 @@ const mongoose = require('../db');
 const userProfileSchema = new mongoose.Schema({
   id: {
     type: String,
-    required: true,
-    unique: true,
+    auto: true
   },
   email: { type: String, required: true, unique: true },
   avatar: { type: String, required: false },

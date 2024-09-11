@@ -6,8 +6,7 @@ const UserProfileController = require('../../controllers/v2/userProfileControlle
 const verifyToken = require('../../auth/authMiddleware');
 
 router.get("/", UserProfileController.getUserProfile);
-router.post("/new_user_profile", verifyToken, UserProfileController.createUserProfile);
-router.put("/update_user_profile", verifyToken, UserProfileController.updateUserProfile);
-router.delete("/delete_user_profile", verifyToken, UserProfileController.deleteUserProfile);
+router.post("/new-user-profile", verifyToken, UserProfileController.createOrUpdateUserProfile);
+router.delete("/delete-user-profile", verifyToken, UserProfileController.deleteUserProfile);
 
 module.exports = router;
