@@ -1,27 +1,26 @@
 const UserProfile = require('../../models/UserProfile');
 const User = require('../../models/Users');
 const UserProfileSerializer = require('../../serializers/v2/userProfileSerializer');
+const UserSerializer  = require('../../serializers/v2/userSerializer');
 
 async function getUserProfile(req, res) {
   try {
-    const userProfile = await UserProfile.findOne({ id: req.params.id });
-    const user = await User.findOne({ _id: userProfile.id });
+    // solution 1 : authToken , find user using the auth token
+    const authToken = req.headers.authorization?.split(' ')[1];
+    const user = await User.findOne({ authToken: authToken });
+    const userProfile = await UserProfile.findOne({ id: user.id });
 
-    if (!userProfile || !user) {
-
-        return res.status(404).json({ message: 'User profile not found' });
+    let serializedData = [];
+    if (userProfile) {
+      serializedData = UserProfileSerializer.serialize(userProfile); 
+    }
+    const serializedUser = UserSerializer.serialize(user);
+        
+    if (serializedData) {
+      userData = { ...serializedUser, ...serializedData }; 
     }
 
-    const serializedData = UserProfileSerializer.serialize(userProfile);
-
-    const mergedData = {
-      ...serializedData,
-      avatar: user.avatar,
-      phone: user.phone,
-      email: user.email,
-    };
-
-    return res.status(200).json(mergedData);
+    return res.status(200).json(userData);
   } catch (error) {
 
     return res.status(500).json({ message: 'Error fetching user profile', error });
