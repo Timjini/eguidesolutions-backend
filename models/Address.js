@@ -1,6 +1,10 @@
 const mongoose = require('../db');
 
 const addressSchema = new mongoose.Schema({
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+        auto: true
+    },
     street_1: {
         type: String,
         required: false

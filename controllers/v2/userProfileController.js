@@ -2,6 +2,8 @@ const UserProfile = require('../../models/UserProfile');
 const User = require('../../models/Users');
 const UserProfileSerializer = require('../../serializers/v2/userProfileSerializer');
 const UserSerializer  = require('../../serializers/v2/userSerializer');
+const { createAddress } = require("../helpers/TourHelper");
+
 
 async function getUserProfile(req, res) {
   try {
@@ -30,7 +32,13 @@ async function getUserProfile(req, res) {
 
 async function createUserProfile(req, res) {
   try {
-    const userProfile = new UserProfile(req.body);
+    // create user Address (req google data formatted_address)
+    const addressData = JSON.parse(req.body.google);
+    const address = await createAddress(addressData);
+    const userProfile = new UserProfile({
+        ...req.body,
+      address: address._id,
+    });
     await userProfile.save();
 
     return res.status(201).json(UserProfileSerializer.serialize(userProfile));
