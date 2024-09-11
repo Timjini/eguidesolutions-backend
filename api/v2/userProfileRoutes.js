@@ -9,3 +9,5 @@ router.get("/", UserProfileController.getUserProfile);
 router.post("/new_user_profile", verifyToken, UserProfileController.createUserProfile);
 router.put("/update_user_profile", verifyToken, UserProfileController.updateUserProfile);
 router.delete("/delete_user_profile", verifyToken, UserProfileController.deleteUserProfile);
+
+module.exports = router;

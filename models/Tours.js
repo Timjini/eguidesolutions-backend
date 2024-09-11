@@ -11,7 +11,8 @@ const tourSchema = new mongoose.Schema({
     ending_date: { type: Date, required: false },
     start_point: { type: addressSchema, required: true },
     end_point: { type: addressSchema, required: true },
-    stops: { type: [addressSchema], required: false } // Array of addressSchema
+    stops: { type: [addressSchema], required: false },
+    address:{type: mongoose.Schema.Types.ObjectId, ref: 'Address', required: true},
 });
 
 // Create and export the Tour model
