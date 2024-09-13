@@ -2,6 +2,9 @@ const sendWelcomeEmail = require("../../mailer/welcomeUser");
 const User = require("../../models/Users");
 const authSerializer = require("../../serializers/authSerializer");
 const bcrypt = require("bcrypt");
+const uuid = require("uuid");
+const jwt = require("jsonwebtoken");
+const secretKey = process.env.JWT_SECRET_KEY;
 
 async function loginAuth(req, res) {
   try {
