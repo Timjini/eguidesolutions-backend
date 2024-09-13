@@ -58,7 +58,7 @@ async function signUpAuth(req, res) {
     await user.save();
     res
       .status(201)
-      .json({ message: "User registered successfully", authToken });
+      .json({ message: "User registered successfully", authToken, user: authSerializer.serialize(user) });
 
     await sendWelcomeEmail(user);
 
