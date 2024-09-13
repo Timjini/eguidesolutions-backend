@@ -4,7 +4,6 @@ const app = express();
 const server = http.createServer(app);
 const io = require("socket.io")(server);
 const cors = require("cors");
-// const { v4: uuidV4 } = require('uuid');
 const verifyToken = require("./auth/authMiddleware");
 const usersRoutes = require("./api/users/usersRoutes");
 const channelsRoutes = require("./api/channels/channelsRoutes");
@@ -70,24 +69,15 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 app.use(express.json());
-app.use("/", (req, res) => {
-  res.render('index');
-});
+// app.use("/", (req, res) => {
+//   // res.render('index');
+// });
 // Use these Routes for Agency users (Owner, Guide, Agent) and Travelers
 app.use("/api/users", usersRoutes);
 app.use("/api/channels", channelsRoutes);
 app.use("/api/tours", toursRoutes);
 app.use("/api/agencies", agenciesRoutes);
 
-// Mobile Client routes
-app.use("/api/v1/auth", authRoutes);
-// app.use('api/v1/channels', touristChannelsRoutes);
-app.use("/api/v1/tours", touristToursRoutes);
-app.use("/api/v1/favorite", favoriteRoutes);
-app.use("/api/v1/channels", touristChannelRoutes);
-
-// v2 routes
-app.use("/api/v2/agencies", agenciesRoutesV2);
 
 // Use This for Admin user (administrator) requests
 app.use("/api/admin", adminRoutes);
@@ -105,14 +95,23 @@ app.get("/uploads/:file_name", async (req, res) => {
   }
 });
 
+// =================================================================================================
+// =========================================== Mobile App ROUTES ===================================[]
+// =================================================================================================
+// Mobile Client routes
+app.use("/api/v1/auth", authRoutes);
+// app.use('api/v1/channels', touristChannelsRoutes);
+app.use("/api/v1/tours", touristToursRoutes);
+app.use("/api/v1/favorite", favoriteRoutes);
+app.use("/api/v1/channels", touristChannelRoutes);
 
 // =================================================================================================
-// =========================================== Admin's ROUTES =======================================[]
+// =========================================== Admin's ROUTES =====================================[]
 // =================================================================================================
 
 //userProfile Page Routes : /profile
 app.use("/api/v2/user-profile", userProfileRoutesAdminPanel);
-
+app.use("/api/v2/agencies", agenciesRoutesV2);
 
 // =================================================================================================
 // =================================== AGORA CHANNEL GENERATE TOKEN ===============================[]

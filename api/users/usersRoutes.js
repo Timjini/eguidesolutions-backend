@@ -270,12 +270,12 @@ router.post("/logout", verifyToken, async (req, res) => {
 
 // Get all users route ============================================================
 router.get("/users", async function (req, res) {
- 
+  console.log("running here======================>")
   // checkUser(req,res)
   try {
     // Find the user based on the authToken
     const user = await User.findOne({ authToken: authToken }).exec();
-
+    consol.log(user)
     if (!user) {
       return res.status(401).json({ message: "Invalid token" });
     }

@@ -1,6 +1,6 @@
-const sendWelcomeEmail = require("../mailer/welcomeUser");
-const User = require("../models/Users");
-const authSerializer = require("../serializers/authSerializer");
+const sendWelcomeEmail = require("../../mailer/welcomeUser");
+const User = require("../../models/Users");
+const authSerializer = require("../../serializers/authSerializer");
 const bcrypt = require("bcrypt");
 
 async function loginAuth(req, res) {
