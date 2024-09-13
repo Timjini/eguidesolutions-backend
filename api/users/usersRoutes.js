@@ -13,6 +13,7 @@ const Agency = require("../../models/Agency");
 const Guide = require("../../models/Guide");
 const { upload, uploadToS3, getUserAvatarUrl } = require("../../fileUploader");
 const sendWelcomeEmail = require("../../mailer/welcomeUser");
+const { isAdministrator } = require("../../auth/auth");
 // const checkUser = require("../../utils/auth/checkUser");
 
 // Users and Profile routes
@@ -269,28 +270,15 @@ router.post("/logout", verifyToken, async (req, res) => {
 });
 
 // Get all users route ============================================================
-router.get("/users", async function (req, res) {
-  console.log("running here======================>")
+router.get("/users", verifyToken, isAdministrator, async function (req, res) {
   // checkUser(req,res)
   try {
-    // Find the user based on the authToken
-    const user = await User.findOne({ authToken: authToken }).exec();
-    consol.log(user)
-    if (!user) {
-      return res.status(401).json({ message: "Invalid token" });
-    }
-
-    // Check if the user has necessary permissions (e.g., admin role)
-    if (user.type !== "admin") {
-      return res.status(403).json({ message: "Access forbidden" });
-    }
-
     // Fetch all users from the database
     const users = await User.find({}, "-password").exec();
 
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ message: "Error processing request" });
+    res.status(500).json({ message: error});
   }
 });
 
