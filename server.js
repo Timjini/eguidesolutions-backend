@@ -15,6 +15,7 @@ const touristToursRoutes = require("./api/v1/tours/touristToursRoutes");
 const authRoutes = require("./api/v1/auth/authRoutes");
 const favoriteRoutes = require("./api/v1/favorite/favoriteRoutes");
 const touristChannelRoutes = require("./api/v1/channels/touristChannelsRoutes");
+const agenciesRoutesV2 = require("./api/v2/agencies/agencyRoutes");
 const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
 const path = require("path");
 const { upload, uploadToS3, getObjectFromS3 } = require("./fileUploader");
@@ -68,7 +69,9 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 app.use(express.json());
-
+app.use("/", (req, res) => {
+  res.render('index');
+});
 // Use these Routes for Agency users (Owner, Guide, Agent) and Travelers
 app.use("/api/users", usersRoutes);
 app.use("/api/channels", channelsRoutes);
@@ -81,6 +84,9 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/tours", touristToursRoutes);
 app.use("/api/v1/favorite", favoriteRoutes);
 app.use("/api/v1/channels", touristChannelRoutes);
+
+// v2 routes
+app.use("/api/v2/agencies", agenciesRoutesV2);
 
 // Use This for Admin user (administrator) requests
 app.use("/api/admin", adminRoutes);
