@@ -19,6 +19,7 @@ const agenciesRoutesV2 = require("./api/v2/agencies/agencyRoutes");
 const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
 const path = require("path");
 const { upload, uploadToS3, getObjectFromS3 } = require("./fileUploader");
+const userProfileRoutesAdminPanel = require("./api/v2/userProfileRoutes");
 
 // =================================================================================================
 // ========================================CORS POLICY =============================================[]
@@ -103,6 +104,15 @@ app.get("/uploads/:file_name", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+// =================================================================================================
+// =========================================== Admin's ROUTES =======================================[]
+// =================================================================================================
+
+//userProfile Page Routes : /profile
+app.use("/api/v2/user-profile", userProfileRoutesAdminPanel);
+
 
 // =================================================================================================
 // =================================== AGORA CHANNEL GENERATE TOKEN ===============================[]
