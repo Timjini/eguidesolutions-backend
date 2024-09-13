@@ -1,4 +1,4 @@
-const Agency = require("../models/Agency");
+const Agency = require("../../models/Agency");
 
 async function createAgency(req, res) {
   try {
@@ -21,6 +21,20 @@ async function createAgency(req, res) {
   }
 }
 
+// get agency by id 
+async function getAgencyById(req, res) {
+  try {
+    const agency = await Agency.findById(req.params.id);
+    if (!agency) {
+      return res => res.status(404).json({ message: "Agency not found" });
+    }
+    res.json(agency);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   createAgency,
+  getAgencyById,
 };
