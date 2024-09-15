@@ -65,10 +65,8 @@ const { isAdministrator } = require("../../auth/auth");
 // });
 
 router.post("/sign_up", async (req, res) => {
-  console.log(req.body);
   const id = uuid.v4();
   const { email, password, phone, username, name, type } = req.body;
-  console.log("type", req.body);
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = uuid.v4();
   const authToken = jwt.sign({ userId }, secretKey, { expiresIn: "90d" });
@@ -104,10 +102,8 @@ router.post("/sign_up", async (req, res) => {
       .json({ message: "User registered successfully", authToken });
 
     await sendWelcomeEmail(user);
-    console.log(user);
   } catch (error) {
     res.status(500).json({ error: error });
-    console.log(error);
   }
 });
 
@@ -117,7 +113,6 @@ router.post("/upload-avatar", verifyToken, async (req, res) => {
     const file = req.file;
     const avatar = await uploadToS3(file);
 
-    console.log("Uploaded File:", req.file);
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
@@ -148,7 +143,6 @@ router.post("/login", async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      console.log("Password does not match");
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
@@ -166,7 +160,6 @@ router.post("/login", async (req, res) => {
         // Verify the existing token
         jwt.verify(user.authToken, secretKey, (err, decoded) => {
           if (err) {
-            console.log(err);
             // Token is invalid or expired, generate a new one
             const tokenExpiration =
               Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 60; // 2 months
@@ -194,7 +187,6 @@ router.post("/login", async (req, res) => {
               });
             }
           } else {
-            console.log("token is valid");
             // Use the existing token if it's still valid
             // res.json({
             //   token: user.authToken,
@@ -234,38 +226,32 @@ router.post("/login", async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: "An error occurred while logging in" });
-    console.log(error);
   }
 });
 
 // Logout Method ==============================================================>
 router.post("/logout", verifyToken, async (req, res) => {
   try {
-    console.log(req);
     // Decode the authToken from the request headers
     const authToken = req.headers.authorization?.split(" ")[1];
-    console.log(authToken);
     // const decodedToken = jwt.verify(authToken, secretKey);
 
     // Use the decoded userId to fetch user data
     const user = await User.findOne({ authToken: authToken });
-    console.log(user);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     // Update the user's status to "offline" in the database
-    await User.updateOne({ _id: user._id }, { $set: { status: "offline" } });
+    user.status = "offline";
+    await user.save();
     res.json({ message: "Logged out successfully" });
-    console.log("user logged out successfully");
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({ message: "Token expired" });
     }
     res.status(500).json({ error: "An error occurred while logging out" });
-    console.log(error);
-    console.log(req);
   }
 });
 
@@ -289,7 +275,6 @@ router.delete("/delete_account", async (req, res) => {
   try {
     // Find the user by ID
     const user = await User.findOne({ authToken: authToken }).exec();
-    console.log(user);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -322,7 +307,6 @@ router.get("/guides", async function (req, res) {
     // Find the user based on the authToken
     const user = await User.findOne({ authToken: authToken }).exec();
     const agency = await Agency.findOne({ owner: user._id });
-    console.log(user);
 
     if (!user) {
       return res.status(401).json({ message: "Invalid token" });
@@ -348,7 +332,6 @@ router.post("/activate", async function (req, res) {
   const password = req.body.password;
   const token = req.body.token;
 
-  console.log("Received token:", token);
 
   if (!token || token === null) {
     return res.status(400).json({ message: "Link Expired", status: "error" });
@@ -359,7 +342,6 @@ router.post("/activate", async function (req, res) {
     const user = await User.findOne({ resetPasswordToken: token }).exec();
     // console.log('Token from database:', user?.resetPasswordToken);
 
-    console.log("Found user:", user);
 
     if (!user) {
       return res

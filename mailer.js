@@ -17,7 +17,6 @@ const msg = {
 sgMail
   .send(msg)
   .then(() => {
-    console.log('Email sent successfully');
   })
   .catch((error) => {
     if (error.response) {

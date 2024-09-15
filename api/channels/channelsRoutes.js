@@ -20,7 +20,6 @@ async function generateAndStoreAgoraToken(channel) {
       Math.floor(Date.now() / 1000) + 7 * 86400,
       Math.floor(Date.now() / 1000) + 7 * 86400
     );
-    console.log("Generated Agora token:", token);
     
     // Update the channel document with the new token
     channel.agoraToken = token;
@@ -33,18 +32,12 @@ async function generateAndStoreAgoraToken(channel) {
 
 // API endpoint to create a room
 router.post("/create", async (req, res) => {
-  console.log(req.body);
   const { type } = req.body;
   // const authToken = req.headers.authorization?.split(' ')[1];
   const authToken = req.body.authToken;
   const guideId = req.body.guide;
   const tourId = req.body.tour;
   const agencyId = req.body.agency;
-
-  console.log("agencyId:" + agencyId); //
-  console.log("tourId:" + tourId); //
-  console.log("guideId:" + guideId); //
-  console.log("authToken:" + authToken); //
 
   if (!authToken) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -72,7 +65,6 @@ router.post("/create", async (req, res) => {
     }
 
     const guide = await Guide.findById(guideId);
-    console.log("Retrieved Guide:", guide);
     if (!guide) {
       return res
         .status(404)
@@ -124,7 +116,6 @@ router.get("/agency_channels", async function (req, res) {
         populate: { path: "user", select: "name avatar" },
       })
       .populate("tour"); // Assuming 'tour' is the field in your Channel model that references the Tour model
-    console.log("Fetched agency channels:", channels);
     res.status(200).json({ message: "Agency Channels", channels: channels });
   } catch (error) {
     console.error(error);
@@ -137,7 +128,6 @@ router.get("/agency_channels", async function (req, res) {
 // get channel by channel code and update participants with user authtoken
 
 router.post("/join", async (req, res) => {
-  console.log(req.body);
   const { code } = req.body;
   const authToken = req.headers.authorization?.split(" ")[1];
 
@@ -162,12 +152,10 @@ router.post("/join", async (req, res) => {
 
     channel.participants.addToSet(user._id);
     await channel.save();
-    console.log(res);
     res.json({
       message: "Channel joined successfully",
       channel: { code: code },
     });
-    console.log(channel.participants);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
@@ -214,7 +202,6 @@ router.get("/channel", async (req, res) => {
 
 // get user's channels
 router.get("/user_channels", async (req, res) => {
-  console.log(req.body);
   const authToken = req.headers.authorization?.split(" ")[1];
   if (!authToken) {
     return res.status(401).json({ message: "Unauthorized" });

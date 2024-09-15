@@ -9,7 +9,6 @@ startButton.addEventListener('click', async () => {
     try {
         // Get local audio stream
         localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        console.log('Local stream:', localStream);
 
         // Mute the local audio track
         localStream.getAudioTracks().forEach(track => {
@@ -55,7 +54,6 @@ startButton.addEventListener('click', async () => {
             }
         });
 
-        console.log('WebRTC connection established.');
     } catch (error) {
         console.error('Error accessing microphone:', error);
     }

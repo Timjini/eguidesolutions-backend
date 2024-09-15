@@ -10,7 +10,6 @@ async function loginAuth(req, res) {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
-    console.log("login User:", user);
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
@@ -65,14 +64,13 @@ async function signUpAuth(req, res) {
 
     await sendWelcomeEmail(user);
 
-    console.log(user);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while registering user" });
-    console.log(error);
   }
 }
 
 async function logoutAuth(req, res) {
+
   try {
     const user = await User.findOne({ _id: req.user.userId });
     if (!user) {
