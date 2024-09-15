@@ -63,7 +63,7 @@ async function updateAgency(req, res) {
   console.log("body here", req.body);
 
   try {
-    const { name } = req.body;
+    const { name , description,  } = req.body;
     const updatedAgency = await Agency.findByIdAndUpdate(
       req.params.id,
       { name },
