@@ -9,7 +9,7 @@ const Tour = require("../models/Tours");
 const { upload, uploadToS3 } = require("../fileUploader");
 const { createAddress, createItinerary } = require("../helpers/TourHelper");
 const Favorite = require("../models/Favorite");
-const TourSerializer = require("../serializers/TourSerializer");
+const TourSerializer = require("../serializers/v2/TourSerializer");
 
 class TourController {
   static async getAllTours(req, res) {
