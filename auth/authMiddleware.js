@@ -5,7 +5,6 @@ const secretKey = process.env.JWT_SECRET_KEY;
 const verifyToken = (req, res, next) => {
   const token =
     req.body.token || req.query.token || req.headers.authorization?.split(' ')[1];
-    console.log(req.headers);
 
   if (!token) {
     return res.status(403).send("A token is required for authentication");

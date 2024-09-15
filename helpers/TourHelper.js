@@ -4,7 +4,6 @@ const Itinerary = require('../models/Itinerary');
 
 class TourHelper {
   static async createAddress(data) {
-    console.log("REQUIRED DATA --------------------> " , data)
     const address = new Address({
       street_1: data.street_1 ?? "",
       street_2: data.street_2 ?? "",
@@ -62,7 +61,6 @@ class TourHelper {
     });
 
     await itinerary.save();
-    console.log("Itinerary is created!");
     return itinerary;
   }
 }

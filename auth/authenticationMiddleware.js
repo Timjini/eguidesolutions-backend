@@ -12,7 +12,6 @@ const authenticationMiddleware = async (socket, next) => {
 
   try {
     const decoded = jwt.verify(authToken, secretKey);
-    console.log(secretKey + "secretKey")
     const userId = decoded.userId;
 
     const user = await User.findOne({ userId });
