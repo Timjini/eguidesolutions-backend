@@ -34,7 +34,27 @@ async function getAgencyById(req, res) {
   }
 }
 
+async function updateAgency(req, res) {
+  console.log("body here",req.body);
+
+  try {
+    const { name } = req.body;
+    const updatedAgency = await Agency.findByIdAndUpdate(
+      req.params.id,
+      { name },
+      { new: true }
+    );
+    if (!updatedAgency) {
+      return res => res.status(404).json({ message: "Agency not found" });
+    }
+    res.json(updatedAgency);
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   createAgency,
   getAgencyById,
+  updateAgency
 };
