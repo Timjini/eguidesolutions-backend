@@ -1,4 +1,29 @@
 const Agency = require("../../models/Agency");
+const AgencySerializer = require("../../serializers/v2/AgencySerializer");
+const User = require("../../models/Users");
+const Tour = require("../../models/Tours");
+
+async function getAgencies(req, res) {
+  try {
+    const agencies = await Agency.find();
+
+    // Serialize each agency using the updated serializer
+    const serializedAgencies = await Promise.all(
+      agencies.map((agency) => AgencySerializer.serialize(agency))
+    );
+
+    return res
+      .status(200)
+      .json({
+        status: "success",
+        message: "Agencies fetched successfully",
+        agencies: serializedAgencies,
+      });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status:error, message: "Internal server error" });
+  }
+}
 
 async function createAgency(req, res) {
   try {
@@ -21,12 +46,12 @@ async function createAgency(req, res) {
   }
 }
 
-// get agency by id 
+// get agency by id
 async function getAgencyById(req, res) {
   try {
     const agency = await Agency.findById(req.params.id);
     if (!agency) {
-      return res => res.status(404).json({ message: "Agency not found" });
+      return (res) => res.status(404).json({ message: "Agency not found" });
     }
     res.json(agency);
   } catch (error) {
@@ -35,7 +60,7 @@ async function getAgencyById(req, res) {
 }
 
 async function updateAgency(req, res) {
-  console.log("body here",req.body);
+  console.log("body here", req.body);
 
   try {
     const { name } = req.body;
@@ -45,7 +70,7 @@ async function updateAgency(req, res) {
       { new: true }
     );
     if (!updatedAgency) {
-      return res => res.status(404).json({ message: "Agency not found" });
+      return (res) => res.status(404).json({ message: "Agency not found" });
     }
     res.json(updatedAgency);
   } catch (error) {
@@ -54,7 +79,8 @@ async function updateAgency(req, res) {
 }
 
 module.exports = {
+  getAgencies,
   createAgency,
   getAgencyById,
-  updateAgency
+  updateAgency,
 };
