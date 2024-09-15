@@ -21,6 +21,9 @@ const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
 const path = require("path");
 const { upload, uploadToS3, getObjectFromS3 } = require("./fileUploader");
 const userProfileRoutesAdminPanel = require("./api/v2/userProfileRoutes");
+const packagesRoutes = require("./api/v2/agencies/packagesRoutes");
+const subscriptionsRoutes = require("./api/v2/agencies/subscriptionsRoutes");
+const paymentsRoutes = require("./api/v2/agencies/paymentsRoutes");
 
 // =================================================================================================
 // ========================================CORS POLICY =============================================[]
@@ -116,7 +119,9 @@ app.use("/api/v1/main", mainRoutes);
 app.use("/api/v2/user-profile", userProfileRoutesAdminPanel);
 app.use("/api/v2/agencies", agenciesRoutesV2);
 app.use("/api/v2/tours", toursRoutesV2);
-
+app.use("/api/v2/packages", packagesRoutes);
+app.use("/api/v2/subscriptions", subscriptionsRoutes);
+app.use("/api/v2/payments", paymentsRoutes);
 // =================================================================================================
 // =================================== AGORA CHANNEL GENERATE TOKEN ===============================[]
 // =================================================================================================
