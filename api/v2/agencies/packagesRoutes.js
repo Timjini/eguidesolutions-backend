@@ -6,5 +6,6 @@ const {isAdministrator} = require("../../../auth/auth");
 const PackagesController = require("../../../controllers/v2/subscriptionPackageController");
 
 router.post("/",verifyToken, isAdministrator, PackagesController.createPackage);
+router.get("/",verifyToken, isAdministrator, PackagesController.getPackages);
 
 module.exports = router;
