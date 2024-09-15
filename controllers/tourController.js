@@ -56,7 +56,6 @@ class TourController {
         })
       );
   
-      console.log("Serialized Tours:", serializedTours.length);
       return res.status(200).json({
         status: "success",
         message: "Tours fetched successfully",
@@ -78,7 +77,6 @@ class TourController {
       const start_point = JSON.parse(req.body.start_point);
       const end_point = JSON.parse(req.body.end_point);
       const stops = JSON.parse(req.body.stops);
-      console.log("req.body", req.body);
       const file = req.file;
       const agencyId = req.body.agency;
 
@@ -141,7 +139,6 @@ class TourController {
   static async getAgencyTours(req, res) {
     const { agencyId } = req.query;
     const authToken = req.headers.authorization?.split(" ")[1];
-    console.log(agencyId);
 
     if (!authToken) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -152,7 +149,6 @@ class TourController {
 
       if ((user.type === "admin" && !agencyId)) {
         const allTours = await Tour.find();
-        console.log("Tours here Admin ----", allTours);
         res.status(200).json({ message: "All Tours", tours: allTours });
       } else {
         const agency = await Agency.findOne({ owner: user._id });
@@ -194,15 +190,12 @@ class TourController {
           (tour) => tour !== null
         );
 
-        console.log(validToursWithGuides);
-
         res.status(200).json({
           message: "Agency Tours",
           tours: validToursWithGuides,
           agency: agency,
           guide: users,
         });
-        console.log("Tours here ----", validToursWithGuides);
       }
     } catch (error) {
       console.error(error);

@@ -42,7 +42,6 @@ const isAgencyOwner = async (req, res, next) => {
 const isAdministrator = async (req, res, next) => {
   try {
     const authToken = req.headers.authorization?.split(' ')[1];
-    console.log(req.headers);
 
     const user = await User.findOne({authToken: authToken});
         if (user && user.type == "admin"){
@@ -52,7 +51,6 @@ const isAdministrator = async (req, res, next) => {
           res.status(401).json({message: 'Unauthorized: Only admin can perform this action'});
         } 
     }catch (error){
-      console.log(error);
       res.status(500).json({message: 'Something wrong with Admin on auth.js'})
     }
 };

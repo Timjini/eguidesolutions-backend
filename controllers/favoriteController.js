@@ -3,7 +3,6 @@ const Favorite = require("../models/Favorite");
 async function addToFavorite(req, res) {
   try {
     const { user_id, tour_id } = req.body;
-    console.log("Tour", tour_id);
     const favorite = new Favorite({
       user: user_id,
       tour: tour_id,

@@ -7,12 +7,11 @@ const Agency = require('../../models/Agency');
 const Guide = require('../../models/Guide');
 const Tour = require('../../models/Tours');
 const { upload, uploadToS3 } = require('../../fileUploader');
-
+const TourSerializer = require('../../serializers/v2/TourSerializer');
 
 
 router.post('/new_tour', async (req, res) => {
   try {
-    // console.log(req)
     const { title, description, guide, agency, startingDate, endingDate } = req.body;
     const file = req.file;
     const agencyId = req.body.agency
@@ -35,13 +34,11 @@ router.post('/new_tour', async (req, res) => {
     await tour.save();
 
     const agencyTour = await Agency.findOne({ _id: agencyId });
-    console.log(agencyTour);
 
     if (!agencyTour) {
       return res.status(404).json({ error: 'Agency not found' });
     }
 
-    console.log(agencyTour);
     // Update the user's profile to include this new tour (assuming you have a user-tour relationship)
     agencyTour.tours.push(tour);
     await agencyTour.save();
@@ -56,7 +53,6 @@ router.post('/new_tour', async (req, res) => {
 router.get('/agency_tours', async function (req, res) {
   const { agencyId } = req.query;
   const authToken = req.headers.authorization?.split(' ')[1];
-  console.log(agencyId)
 
   if (!authToken) {
     return res.status(401).json({ message: 'Unauthorized' });
@@ -70,9 +66,7 @@ router.get('/agency_tours', async function (req, res) {
       const allTours = await Tour.find();
 
 
-      console.log("Tours here Admin ----", allTours)
-
-      res.status(200).json({ message: 'All Tours', tours: allTours });
+      res.status(200).json({ message: 'All Tours', tours: TourSerializer.serialize(allTours) });
     } else {
       const agency = await Agency.findOne({ owner: user._id });
 
@@ -111,11 +105,9 @@ router.get('/agency_tours', async function (req, res) {
       // Filter out any tours that failed to be populated
       const validToursWithGuides = toursWithGuides.filter(tour => tour !== null);
 
-      console.log(validToursWithGuides);
 
 
       res.status(200).json({ message: 'Agency Tours', tours: toursWithGuides, agency: agency, guide: users });
-      console.log("Tours here ----", toursWithGuides)
     }
   } catch (error) {
     console.error(error);
