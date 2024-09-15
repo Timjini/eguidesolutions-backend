@@ -1,4 +1,4 @@
-const UserSerializer = require("./UserSerializer");
+const UserSerializer = require("./userSerializer");
 const User = require("../../models/Users");
 const Guide = require("../../models/Guide");
 
