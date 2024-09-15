@@ -1,7 +1,7 @@
 const UserProfile = require('../../models/UserProfile');
 const User = require('../../models/Users');
 const UserProfileSerializer = require('../../serializers/v2/userProfileSerializer');
-const UserSerializer = require('../../serializers/v2/UserSerializer');
+const UserSerializer = require('../../serializers/v2/userSerializer');
 const { createAddress } = require("../../helpers/TourHelper");
 
 
