@@ -10,6 +10,7 @@ const agencySchema = new mongoose.Schema({
     image: { type: String, required: false },
     address:{type: mongoose.Schema.Types.ObjectId, ref: 'Address', required: false},
     status: { type: String, enum: ['inactive', 'active'], default: 'inactive' },
+    subscription: { type: mongoose.Schema.Types.ObjectId, ref: 'Subscription' } // Reference to subscription
 });
 
 const Agency = mongoose.model('Agency', agencySchema);
