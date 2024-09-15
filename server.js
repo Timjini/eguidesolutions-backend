@@ -15,6 +15,7 @@ const authRoutes = require("./api/v1/auth/authRoutes");
 const favoriteRoutes = require("./api/v1/favorite/favoriteRoutes");
 const touristChannelRoutes = require("./api/v1/channels/touristChannelsRoutes");
 const agenciesRoutesV2 = require("./api/v2/agencies/agencyRoutes");
+const toursRoutesV2 = require("./api/v2/agencies/toursRoutes");
 const mainRoutes = require("./api/v1/main/mainRoutes");
 const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
 const path = require("path");
@@ -114,6 +115,7 @@ app.use("/api/v1/main", mainRoutes);
 //userProfile Page Routes : /profile
 app.use("/api/v2/user-profile", userProfileRoutesAdminPanel);
 app.use("/api/v2/agencies", agenciesRoutesV2);
+app.use("/api/v2/tours", toursRoutesV2);
 
 // =================================================================================================
 // =================================== AGORA CHANNEL GENERATE TOKEN ===============================[]
