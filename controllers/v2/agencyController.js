@@ -60,7 +60,6 @@ async function getAgencyById(req, res) {
 }
 
 async function updateAgency(req, res) {
-  console.log("body here", req.body);
 
   try {
     const { name , description,  } = req.body;

@@ -10,7 +10,6 @@ class TourSerializer {
       }
 
       const tourGuide = await Guide.findById(tour.guide).exec();
-      console.log("Tourguide here ", tourGuide.user);
       const tourGuideUser = await User.findById(tourGuide.user).exec();
   
       const convertIdToString = (id) => id ? id.toString() : null;

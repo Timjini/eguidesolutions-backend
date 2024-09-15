@@ -3,7 +3,6 @@ const Tour = require("../../models/Tours");
 
 // get agency by id 
 async function getAgencyTourById(req, res) {
-    console.log(req.params.id);
     try {
       const tour = await Tour.findById(req.params.id);
       if (!tour) {

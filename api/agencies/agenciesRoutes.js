@@ -22,15 +22,12 @@ const crypto = require('crypto');
 
 router.post('/create_agency', async (req, res) => {
     try {
-        console.log(req.headers)
         const { name, description } = req.body;
         const file = req.file;
-        console.log(req.body)
         const photo = await uploadToS3(file);
 
         const authToken = req.headers.authorization?.split(' ')[1];
         const user = await User.findOne({ authToken: authToken });
-        console.log(user)
         if (!user.isAgencyOwner) {
             user.isAgencyOwner = true;
             await user.save();
@@ -46,7 +43,6 @@ router.post('/create_agency', async (req, res) => {
             description,
         });
 
-        console.log(agency)
 
         await agency.save();
         await User.updateOne({ _id: user._id }, { ownedAgency: agency._id });
@@ -65,12 +61,10 @@ router.post('/create_agency', async (req, res) => {
 
 router.post('/create_agent', async (req, res) => {
     try {
-      console.log(req.body)
       const { name, email, password, type, phone } = req.body;
       const file = req.file;
       const avatar = await uploadToS3(file);
       const agency = await Agency.findOne({ _id: req.body.agencyId });
-      console.log(agency)
     
   
       // Generate a unique token
@@ -119,11 +113,8 @@ router.post('/create_agent', async (req, res) => {
 
 router.post('/agency_data', async function (req, res) {
   const { agencyId } = req.body.body;
-  console.log("body", req.body)
-  console.log("agency fetch" , agencyId);
 
   const authToken = req.body.headers.Authorization?.split(' ')[1];
-  console.log("authToken", authToken)
   if (!authToken) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
@@ -131,14 +122,12 @@ router.post('/agency_data', async function (req, res) {
   try {
 
     const agency = await Agency.findOne({ _id: agencyId });
-    console.log("agnecy here" ,agency);
 
     if (!agency) {
       return res.status(404).json({ message: 'Agency not found for the user' });
     }
 
     const guidesCount = await Guide.find({agency: agency}).count();
-    console.log(guidesCount);
     const channelsCount = await Channel.countDocuments({ agency: agencyId });
      
     const channels = await Channel.find({ agency: agencyId });
@@ -168,7 +157,6 @@ router.post('/agency_data', async function (req, res) {
 
   router.get('/members', async (req, res) => {
     const { agencyId } = req.query;
-    console.log("members method", agencyId);
   
     try {
       const authToken = req.headers.authorization?.split(' ')[1];
@@ -196,7 +184,6 @@ router.post('/agency_data', async function (req, res) {
       // Find user documents by their IDs 
       const users = await User.find({ _id: { $in: memberIds } });
   
-      console.log(users);
       res.status(200).json({ message: 'Agency Users', members: users, agency: agency });
     } catch (error) {
       console.error(error);
@@ -212,7 +199,6 @@ router.post('/agency_data', async function (req, res) {
 
 router.get('/agency_channels', async function (req, res) {
   const { agencyId } = req.query;
-  console.log(agencyId);
 
   const authToken = req.headers.authorization?.split(' ')[1];
   if (!authToken) {
