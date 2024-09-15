@@ -9,7 +9,7 @@ const agencySchema = new mongoose.Schema({
     tours: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tour' }], 
     image: { type: String, required: false },
     address:{type: mongoose.Schema.Types.ObjectId, ref: 'Address', required: false},
-    status: { type: String, enum: ['inactive', 'active'], default: 'inactive' },
+    status: { type: String, enum: ['inactive', 'active','archived'], default: 'inactive' },
     subscription: { type: mongoose.Schema.Types.ObjectId, ref: 'Subscription' } // Reference to subscription
 });
 
