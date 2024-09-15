@@ -7,7 +7,6 @@ const Agency = require('../../models/Agency');
 const Guide = require('../../models/Guide');
 const Tour = require('../../models/Tours');
 const { upload, uploadToS3 } = require('../../fileUploader');
-const TourSerializer = require('../../serializers/v2/TourSerializer');
 
 
 router.post('/new_tour', async (req, res) => {
@@ -66,7 +65,7 @@ router.get('/agency_tours', async function (req, res) {
       const allTours = await Tour.find();
 
 
-      res.status(200).json({ message: 'All Tours', tours: TourSerializer.serialize(allTours) });
+      res.status(200).json({ message: 'All Tours', tours: allTours });
     } else {
       const agency = await Agency.findOne({ owner: user._id });
 
@@ -89,7 +88,7 @@ router.get('/agency_tours', async function (req, res) {
           return {
             title: populatedTour.title,
             description: populatedTour.description,
-            image: `uploads/${populatedTour.photo}`,
+            photo: populatedTour.photo,
             _id: populatedTour._id,
             guide: populatedTour.guide,
             agency: populatedTour.agency,
