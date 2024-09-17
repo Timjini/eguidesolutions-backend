@@ -1,11 +1,12 @@
 const UserProfile = require('../../models/UserProfile');
 const User = require('../../models/Users');
 const UserProfileSerializer = require('../../serializers/v2/userProfileSerializer');
-const UserSerializer  = require('../../serializers/v2/userSerializer');
-const { createAddress } = require("../../helpers/TourHelper");
+const UserSerializer = require('../../serializers/v2/userSerializer');
+const { createAddress, addressPayload } = require("../../helpers/TourHelper");
 
 
 async function getUserProfile(req, res) {
+
   try {
     // solution 1 : authToken , find user using the auth token
     const authToken = req.headers.authorization?.split(' ')[1];
@@ -14,12 +15,12 @@ async function getUserProfile(req, res) {
 
     let serializedData = [];
     if (userProfile) {
-      serializedData = UserProfileSerializer.serialize(userProfile); 
+      serializedData = UserProfileSerializer.serialize(userProfile);
     }
     const serializedUser = UserSerializer.serialize(user);
-        
+
     if (serializedData) {
-      userData = { ...serializedUser, ...serializedData }; 
+      userData = { ...serializedUser, ...serializedData };
     }
 
     return res.status(200).json(userData);
@@ -39,29 +40,32 @@ async function createOrUpdateUserProfile(req, res) {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
     let userProfile = await UserProfile.findOne({ id: user._id });
 
     if (!userProfile) {
-      const addressData = JSON.parse(req.body.addressData);
-      const address = await createAddress(addressData);
+      console.log("REQ BODY", req.body)
+      const addressData = req.body.address;
+      const addressManipulated = addressPayload(addressData)
+      const address = await createAddress(addressManipulated);
+      
 
       userProfile = new UserProfile({
-        ...req.body, 
+        ...req.body,
         address: address._id,
         user: user._id
       });
-
       await userProfile.save(); 
-    } else {
-      userProfile = await UserProfile.findOneAndUpdate(
-        { id: user._id },
-        req.body,
-        { new: true }
-      );
+      return res.status(201).json(UserProfileSerializer(userProfile));
     }
+    // else {
+    //   userProfile = await UserProfile.findOneAndUpdate(
+    //     { id: user._id },
+    //     req.body,
+    //     { new: true }
+    //   );
+    // }
 
-    return res.status(201).json(UserProfileSerializer.serialize(userProfile));
+    // return res.status(201).json(UserProfileSerializer.serialize(userProfile));
 
   } catch (error) {
     return res.status(400).json({ message: 'Error creating or updating user profile', error });
