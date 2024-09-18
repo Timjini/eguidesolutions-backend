@@ -272,6 +272,7 @@ router.get("/users", async function (req, res) {
   // checkUser(req,res)
   try {
     // Find the user based on the authToken
+    const authToken = req.headers.authorization?.split(' ')[1];
     const user = await User.findOne({ authToken: authToken }).exec();
 
     if (!user) {
