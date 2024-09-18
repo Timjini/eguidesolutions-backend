@@ -31,77 +31,49 @@ async function getUserProfile(req, res) {
   }
 }
 
+async function createNewAddress(address){
+  console.log("========>",address);
+  const addressManipulated = await addressPayload(address);
+  const newAddressCreation = await createAddress(addressManipulated);
+  return newAddressCreation;
+}
 
 async function createOrUpdateUserProfile(req, res) {
   try {
-    const authToken = req.headers.authorization?.split(' ')[1];
-    const user = await User.findOne({ authToken: authToken });
 
+    const authToken = req.headers.authorization?.split(' ')[1];
+    const {dob, email,department, selectedLanguage, timeZone, } = req.body;
+    const user = await User.findOne({ authToken: authToken });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
     let userProfile = await UserProfile.findOne({ user: user._id });
-    // return res.status(200).json({userProfile: userProfile})
-    const addressData = req.body.address;
-    const addressManipulated = await addressPayload(addressData);
-    const address = await createAddress(addressManipulated);
-
-    if (userProfile) {
-      userProfile = await UserProfile.updateOne(
-        { user: user._id },
-        // req.body,
-        {
-          email: req.body.email,
-          department: req.body.department,
-          address: address._id,
-        },
-        { new: true }
-      );
-    } else {
+    let testAddress = await Address.findOne({ _id: "668ccb52fad73e204078973d"});
+    console.log(userProfile);
+    // const result = await createNewAddress(req.body.address);
+    if(!userProfile) {
       let userProfile = new UserProfile({
-        ...req.body,
-        address: address._id,
-        user: user._id
+        email: user.email,
+        user: req.body.user,
+        address: testAddress._id,
       });
-      console.log("UP", userProfile)
-      await userProfile.save();
+      await userProfile.save()
+    } else {
+      userProfile.updateOne(
+        {
+          address: testAddress._id,
+          dob: dob,
+          department: department,
+          selectedLanguage: selectedLanguage,
+        }
+      )
     }
+    return res.status(200).json({userProfile: userProfile});
 
-
-    //   // Log for validation errors
-    //   const validationError = userProfile.validateSync();
-    //   if (validationError) {
-    //     console.log("Validation Error:", validationError);
-    //     return res.status(400).json({ message: 'Validation failed', error: validationError });
-    //   }
-
-    //   console.log("USER PROFILE CREATED ===>", userProfile);
-
-    //   await userProfile.save();
-    //   return res.status(201).json(UserProfileSerializer.serialize(userProfile));
-    // } else {
-    //   // Update user profile
-    //   console.log("Else !userProfile", userProfile)
-    //   userProfile = await UserProfile.findOneAndUpdate(
-    //     { user: user._id },
-    //     // req.body,
-    //     {
-    //       email: req.body.email,
-    //       department: req.body.department,
-    //       address: address._id,
-    //     },
-    //     { new: true }
-    //   );
-
-    //   console.log("USER PROFILE UPDATED ===>", userProfile);
-
-    //   return res.status(201).json(UserProfileSerializer.serialize(userProfile));
-    // }
-  } catch (error) {
-    console.error("Error:", error);
-    return res.status(400).json({ message: 'Error creating or updating user profile', error });
+  } catch (err){
+    return res.status(500).json({error: err});
   }
+    
 }
 
 
