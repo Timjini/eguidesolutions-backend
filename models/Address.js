@@ -26,8 +26,7 @@ const addressSchema = new mongoose.Schema({
         required: true
     },
     postal_code: {
-        type: String,
-        required: true
+        type: String
     },
     coordinates: {
         lat: {

@@ -4,7 +4,7 @@ const Itinerary = require('../models/Itinerary');
 
 class TourHelper {
   static async createAddress(data) {
-    console.log("HELPER Address DATA", await data.coordinates )
+ 
     try {
       const address = new Address({
         street_1: data?.street_1 ?? "",
@@ -14,12 +14,12 @@ class TourHelper {
         country: data?.country ?? "",
         postal_code: data?.postal_code ?? "",
         coordinates: {
-          lng: data?.coordinates.lng ?? "",
-          lat: data?.coordinates.lat ?? "",
+          lng: data?.coordinates?.lng ?? "",
+          lat: data?.coordinates?.lat ?? "",
         },
         address_type: data?.address_type ?? 0,
       });
-
+      console.log("Create Address", address)
       await address.save();
     } catch (error) {
       console.log("Create Address Error", error)
@@ -71,6 +71,7 @@ class TourHelper {
   }
 
   static async addressPayload(data) {
+    
     return {
       street_1: data?.street_1?.long_name ?? "",
       street_2: data?.street_2?.long_name ?? "",

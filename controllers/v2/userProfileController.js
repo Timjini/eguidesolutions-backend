@@ -43,29 +43,26 @@ async function createOrUpdateUserProfile(req, res) {
     let userProfile = await UserProfile.findOne({ id: user._id });
 
     if (!userProfile) {
-      console.log("REQ BODY", req.body)
       const addressData = req.body.address;
-      const addressManipulated = addressPayload(addressData)
+      const addressManipulated = await addressPayload(addressData)
       const address = await createAddress(addressManipulated);
-      
 
       userProfile = new UserProfile({
         ...req.body,
         address: address._id,
         user: user._id
       });
-      await userProfile.save(); 
+      await userProfile.save();
       return res.status(201).json(UserProfileSerializer(userProfile));
+    } else {
+      userProfile = await UserProfile.findOneAndUpdate(
+        { id: user._id },
+        req.body,
+        { new: true }
+      );
     }
-    // else {
-    //   userProfile = await UserProfile.findOneAndUpdate(
-    //     { id: user._id },
-    //     req.body,
-    //     { new: true }
-    //   );
-    // }
 
-    // return res.status(201).json(UserProfileSerializer.serialize(userProfile));
+    return res.status(201).json(UserProfileSerializer.serialize(userProfile));
 
   } catch (error) {
     return res.status(400).json({ message: 'Error creating or updating user profile', error });
