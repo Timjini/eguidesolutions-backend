@@ -64,7 +64,6 @@ const sendWelcomeEmail = require("../../mailer/welcomeUser");
 // });
 
 router.post("/sign_up", async (req, res) => {
-  console.log(req.body);
   const id = uuid.v4();
   const { email, password, phone, username, name, type } = req.body;
   console.log("type", req.body);
@@ -248,7 +247,6 @@ router.post("/logout", verifyToken, async (req, res) => {
 
     // Use the decoded userId to fetch user data
     const user = await User.findOne({ authToken: authToken });
-    console.log(user);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

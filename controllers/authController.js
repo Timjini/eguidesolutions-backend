@@ -61,8 +61,6 @@ async function signUpAuth(req, res) {
       .json({ message: "User registered successfully", authToken });
 
     await sendWelcomeEmail(user);
-
-    console.log(user);
   } catch (error) {
     res.status(500).json({ error: "An error occurred while registering user" });
     console.log(error);
