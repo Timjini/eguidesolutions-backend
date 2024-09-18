@@ -40,7 +40,6 @@ function generateChannelCode() {
     code += characters.charAt(Math.floor(Math.random() * characters.length));
   }
   return code;
-  console.log(code);
 }
 
 channelSchema.pre('save', async function (next) {

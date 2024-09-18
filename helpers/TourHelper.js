@@ -19,8 +19,9 @@ class TourHelper {
         },
         address_type: data?.address_type ?? 0,
       });
-      console.log("Create Address", address)
+      
       await address.save();
+      return address
     } catch (error) {
       console.log("Create Address Error", error)
     }

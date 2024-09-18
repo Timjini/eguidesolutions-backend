@@ -113,8 +113,7 @@ class TourController {
   static async getAgencyTours(req, res) {
     const { agencyId } = req.query;
     const authToken = req.headers.authorization?.split(" ")[1];
-    console.log(agencyId);
-
+  
     if (!authToken) {
       return res.status(401).json({ message: "Unauthorized" });
     }
