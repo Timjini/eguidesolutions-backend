@@ -52,7 +52,7 @@ async function createOrUpdateUserProfile(req, res) {
     if (!userProfile) {
       console.log("IN !userProfile")
 
-      userProfile = new UserProfile({
+      let userProfile = new UserProfile({
         ...req.body,
         address: address._id,
         user: user._id
