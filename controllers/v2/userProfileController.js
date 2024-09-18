@@ -42,37 +42,13 @@ async function createOrUpdateUserProfile(req, res) {
     }
 
     let userProfile = await UserProfile.findOne({ user: user._id });
-    console.log("OUT !userProfile", userProfile)
-
+    // return res.status(200).json({userProfile: userProfile})
     const addressData = req.body.address;
     const addressManipulated = await addressPayload(addressData);
     const address = await createAddress(addressManipulated);
-    console.log("ADDRESS", address)
 
-    if (!userProfile) {
-      console.log("IN !userProfile")
-
-      let userProfile = new UserProfile({
-        ...req.body,
-        address: address._id,
-        user: user._id
-      });
-
-      // Log for validation errors
-      const validationError = userProfile.validateSync();
-      if (validationError) {
-        console.log("Validation Error:", validationError);
-        return res.status(400).json({ message: 'Validation failed', error: validationError });
-      }
-
-      console.log("USER PROFILE CREATED ===>", userProfile);
-
-      await userProfile.save();
-      return res.status(201).json(UserProfileSerializer.serialize(userProfile));
-    } else {
-      // Update user profile
-      console.log("Else !userProfile", userProfile)
-      userProfile = await UserProfile.findOneAndUpdate(
+    if (userProfile) {
+      userProfile = await UserProfile.updateOne(
         { user: user._id },
         // req.body,
         {
@@ -82,11 +58,46 @@ async function createOrUpdateUserProfile(req, res) {
         },
         { new: true }
       );
-
-      console.log("USER PROFILE UPDATED ===>", userProfile);
-
-      return res.status(201).json(UserProfileSerializer.serialize(userProfile));
+    } else {
+      let userProfile = new UserProfile({
+        ...req.body,
+        address: address._id,
+        user: user._id
+      });
+      console.log("UP", userProfile)
+      await userProfile.save();
     }
+
+
+    //   // Log for validation errors
+    //   const validationError = userProfile.validateSync();
+    //   if (validationError) {
+    //     console.log("Validation Error:", validationError);
+    //     return res.status(400).json({ message: 'Validation failed', error: validationError });
+    //   }
+
+    //   console.log("USER PROFILE CREATED ===>", userProfile);
+
+    //   await userProfile.save();
+    //   return res.status(201).json(UserProfileSerializer.serialize(userProfile));
+    // } else {
+    //   // Update user profile
+    //   console.log("Else !userProfile", userProfile)
+    //   userProfile = await UserProfile.findOneAndUpdate(
+    //     { user: user._id },
+    //     // req.body,
+    //     {
+    //       email: req.body.email,
+    //       department: req.body.department,
+    //       address: address._id,
+    //     },
+    //     { new: true }
+    //   );
+
+    //   console.log("USER PROFILE UPDATED ===>", userProfile);
+
+    //   return res.status(201).json(UserProfileSerializer.serialize(userProfile));
+    // }
   } catch (error) {
     console.error("Error:", error);
     return res.status(400).json({ message: 'Error creating or updating user profile', error });
