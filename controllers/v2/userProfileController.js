@@ -42,12 +42,16 @@ async function createOrUpdateUserProfile(req, res) {
     }
 
     let userProfile = await UserProfile.findOne({ user: user._id });
+    console.log("OUT !userProfile", userProfile)
+
+    const addressData = req.body.address;
+    const addressManipulated = await addressPayload(addressData);
+    const address = await createAddress(addressManipulated);
+    console.log("ADDRESS", address)
 
     if (!userProfile) {
-      const addressData = req.body.address;
-      const addressManipulated = await addressPayload(addressData);
-      const address = await createAddress(addressManipulated);
-      console.log("ADDRESS", address)
+      console.log("IN !userProfile")
+
       userProfile = new UserProfile({
         ...req.body,
         address: address._id,
@@ -67,9 +71,15 @@ async function createOrUpdateUserProfile(req, res) {
       return res.status(201).json(UserProfileSerializer.serialize(userProfile));
     } else {
       // Update user profile
+      console.log("Else !userProfile", userProfile)
       userProfile = await UserProfile.findOneAndUpdate(
         { user: user._id },
-        req.body,
+        // req.body,
+        {
+          email: req.body.email,
+          department: req.body.department,
+          address: address._id,
+        },
         { new: true }
       );
 
