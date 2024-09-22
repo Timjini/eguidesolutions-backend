@@ -27,7 +27,6 @@ const uploadToS3 = async (file) => {
   };
 
   const data = await s3.upload(params).promise();
-  console.log('File uploaded successfully. ETag:', data.ETag);
 
   return { originalname: file.originalname, file_name: uniqueFilename };
   

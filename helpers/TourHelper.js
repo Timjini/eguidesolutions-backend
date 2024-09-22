@@ -26,7 +26,7 @@ class TourHelper {
       console.log("Create Address Error", error)
     }
 
-    // return address;
+    return address;
   }
 
   static async createItinerary(addresses, tour) {
@@ -67,7 +67,6 @@ class TourHelper {
     });
 
     await itinerary.save();
-    console.log("Itinerary is created!");
     return itinerary;
   }
 

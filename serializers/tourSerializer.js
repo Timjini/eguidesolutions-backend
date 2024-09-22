@@ -9,6 +9,7 @@ class TourSerializer {
       starting_date: tour.starting_date,
       ending_date: tour.ending_date,
       favorite: tour.favorite ?? false,
+      addresses: tour.addresses,
     };
   }
 

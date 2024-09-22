@@ -8,28 +8,54 @@ const Guide = require("../models/Guide");
 const Tour = require("../models/Tours");
 const { upload, uploadToS3 } = require("../fileUploader");
 const { createAddress, createItinerary } = require("../helpers/TourHelper");
+const Favorite = require("../models/Favorite");
+const TourSerializer = require("../serializers/v2/TourSerializer");
 
 class TourController {
   static async getAllTours(req, res) {
     try {
       const userId = req.body.user_id;
       const tours = await Tour.find();
-
+  
+      if (tours.length === 0) {
+        return res.status(200).json({
+          status: "error",
+          message: "No tours found",
+          // Include fake tour data here
+          tours: [
+            {
+              title: "Sample Tour",
+              description: "This is a sample tour description.",
+              photo: "sample_image.jpg",
+              guide: "John Doe",
+              agency: "Sample Agency",
+              starting_date: "2024-01-01",
+              ending_date: "2024-01-07",
+              start_point: "Sample Start Point",
+              end_point: "Sample End Point",
+              stops: ["Stop 1", "Stop 2"]
+            }
+          ]
+        });
+      }
+  
       const serializedTours = await Promise.all(
         tours.map(async (tour) => {
           const favoriteRecord = await Favorite.findOne({
             user: userId,
             tour: tour._id,
           });
-
-          return {
+  
+          // Create serialized tour with or without favorite field
+          const serializedTour = {
             ...TourSerializer.serialize(tour),
-            favorite: favoriteRecord ? favoriteRecord.isFavorite : false,
+            ...(favoriteRecord ? { favorite: favoriteRecord.isFavorite } : {})
           };
+  
+          return serializedTour; // Ensure serializedTour is returned
         })
       );
-
-      console.log("Serialized Tours:", serializedTours.length);
+  
       return res.status(200).json({
         status: "success",
         message: "Tours fetched successfully",
@@ -43,6 +69,7 @@ class TourController {
       });
     }
   }
+  
 
   static async createNewTour(req, res) {
     try {
@@ -50,7 +77,6 @@ class TourController {
       const start_point = JSON.parse(req.body.start_point);
       const end_point = JSON.parse(req.body.end_point);
       const stops = JSON.parse(req.body.stops);
-      console.log("req.body", req.body);
       const file = req.file;
       const agencyId = req.body.agency;
 
@@ -113,7 +139,7 @@ class TourController {
   static async getAgencyTours(req, res) {
     const { agencyId } = req.query;
     const authToken = req.headers.authorization?.split(" ")[1];
-  
+
     if (!authToken) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -123,7 +149,6 @@ class TourController {
 
       if ((user.type === "admin" && !agencyId)) {
         const allTours = await Tour.find();
-        console.log("Tours here Admin ----", allTours);
         res.status(200).json({ message: "All Tours", tours: allTours });
       } else {
         const agency = await Agency.findOne({ owner: user._id });
@@ -165,15 +190,12 @@ class TourController {
           (tour) => tour !== null
         );
 
-        console.log(validToursWithGuides);
-
         res.status(200).json({
           message: "Agency Tours",
           tours: validToursWithGuides,
           agency: agency,
           guide: users,
         });
-        console.log("Tours here ----", validToursWithGuides);
       }
     } catch (error) {
       console.error(error);

@@ -4,7 +4,6 @@ const app = express();
 const server = http.createServer(app);
 const io = require("socket.io")(server);
 const cors = require("cors");
-// const { v4: uuidV4 } = require('uuid');
 const verifyToken = require("./auth/authMiddleware");
 const usersRoutes = require("./api/users/usersRoutes");
 const channelsRoutes = require("./api/channels/channelsRoutes");
@@ -15,10 +14,16 @@ const touristToursRoutes = require("./api/v1/tours/touristToursRoutes");
 const authRoutes = require("./api/v1/auth/authRoutes");
 const favoriteRoutes = require("./api/v1/favorite/favoriteRoutes");
 const touristChannelRoutes = require("./api/v1/channels/touristChannelsRoutes");
+const agenciesRoutesV2 = require("./api/v2/agencies/agencyRoutes");
+const toursRoutesV2 = require("./api/v2/agencies/toursRoutes");
+const mainRoutes = require("./api/v1/main/mainRoutes");
 const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
 const path = require("path");
 const { upload, uploadToS3, getObjectFromS3 } = require("./fileUploader");
 const userProfileRoutesAdminPanel = require("./api/v2/userProfileRoutes");
+const packagesRoutes = require("./api/v2/agencies/packagesRoutes");
+const subscriptionsRoutes = require("./api/v2/agencies/subscriptionsRoutes");
+const paymentsRoutes = require("./api/v2/agencies/paymentsRoutes");
 
 // =================================================================================================
 // ========================================CORS POLICY =============================================[]
@@ -33,7 +38,17 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
   })
 );
 
@@ -69,19 +84,15 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 app.set("view engine", "ejs");
 app.use(express.json());
-
+// app.use("/", (req, res) => {
+//   // res.render('index');
+// });
 // Use these Routes for Agency users (Owner, Guide, Agent) and Travelers
 app.use("/api/users", usersRoutes);
 app.use("/api/channels", channelsRoutes);
 app.use("/api/tours", toursRoutes);
 app.use("/api/agencies", agenciesRoutes);
 
-// Mobile Client routes
-app.use("/api/v1/auth", authRoutes);
-// app.use('api/v1/channels', touristChannelsRoutes);
-app.use("/api/v1/tours", touristToursRoutes);
-app.use("/api/v1/favorite", favoriteRoutes);
-app.use("/api/v1/channels", touristChannelRoutes);
 
 // Use This for Admin user (administrator) requests
 app.use("/api/admin", adminRoutes);
@@ -99,15 +110,28 @@ app.get("/uploads/:file_name", async (req, res) => {
   }
 });
 
+// =================================================================================================
+// =========================================== Mobile App ROUTES ===================================[]
+// =================================================================================================
+// Mobile Client routes
+app.use("/api/v1/auth", authRoutes);
+// app.use('api/v1/channels', touristChannelsRoutes);
+app.use("/api/v1/tours", touristToursRoutes);
+app.use("/api/v1/favorite", favoriteRoutes);
+app.use("/api/v1/channels", touristChannelRoutes);
+app.use("/api/v1/main", mainRoutes);
 
 // =================================================================================================
-// =========================================== Admin's ROUTES =======================================[]
+// =========================================== Admin's ROUTES =====================================[]
 // =================================================================================================
 
 //userProfile Page Routes : /profile
 app.use("/api/v2/user-profile", userProfileRoutesAdminPanel);
-
-
+app.use("/api/v2/agencies", agenciesRoutesV2);
+app.use("/api/v2/tours", toursRoutesV2);
+app.use("/api/v2/packages", packagesRoutes);
+app.use("/api/v2/subscriptions", subscriptionsRoutes);
+app.use("/api/v2/payments", paymentsRoutes);
 // =================================================================================================
 // =================================== AGORA CHANNEL GENERATE TOKEN ===============================[]
 // =================================================================================================
