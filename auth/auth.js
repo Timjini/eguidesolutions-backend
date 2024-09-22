@@ -42,11 +42,6 @@ const isAgencyOwner = async (req, res, next) => {
 const isAdministrator = async (req, res, next) => {
   try {
     const authToken = req.headers.authorization?.split(' ')[1];
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> production
     const user = await User.findOne({authToken: authToken});
         if (user && user.type == "admin"){
           req.user = user;

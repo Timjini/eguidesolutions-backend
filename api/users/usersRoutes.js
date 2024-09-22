@@ -259,7 +259,6 @@ router.post("/logout", verifyToken, async (req, res) => {
 router.get("/users", verifyToken, isAdministrator, async function (req, res) {
   // checkUser(req,res)
   try {
-<<<<<<< HEAD
     // Find the user based on the authToken
     const authToken = req.headers.authorization?.split(' ')[1];
     const user = await User.findOne({ authToken: authToken }).exec();
@@ -273,8 +272,6 @@ router.get("/users", verifyToken, isAdministrator, async function (req, res) {
       return res.status(403).json({ message: "Access forbidden" });
     }
 
-=======
->>>>>>> production
     // Fetch all users from the database
     const users = await User.find({}, "-password").exec();
 
