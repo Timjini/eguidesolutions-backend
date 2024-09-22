@@ -29,7 +29,6 @@ async function userChannels(req, res) {
   try {
     const { userId } = req.body;
     // const user = await User.findOne({ _id: userId });
-    console.log("User:", userId);
 
     const channels = await Channel.find({ participants: userId })
       .populate({

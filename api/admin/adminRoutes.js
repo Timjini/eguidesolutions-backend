@@ -124,14 +124,10 @@ router.get('/channels', isAdministrator, async (req, res) => {
 // =======================================================================================================================================
 
 router.post('/create_agency_owner', isAdministrator, async (req, res) => {
-    console.log(req.file)
     try {
 
     const file = req.file;
     const avatar = await uploadToS3(file);
-
-    console.log(req.body)
-
     const { name, email, phone } = req.body;
 
     // Validate user input
@@ -174,7 +170,6 @@ router.post('/create_agency_owner', isAdministrator, async (req, res) => {
 
   } catch (error) {
 
-    console.log(error);
     res.status(500).send('Error creating user');
 
   }
