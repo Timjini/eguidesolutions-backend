@@ -6,6 +6,7 @@ const { createAddress, addressPayload } = require("../../helpers/TourHelper");
 const Address = require('../../models/Address');
 
 
+
 async function getUserProfile(req, res) {
 
   try {
@@ -32,7 +33,6 @@ async function getUserProfile(req, res) {
 }
 
 async function createNewAddress(address){
-  console.log("========>",address);
   const addressManipulated = await addressPayload(address);
   const newAddressCreation = await createAddress(addressManipulated);
   return newAddressCreation;
@@ -40,41 +40,51 @@ async function createNewAddress(address){
 
 async function createOrUpdateUserProfile(req, res) {
   try {
-
     const authToken = req.headers.authorization?.split(' ')[1];
-    const {dob, email,department, selectedLanguage, timeZone, } = req.body;
+    const { dob, department, selectedLanguage, timeZone, phoneNumber } = req.body;
+
+    // Find the user
     const user = await User.findOne({ authToken: authToken });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    let userProfile = await UserProfile.findOne({ user: user._id });
-    let testAddress = await Address.findOne({ _id: "668ccb52fad73e204078973d"});
-    console.log(userProfile);
-    // const result = await createNewAddress(req.body.address);
-    if(!userProfile) {
-      let userProfile = new UserProfile({
-        email: user.email,
-        user: req.body.user,
-        address: testAddress._id,
-      });
-      await userProfile.save()
-    } else {
-      userProfile.updateOne(
-        {
-          address: testAddress._id,
-          dob: dob,
-          department: department,
-          selectedLanguage: selectedLanguage,
-        }
-      )
-    }
-    return res.status(200).json({userProfile: userProfile});
 
-  } catch (err){
-    return res.status(500).json({error: err});
-  }
+    // Find or create user profile
+    let userProfile = await UserProfile.findOne({ user: user._id });
     
+    const userAddress = await Address.findOne({ _id: userProfile.address });
+    if (!userAddress) {
+      userAddress = await createNewAddress(req.body.address);
+    }
+    
+    if (!userProfile) {
+      // Create new user profile
+      userProfile = new UserProfile({
+        email: user.email,
+        user: user._id,
+        phone: phoneNumber,
+        address: userAddress._id,
+        dob,
+        department,
+        selectedLanguage,
+      });
+    } else {
+      // Update existing user profile
+      userProfile.address = userAddress._id;
+      userProfile.phone = phoneNumber;
+      userProfile.dob = dob;
+      userProfile.department = department;
+      userProfile.selectedLanguage = selectedLanguage;
+    }
+
+    await userProfile.save();
+    return res.status(200).json({message:'success', user_profile: userProfile });
+  } catch (err) {
+    console.error(err); // Log error details for debugging
+    return res.status(500).json({ error: err.message });
+  }
 }
+
 
 
 async function deleteUserProfile(req, res) {
