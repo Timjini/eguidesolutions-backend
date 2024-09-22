@@ -2,10 +2,12 @@ const UserProfile = require('../../models/UserProfile');
 const User = require('../../models/Users');
 const UserProfileSerializer = require('../../serializers/v2/userProfileSerializer');
 const UserSerializer = require('../../serializers/v2/userSerializer');
-const { createAddress } = require("../../helpers/TourHelper");
+const { createAddress, addressPayload } = require("../../helpers/TourHelper");
+const Address = require('../../models/Address');
 
 
 async function getUserProfile(req, res) {
+
   try {
     // solution 1 : authToken , find user using the auth token
     const authToken = req.headers.authorization?.split(' ')[1];
@@ -14,12 +16,12 @@ async function getUserProfile(req, res) {
 
     let serializedData = [];
     if (userProfile) {
-      serializedData = UserProfileSerializer.serialize(userProfile); 
+      serializedData = UserProfileSerializer.serialize(userProfile);
     }
     const serializedUser = UserSerializer.serialize(user);
-        
+
     if (serializedData) {
-      userData = { ...serializedUser, ...serializedData }; 
+      userData = { ...serializedUser, ...serializedData };
     }
 
     return res.status(200).json(userData);
@@ -29,44 +31,60 @@ async function getUserProfile(req, res) {
   }
 }
 
+async function createNewAddress(address){
+  const addressManipulated = await addressPayload(address);
+  const newAddressCreation = await createAddress(addressManipulated);
+  return newAddressCreation;
+}
 
 async function createOrUpdateUserProfile(req, res) {
   try {
-    // Extract and split the auth token
     const authToken = req.headers.authorization?.split(' ')[1];
-    const user = await User.findOne({ authToken: authToken });
+    const { dob, department, selectedLanguage, timeZone, phoneNumber } = req.body;
 
+    // Find the user
+    const user = await User.findOne({ authToken: authToken });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    let userProfile = await UserProfile.findOne({ id: user._id });
-
+    // Find or create user profile
+    let userProfile = await UserProfile.findOne({ user: user._id });
+    
+    const userAddress = await Address.findOne({ _id: userProfile.address });
+    if (!userAddress) {
+      userAddress = await createNewAddress(req.body.address);
+    }
+    
     if (!userProfile) {
-      const addressData = JSON.parse(req.body.addressData);
-      const address = await createAddress(addressData);
-
+      // Create new user profile
       userProfile = new UserProfile({
-        ...req.body, 
-        address: address._id,
-        user: user._id
+        email: user.email,
+        user: user._id,
+        phone: phoneNumber,
+        address: userAddress._id,
+        dob,
+        department,
+        selectedLanguage,
       });
-
-      await userProfile.save(); 
     } else {
-      userProfile = await UserProfile.findOneAndUpdate(
-        { id: user._id },
-        req.body,
-        { new: true }
-      );
+      // Update existing user profile
+      userProfile.address = userAddress._id;
+      userProfile.phone = phoneNumber;
+      userProfile.dob = dob;
+      userProfile.department = department;
+      userProfile.selectedLanguage = selectedLanguage;
     }
 
-    return res.status(201).json(UserProfileSerializer.serialize(userProfile));
-
-  } catch (error) {
-    return res.status(400).json({ message: 'Error creating or updating user profile', error });
+    await userProfile.save();
+    return res.status(200).json({message:'success', user_profile: userProfile });
+  } catch (err) {
+    console.error(err); // Log error details for debugging
+    return res.status(500).json({ error: err.message });
   }
 }
+
+
 
 async function deleteUserProfile(req, res) {
   try {

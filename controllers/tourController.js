@@ -103,7 +103,7 @@ class TourController {
       if (!start_point || !end_point) {
         return res.status(400).json({ error: "Start point and end point are required" });
       }
-
+  
       const startPointAddress = await createAddress(start_point);
       const endPointAddress = await createAddress(end_point);
 
