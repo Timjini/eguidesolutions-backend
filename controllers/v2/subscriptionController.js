@@ -11,6 +11,7 @@ async function createSubscription(req, res) {
     }
 
 
+
     const subscriptionPackage = await SubscriptionPackage.findById(packageId);
     if (!subscriptionPackage) {
       return res.status(404).json({ error: "Subscription package not found" });
@@ -20,6 +21,10 @@ async function createSubscription(req, res) {
     let durationToMonth = subscriptionPackage.durationInMonths * 30;
     let endDate = new Date(today.getTime() + durationToMonth * 24 * 60 * 60 * 1000);
 
+    let subscription = await Subscription.findOne({agency: agencyId});
+    if (subscription && subscription.endDate > endDate) {
+      return res.status(400).json({ error: "Agency already has an active subscription" });
+    }
 
     const newSubscription = new Subscription({
       agency: agencyId,
@@ -32,12 +37,22 @@ async function createSubscription(req, res) {
     await newSubscription.save();
     agency.status = "active";
     await agency.save();
-    res.status(201).json(today);
+    res.status(201).json(newSubscription);
   } catch (err) {
     res.status(500).json({ error: "Failed to create subscription", error: err.message });
   }
 }
 
+async function getSubscriptions(req, res) {
+  try {
+    const subscriptions = await Subscription.find();
+    res.status(200).json(subscriptions);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to retrieve subscriptions" });
+  }
+}
+
 module.exports = {
     createSubscription,
+    getSubscriptions
   };
