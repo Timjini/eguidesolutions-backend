@@ -53,7 +53,12 @@ async function getAgencyById(req, res) {
     if (!agency) {
       return (res) => res.status(404).json({ message: "Agency not found" });
     }
-    res.json(agency);
+    const serializedAgency = await AgencySerializer.serialize(agency)
+    return res
+      .status(200)
+      .json({
+        agency: serializedAgency
+      });
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
@@ -62,10 +67,11 @@ async function getAgencyById(req, res) {
 async function updateAgency(req, res) {
 
   try {
-    const { name , description,  } = req.body;
+    console.log("update me ==============>", req.body)
+    const { name , description, status } = req.body;
     const updatedAgency = await Agency.findByIdAndUpdate(
       req.params.id,
-      { name },
+      { name, description, status },
       { new: true }
     );
     if (!updatedAgency) {

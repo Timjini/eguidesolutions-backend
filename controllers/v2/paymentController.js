@@ -1,6 +1,7 @@
 const Agency = require("../../models/Agency");
 const Subscription = require("../../models/Subscription");
 const SubscriptionPackage = require("../../models/SubscriptionPackage");
+const Payment = require("../../models/Payment");
 
 async function createPayment(req, res) {
     try {
@@ -34,6 +35,16 @@ async function createPayment(req, res) {
       res.status(500).json({ error: "Failed to create payment" });
       }
     }
+
+async function getPayments(req, res) {
+  try {
+    const payments = await Payment.find();
+    res.status(200).json(payments);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to retrieve payments" });
+  }
+}
     module.exports = {
       createPayment,
+      getPayments
     };
