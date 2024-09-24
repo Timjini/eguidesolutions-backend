@@ -25,8 +25,6 @@ class TourHelper {
     } catch (error) {
       console.log("Create Address Error", error)
     }
-
-    return address;
   }
 
   static async createItinerary(addresses, tour) {
