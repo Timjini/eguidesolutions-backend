@@ -35,6 +35,8 @@ class AgencySerializer {
           }
         })
       );
+
+      const subscription = await agency.subscription;
   
       // Filter out null tours
       const filteredTours = tours.filter(tour => tour !== null);
@@ -48,6 +50,7 @@ class AgencySerializer {
         description: agency.description,
         members: filteredMembers,
         tours: filteredTours,
+        subscription: subscription ? await subscription.serialize() : null,
         image: agency.image,
         address: agency.address,
         status: agency.status,
