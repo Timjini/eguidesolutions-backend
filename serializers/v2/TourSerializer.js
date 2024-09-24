@@ -19,7 +19,7 @@ class TourSerializer {
         id: convertIdToString(tour._id), 
         title: tour.title,
         description: tour.description,
-        photo: tour?.photo,
+        image: `uploads/${tour.photo}` ?? "uploads/1709835166036-44599960.jpg",
         guide: tourGuideUser ? await UserSerializer.serialize(tourGuideUser) : null,
         agency: convertIdToString(tour.agency), 
         starting_date: tour?.starting_date ?? '',
