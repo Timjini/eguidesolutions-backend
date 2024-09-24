@@ -12,7 +12,7 @@ const tourSchema = new mongoose.Schema({
     start_point: { type: addressSchema, required: true },
     end_point: { type: addressSchema, required: true },
     stops: { type: [addressSchema], required: false },
-    address:{type: mongoose.Schema.Types.ObjectId, ref: 'Address', required: true},
+    // address:{type: mongoose.Schema.Types.ObjectId, ref: 'Address', required: true},
 });
 
 // Create and export the Tour model
