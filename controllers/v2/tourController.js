@@ -13,8 +13,19 @@ async function getAgencyTourById(req, res) {
       return res.status(500).json({ message: "Internal server error" });
     }
   }
+
+async function getAgencyTours(req, res) {
+  try {
+      const tours = await Tour.find({ agency: req.query.agencyId });
+      return res.status(200).json(tours);
+    } catch (error) {
+      return
+      res.status(500).json({ message: "Internal server error" });
+      }
+}
   
   module.exports = {
     getAgencyTourById,
+    getAgencyTours,
   };
   

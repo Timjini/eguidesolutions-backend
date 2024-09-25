@@ -52,7 +52,27 @@ async function getSubscriptions(req, res) {
   }
 }
 
+async function updateSubscription(req, res) {
+  try {
+    console.log(req.body);
+    const { id } = req.params;
+    const { payment_status,startDate,endDate,status  } = req.body;
+    const updatedSubscription = await Subscription.findByIdAndUpdate(
+      id,
+      { status, payment_status,startDate,endDate },
+      { new: true }
+    );
+    if (!updatedSubscription) {
+      return res.status(404).json({ error: "Subscription not found" });
+    }
+    res.status(200).json(updatedSubscription);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update subscription" });
+  }
+}
+
 module.exports = {
     createSubscription,
-    getSubscriptions
+    getSubscriptions,
+    updateSubscription
   };
