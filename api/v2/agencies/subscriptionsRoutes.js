@@ -7,6 +7,7 @@ const subscriptionController = require("../../../controllers/v2/subscriptionCont
 
 router.post("/",verifyToken, isAdministrator, subscriptionController.createSubscription);
 router.get("/",verifyToken, isAdministrator, subscriptionController.getSubscriptions);
+router.put("/:id", subscriptionController.updateSubscription);
 
 
 module.exports = router;

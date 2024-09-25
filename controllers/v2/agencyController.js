@@ -67,7 +67,6 @@ async function getAgencyById(req, res) {
 async function updateAgency(req, res) {
 
   try {
-    console.log("update me ==============>", req.body)
     const { name , description, status } = req.body;
     const updatedAgency = await Agency.findByIdAndUpdate(
       req.params.id,

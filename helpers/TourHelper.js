@@ -23,7 +23,6 @@ class TourHelper {
       await address.save();
       return address
     } catch (error) {
-      console.log("Create Address Error", error)
     }
   }
 

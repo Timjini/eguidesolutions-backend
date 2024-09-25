@@ -63,8 +63,6 @@ router.get('/agency_tours', async function (req, res) {
     // Check if the user is an admin and agencyId is null
     if (user.type === 'admin' && agencyId === null || agencyId === undefined) {
       const allTours = await Tour.find();
-
-
       res.status(200).json({ message: 'All Tours', tours: allTours });
     } else {
       const agency = await Agency.findOne({ owner: user._id });
@@ -79,34 +77,12 @@ router.get('/agency_tours', async function (req, res) {
       const userIDs = guides.map(guide => guide.user);
       const users = await User.find({ _id: { $in: userIDs } }).exec();
 
-      const toursWithGuides = await Promise.all(tours.map(async (tour) => {
-        try {
-          const populatedTour = await Tour.findById(tour._id)
-            .populate('guide')
-            .populate('agency');
-
-          return {
-            title: populatedTour.title,
-            description: populatedTour.description,
-            photo: populatedTour.photo,
-            _id: populatedTour._id,
-            guide: populatedTour.guide,
-            agency: populatedTour.agency,
-            starting_date: populatedTour.starting_date,
-            ending_date: populatedTour.ending_date,
-          };
-        } catch (error) {
-          console.error('Error populating guide for tour:', error);
-          return null; // Handle the error as needed
-        }
+      const serializedTours = await Promise.all(allTours.map(async (tour) => {
+        return await TourSerializer.serialize(tour);
       }));
 
-      // Filter out any tours that failed to be populated
-      const validToursWithGuides = toursWithGuides.filter(tour => tour !== null);
 
-
-
-      res.status(200).json({ message: 'Agency Tours', tours: toursWithGuides, agency: agency, guide: users });
+      res.status(200).json({ message: 'Agency Tours', tours: serializedTours, agency: agency, guide: users });
     }
   } catch (error) {
     console.error(error);
