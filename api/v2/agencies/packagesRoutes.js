@@ -7,6 +7,6 @@ const PackagesController = require("../../../controllers/v2/subscriptionPackageC
 
 router.post("/",verifyToken, isAdministrator, PackagesController.createPackage);
 router.get("/",verifyToken, isAdministrator, PackagesController.getPackages);
-router.delete("/:id",verifyToken, PackagesController.deletePackage);
+router.delete("/:id", PackagesController.deletePackage);
 
 module.exports = router;
