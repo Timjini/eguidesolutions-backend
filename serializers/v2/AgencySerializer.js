@@ -2,6 +2,8 @@ const UserSerializer = require("./userSerializer");
 const TourSerializer = require("./TourSerializer");
 const User = require("../../models/Users");
 const Tour = require("../../models/Tours");
+const Subscription = require("../../models/Subscription");
+
 
 class AgencySerializer {
     static async serialize(agency) {
@@ -36,7 +38,9 @@ class AgencySerializer {
         })
       );
 
-      const subscription = await agency.subscription;
+      const subscription = await Subscription.findOne({agency: agency._id}).exec();
+      console.log("agency id-------------->", agency?._id)
+      console.log("subscription-------------------->", subscription);
   
       // Filter out null tours
       const filteredTours = tours.filter(tour => tour !== null);
@@ -50,7 +54,7 @@ class AgencySerializer {
         description: agency.description,
         members: filteredMembers,
         tours: filteredTours,
-        subscription: subscription ? await subscription.serialize() : null,
+        subscription: subscription ?? null,
         image: agency.image,
         address: agency.address,
         status: agency.status,
