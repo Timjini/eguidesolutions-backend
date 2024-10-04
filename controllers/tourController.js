@@ -8,36 +8,20 @@ const Guide = require("../models/Guide");
 const Tour = require("../models/Tours");
 const { upload, uploadToS3 } = require("../fileUploader");
 const { createAddress, createItinerary } = require("../helpers/TourHelper");
-const Favorite = require("../models/Favorite");
-const TourSerializer = require("../serializers/v2/TourSerializer");
+const UserToursSerializer = require("../serializers/v2/UserToursSerializer");
 
 class TourController {
   static async getAllTours(req, res) {
     try {
       const userId = req.body.user_id;
+      const user = await User.findById(userId);
       const tours = await Tour.find();
       console.log("tourrss->" , tours)
-  
-      // const serializedTours = await Promise.all(
-      //   tours.map(async (tour) => {
-      //     const favoriteRecord = await Favorite.findOne({
-      //       user: userId,
-      //       tour: tour._id,
-      //     });
-  
-      //     // Create serialized tour with or without favorite field
-      //     const serializedTour = {
-      //       ...TourSerializer.serialize(tour),
-      //       ...(favoriteRecord ? { favorite: favoriteRecord.isFavorite } : {})
-      //     };
-  
-      //     return serializedTour; // Ensure serializedTour is returned
-      //   })
-      // );
+
   
 
       const serializedTours = await Promise.all(tours.map(async (tour) => {
-        return await TourSerializer.serialize(tour);
+        return await UserToursSerializer.serialize(tour, user);
       }));
 
       return res.status(200).json({
