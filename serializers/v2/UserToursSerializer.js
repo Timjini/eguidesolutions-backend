@@ -1,10 +1,11 @@
 const UserSerializer = require("./userSerializer");
 const User = require("../../models/Users");
 const Guide = require("../../models/Guide");
+const Favorite = require("../../models/Favorite");
 
 
-class TourSerializer {
-    static async serialize(tour) {
+class UserToursSerializer {
+    static async serialize(tour , user) {
       if (!tour) {
         return null; 
       }
@@ -13,7 +14,7 @@ class TourSerializer {
       const tourGuideUser = await User.findById(tourGuide.user).exec();
 
       const favoriteRecord = await Favorite.findOne({
-              user: userId,
+              user: user._id,
               tour: tour._id,
             });
   
@@ -33,11 +34,12 @@ class TourSerializer {
         end_point: tour?.end_point ?? '',
         stops: tour?.stops ?? [],
         address: tour?.address  ?? '',
+        favorite: favoriteRecord ? favoriteRecord.isFavorite : false,
       };
   
       return serializedTour;
     }
   }
   
-  module.exports = TourSerializer;
+  module.exports = UserToursSerializer;
   
