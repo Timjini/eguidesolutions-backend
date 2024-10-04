@@ -11,7 +11,8 @@ const paymentSchema = new mongoose.Schema({
         enum: ['pending', 'completed', 'failed'], 
         default: 'pending' 
     },
-    transactionId: { type: String, required: false } 
+    transactionId: { type: String, required: false },
+    photo: { type: String, required: false }, 
 });
 
 const Payment = mongoose.model('Payment', paymentSchema);
