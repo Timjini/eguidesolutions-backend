@@ -16,46 +16,30 @@ class TourController {
     try {
       const userId = req.body.user_id;
       const tours = await Tour.find();
+      console.log("tourrss->" , tours)
   
-      if (tours.length === 0) {
-        return res.status(200).json({
-          status: "error",
-          message: "No tours found",
-          // Include fake tour data here
-          tours: [
-            {
-              title: "Sample Tour",
-              description: "This is a sample tour description.",
-              photo: "sample_image.jpg",
-              guide: "John Doe",
-              agency: "Sample Agency",
-              starting_date: "2024-01-01",
-              ending_date: "2024-01-07",
-              start_point: "Sample Start Point",
-              end_point: "Sample End Point",
-              stops: ["Stop 1", "Stop 2"]
-            }
-          ]
-        });
-      }
+      // const serializedTours = await Promise.all(
+      //   tours.map(async (tour) => {
+      //     const favoriteRecord = await Favorite.findOne({
+      //       user: userId,
+      //       tour: tour._id,
+      //     });
   
-      const serializedTours = await Promise.all(
-        tours.map(async (tour) => {
-          const favoriteRecord = await Favorite.findOne({
-            user: userId,
-            tour: tour._id,
-          });
+      //     // Create serialized tour with or without favorite field
+      //     const serializedTour = {
+      //       ...TourSerializer.serialize(tour),
+      //       ...(favoriteRecord ? { favorite: favoriteRecord.isFavorite } : {})
+      //     };
   
-          // Create serialized tour with or without favorite field
-          const serializedTour = {
-            ...TourSerializer.serialize(tour),
-            ...(favoriteRecord ? { favorite: favoriteRecord.isFavorite } : {})
-          };
+      //     return serializedTour; // Ensure serializedTour is returned
+      //   })
+      // );
   
-          return serializedTour; // Ensure serializedTour is returned
-        })
-      );
-  
+
+      const serializedTours = await Promise.all(tours.map(async (tour) => {
+        return await TourSerializer.serialize(tour);
+      }));
+
       return res.status(200).json({
         status: "success",
         message: "Tours fetched successfully",
