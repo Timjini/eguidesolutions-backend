@@ -1,6 +1,7 @@
 const Agency = require("../../models/Agency");
 const Subscription = require("../../models/Subscription");
 const SubscriptionPackage = require("../../models/SubscriptionPackage");
+const SubscriptionSerializer = require("../../serializers/v2/SubscriptionSerializer");
 
 async function createSubscription(req, res) {
   try {
@@ -46,7 +47,10 @@ async function createSubscription(req, res) {
 async function getSubscriptions(req, res) {
   try {
     const subscriptions = await Subscription.find();
-    res.status(200).json(subscriptions);
+    const serializedSubscription = await Promise.all(
+      subscriptions.map((subscriptions) => SubscriptionSerializer.serialize(subscriptions))
+    );
+    res.status(200).json(serializedSubscription);
   } catch (err) {
     res.status(500).json({ error: "Failed to retrieve subscriptions" });
   }
