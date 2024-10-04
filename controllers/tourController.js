@@ -16,9 +16,6 @@ class TourController {
       const userId = req.body.user_id;
       const user = await User.findById(userId);
       const tours = await Tour.find();
-      console.log("tourrss->" , tours)
-
-  
 
       const serializedTours = await Promise.all(tours.map(async (tour) => {
         return await UserToursSerializer.serialize(tour, user);
