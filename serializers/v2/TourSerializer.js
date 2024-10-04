@@ -12,10 +12,6 @@ class TourSerializer {
       const tourGuide = await Guide.findById(tour.guide).exec();
       const tourGuideUser = await User.findById(tourGuide.user).exec();
 
-      const favoriteRecord = await Favorite.findOne({
-              user: userId,
-              tour: tour._id,
-            });
   
       const convertIdToString = (id) => id ? id.toString() : null;
   
