@@ -3,10 +3,14 @@ const Subscription = require("../../models/Subscription");
 const SubscriptionPackage = require("../../models/SubscriptionPackage");
 const Payment = require("../../models/Payment");
 const PaymentSerializer = require("../../serializers/v2/PaymentSerializer");
+const { uploadToS3 } = require("../../fileUploader");
 
 async function createPayment(req, res){
     try {
       const { agencyId, packageId, amount } = req.body;
+      // const file = req.file;
+      // const photo = await uploadToS3(file);
+
 
       const agency = await Agency.findById(agencyId);
           if (!agency) {
@@ -47,6 +51,7 @@ async function createPayment(req, res){
         }
       }
 
+
       let newPayment;
           try {
             const newPayment = new Payment({
@@ -54,6 +59,7 @@ async function createPayment(req, res){
               subscription: subscription?._id,
               package: packageId,
               amount,
+              // photo: photo.file_name ?? "",
               status: "pending",
             });
             await newPayment.save();

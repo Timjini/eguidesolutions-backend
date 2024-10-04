@@ -38,10 +38,7 @@ class AgencySerializer {
         })
       );
 
-      const subscription = await Subscription.findOne({agency: agency._id}).exec();
-      console.log("agency id-------------->", agency?._id)
-      console.log("subscription-------------------->", subscription);
-  
+      const subscription = await Subscription.findOne({agency: agency._id}).exec();  
       // Filter out null tours
       const filteredTours = tours.filter(tour => tour !== null);
       const filteredMembers = members.filter(member => member !== null);
