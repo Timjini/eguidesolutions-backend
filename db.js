@@ -1,27 +1,16 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 
-// MongoDB Configuration (Environment Variables)
-const dbHost = 'mongodb_container';
-const dbPort = '27017';
-const dbUser = 'root';
-const dbPassword = 'pass';
-const dbName = 'eguide_db';
-
-// MongoDB connection string
-const connectionString = `mongodb://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}?authSource=admin`;
+const connectionString = process.env.MONGO_URI 
+// const connectionString = 'mongodb://root:pass@eguidesolutions-backend-eguide_mongodb_container-1:27017/admin';
 
 mongoose.connect(connectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  dbName: dbName, 
-  serverSelectionTimeoutMS: 30000,
-});
-
-const db = mongoose.connection;
-
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-  console.log('Connected to MongoDB');
+}).then(() => {
+  console.log('MongoDB connected');
+}).catch((err) => {
+  console.error('MongoDB connection error:', err);
 });
 
 module.exports = mongoose;

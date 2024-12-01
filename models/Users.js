@@ -1,5 +1,8 @@
 const mongoose = require('../db');
 
+console.log("here =========>" ,mongoose.Schema.Types.ObjectId);
+
+
 const UserType = {
   LISTENER: 'listener',
   GUIDE: 'guide',
@@ -21,7 +24,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: false },
   avatar: { type: String, required: false },
   isAgencyOwner: { type: Boolean, default: false }, 
-  ownedAgency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency' }, 
+  // ownedAgency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency' }, 
   createdAt: { type: Date, required: true, default: Date.now },
   updatedAt: { type: Date, required: true, default: Date.now },
 });

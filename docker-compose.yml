@@ -11,23 +11,25 @@ services:
       - /app/node_modules
     env_file:
       - .env
-    command: npm run dev
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - MONGO_URI=${MONGODB_URI}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     networks:
-      - app_network
-    environment:
-    - NODE_ENV=development
+    - app_network
 
 
-  mongodb_container:
-    image: mongo:latest
-    container_name: eguide_mongodb_container
+  eguide_mongodb_container:
+    image: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - "27017:27017"
+    networks:
+      - app_network
 
-  # Mongo Express container
   mongo_express:
     image: mongo-express:latest
     container_name: eguide_mongo_express
@@ -39,6 +41,8 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: ${ME_CONFIG_BASICAUTH_PASSWORD}
     ports:
       - "8081:8081"
+    networks:
+      - app_network
 
 volumes:
   mongo_data:

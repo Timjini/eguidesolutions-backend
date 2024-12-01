@@ -226,7 +226,7 @@ router.post("/login", async (req, res) => {
       console.error(error);
     }
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while logging in" });
+    res.status(500).json({ error: error.message });
   }
 });
 
