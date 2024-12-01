@@ -1,8 +1,20 @@
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb+srv://admin:9T69hsFlCpri4pNu@eguide-db.mtcke3w.mongodb.net/backend_db', {
+// MongoDB Configuration (Environment Variables)
+const dbHost = 'mongodb_container';
+const dbPort = '27017';
+const dbUser = 'root';
+const dbPassword = 'pass';
+const dbName = 'eguide_db';
+
+// MongoDB connection string
+const connectionString = `mongodb://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}?authSource=admin`;
+
+mongoose.connect(connectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  dbName: dbName, 
+  serverSelectionTimeoutMS: 30000,
 });
 
 const db = mongoose.connection;

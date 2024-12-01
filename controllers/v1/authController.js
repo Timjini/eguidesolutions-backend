@@ -32,8 +32,16 @@ async function loginAuth(req, res) {
 }
 
 async function signUpAuth(req, res) {
+  console.log("hit the signup controller");
   const id = uuid.v4();
   const { email, password, phone, username, name, type } = req.body;
+
+  const requiredFields = { email, password, phone, username, name, type };
+  for (const [key, value] of Object.entries(requiredFields)) {
+    if (!value) {
+      return res.status(400).json({ message: `${key} is required` });
+    }
+  }
   const hashedPassword = await bcrypt.hash(password, 10);
   const userId = uuid.v4();
   const authToken = jwt.sign({ userId }, secretKey, { expiresIn: "90d" });
@@ -65,7 +73,7 @@ async function signUpAuth(req, res) {
     await sendWelcomeEmail(user);
 
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while registering user" });
+    res.status(500).json({ error: `An error occurred while registering user ${error}` });
   }
 }
 
