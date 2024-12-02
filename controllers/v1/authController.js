@@ -9,7 +9,7 @@ const secretKey = process.env.JWT_SECRET_KEY;
 async function loginAuth(req, res) {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
@@ -47,7 +47,7 @@ async function signUpAuth(req, res) {
   try {
     const user = new User({
       id,
-      email,
+      email: email.toLowerCase(),
       password: hashedPassword,
       phone,
       type,
@@ -90,8 +90,33 @@ async function logoutAuth(req, res) {
   }
 }
 
+async function deleteAccount(req, res) {
+  console.log("-------------->",req.headers.authorization);
+  try {
+    const authToken = req.headers.authorization?.split(' ')[1];
+    const user = await User.findOne({ authToken: authToken });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    console.log(user);
+
+    // delete User
+    await User.deleteOne({ _id: user._id });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Account Deleted successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   loginAuth,
   logoutAuth,
   signUpAuth,
+  deleteAccount
 };
