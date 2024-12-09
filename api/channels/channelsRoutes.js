@@ -7,28 +7,63 @@ const Tour = require("../../models/Tours");
 const Guide = require("../../models/Guide");
 const Agency = require("../../models/Agency");
 const { RtcTokenBuilder, RtcRole } = require("agora-access-token");
+const  AgoraChannel = require("../../services/AgoraChannel");
 
-async function generateAndStoreAgoraToken(channel) {
-  try {
-    // Use Agora SDK to generate a token based on your Agora App ID and App Certificate
-    const token = RtcTokenBuilder.buildTokenWithUid(
-      process.env.APP_KEY,
-      process.env.APP_CERTIFICATE,
-      channel.code,
-      0,
-      RtcRole.PUBLISHER,
-      Math.floor(Date.now() / 1000) + 7 * 86400,
-      Math.floor(Date.now() / 1000) + 7 * 86400
-    );
+// async function generateAndStoreAgoraToken(channel) {
+//   try {
+//     // Use Agora SDK to generate a token based on your Agora App ID and App Certificate
+//     const token = RtcTokenBuilder.buildTokenWithUid(
+//       process.env.APP_KEY,
+//       process.env.APP_CERTIFICATE,
+//       channel.code,
+//       0,
+//       RtcRole.PUBLISHER,
+//       Math.floor(Date.now() / 1000) + 7 * 86400,
+//       Math.floor(Date.now() / 1000) + 7 * 86400
+//     );
     
-    // Update the channel document with the new token
-    channel.agoraToken = token;
-    await channel.save();
+//     // Update the channel document with the new token
+//     channel.agoraToken = token;
+//     await channel.save();
+//   } catch (error) {
+//     console.error("Error generating and storing Agora token:", error);
+//     throw error;
+//   }
+// }
+
+// Agora channel check : https://api.agora.io/dev/v1/channel/9b956f69e297416a88316fa367de9fe9
+// {
+//   "success": true,
+//   "data": {
+//       "channels": [
+//           {
+//               "channel_name": "204225",
+//               "user_count": 2
+//           }
+//       ],
+//       "total_size": 1
+//   }
+// }
+
+async function handleChannel(channelCode) {
+  try {
+    const agoraChannel = new AgoraChannel(channelCode);
+    const token = await agoraChannel.getOrCreateToken();
+
+    console.log(`Agora Token for channel ${channelCode}:`, token);
+
+    const isClosed = await agoraChannel.isChannelClosed();
+    console.log(`Is Channel ${channelCode} closed?`, isClosed);
+
+    if (isClosed) {
+      const newToken = await agoraChannel.ensureChannelActive();
+      console.log(`Regenerated Token:`, newToken);
+    }
   } catch (error) {
-    console.error("Error generating and storing Agora token:", error);
-    throw error;
+    console.error('Error handling Agora channel:', error);
   }
 }
+
 
 // API endpoint to create a room
 router.post("/create", async (req, res) => {
@@ -38,6 +73,8 @@ router.post("/create", async (req, res) => {
   const guideId = req.body.guide;
   const tourId = req.body.tour;
   const agencyId = req.body.agency;
+  const startingDate = req.body.startingDate;
+  const endingDate = req.body.endingDate;
 
   if (!authToken) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -71,6 +108,12 @@ router.post("/create", async (req, res) => {
         .json({ message: "Guide not found for the agency" });
     }
 
+    console.log("----------->",startingDate,endingDate)
+    console.log("Parsed Dates:", new Date(startingDate), new Date(endingDate));
+    const starting_date_utc = new Date(startingDate).toISOString();
+    const ending_date_utc = new Date(endingDate).toISOString();
+    console.log("UTC Dates:", starting_date_utc, ending_date_utc);
+
     // Create a new channel with the owner set to the found user
     const newChannel = new Channel({
       type,
@@ -78,11 +121,13 @@ router.post("/create", async (req, res) => {
       agency: agency,
       tour: tour,
       guide: guide,
+      starting_date: new Date(startingDate),
+      ending_date: new Date(endingDate),
     });
 
     await newChannel.save();
 
-    await generateAndStoreAgoraToken(newChannel);
+    await handleChannel(newChannel.code);
 
     res.json({
       message: "Channel created successfully",
@@ -92,6 +137,14 @@ router.post("/create", async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
+});
+
+router.post('/refresh_token',async (req, res) =>  {
+  const channelName = req.body.channelName;
+  const channel = await Channel.findOne({ code: channelName });
+  console.log("-------------->", channel);
+  await handleChannel(channel.code);
+  res.json({ message: "Token refreshed successfully", agoraToken: channel.agoraToken });
 });
 
 router.get("/agency_channels", async function (req, res) {

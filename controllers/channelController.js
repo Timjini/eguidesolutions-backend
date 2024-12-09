@@ -74,8 +74,41 @@ async function getChannel(req, res) {
   }
 }
 
+async function fetchChannel(req, res) {
+  console.log("fetchChannel called");
+  try {
+    console.log("------>",req.body.channelName)
+    const { code } = req.body;
+    const authToken = req.headers.authorization?.split(' ')[1];
+    if (!authToken) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const channel = await Channel.findOne({ code: code });
+    
+    if (!channel) {
+      return res.status(404).json({
+        status: "error",
+        message: "Channel not found",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Channel details",
+      channel: { code: code },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+    });
+  }
+}
+
 module.exports = {
   joinChannel,
   userChannels,
   getChannel,
+  fetchChannel,
 };
