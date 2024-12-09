@@ -126,8 +126,7 @@ router.post('/agency_data', async function (req, res) {
     if (!agency) {
       return res.status(404).json({ message: 'Agency not found for the user' });
     }
-
-    const guidesCount = await Guide.find({agency: agency}).count();
+    const guidesCount = await Guide.find({agency: agency});
     const channelsCount = await Channel.countDocuments({ agency: agencyId });
      
     const channels = await Channel.find({ agency: agencyId });
@@ -136,7 +135,7 @@ router.post('/agency_data', async function (req, res) {
       .filter((channel) => channel.participants.length)
       .reduce((acc, channel) => acc + channel.participants.length, 0);
 
-    res.status(200).json({ message: 'Agency Data', guides: guidesCount, channels: channelsCount, tourists: touristsCount});
+    res.status(200).json({ message: 'Agency Data', guides: guidesCount?.length, channels: channelsCount, tourists: touristsCount});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'An error occurred while fetching the guides' });

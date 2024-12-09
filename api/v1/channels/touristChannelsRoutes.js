@@ -5,5 +5,6 @@ const ChannelController = require("../../../controllers/channelController");
 router.post("/", ChannelController.joinChannel);
 router.post("/user_channels", ChannelController.userChannels);
 router.post("/get_channel", ChannelController.getChannel);
+router.post("/fetch_channel", ChannelController.fetchChannel);
 
 module.exports = router;
