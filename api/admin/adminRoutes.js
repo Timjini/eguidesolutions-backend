@@ -4,6 +4,7 @@ const Agency = require('../../models/Agency');
 const User = require('../../models/Users');
 const Guide = require('../../models/Guide');
 const Tour = require('../../models/Tours');
+const JobLog = require('../../models/JobLog');
 const { isAdministrator } = require('../../auth/auth');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
@@ -172,6 +173,15 @@ router.post('/create_agency_owner', isAdministrator, async (req, res) => {
 
     res.status(500).send('Error creating user');
 
+  }
+});
+
+router.get('/job-logs', async (req, res) => {
+  try {
+    const logs = await JobLog.find().sort({ executionTime: -1 });
+    res.json(logs);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch job logs' });
   }
 });
 
