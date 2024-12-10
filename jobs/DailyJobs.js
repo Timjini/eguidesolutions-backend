@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const moment = require('moment');
 const Channel = require('../models/Channels');
-const Channel = require('../models/JobLog');
+const JobLog = require('../models/JobLog');
 const AgoraChannel = require('../services/AgoraChannel');
 
 async function handleChannel(channelCode) {
