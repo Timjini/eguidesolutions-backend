@@ -4,6 +4,7 @@ const authSerializer = require("../../serializers/authSerializer");
 const bcrypt = require("bcrypt");
 const uuid = require("uuid");
 const jwt = require("jsonwebtoken");
+const {generateRandomPassword, generateUserCredentials } = require("../../utils/auth/checkUser");
 const secretKey = process.env.JWT_SECRET_KEY;
 
 async function loginAuth(req, res) {
@@ -69,6 +70,66 @@ async function signUpAuth(req, res) {
   }
 }
 
+
+async function guestUser(req, res) {
+  console.log("==========>")
+  try {
+    const { deviceId } = req.body;
+
+    if (!deviceId) {
+      return res.status(400).json({ 
+        status: "error", 
+        message: "Device ID is required" 
+      });
+    }
+
+    const user = await User.findOne({ deviceId });
+    console.log("User found: ", user);
+
+    if (!user) {
+      const id = uuid.v4();
+      const userId = uuid.v4();
+      const authToken = jwt.sign({ userId }, secretKey, { expiresIn: "90d" });
+      const { username, email } = generateUserCredentials();
+      const password = generateRandomPassword();
+
+      const newUser = new User({
+        id,
+        email,
+        userId,
+        password,
+        username,
+        name: username,
+        deviceId,
+        authToken,
+        status: "online",
+      });
+
+      await newUser.save();
+      return res.status(201).json({
+        status: "success",
+        message: "Guest user created successfully",
+        authToken,
+        user: authSerializer.serialize(newUser),
+      });
+    } else {
+      return res.status(200).json({
+        status: "success",
+        message: "User already exists",
+        authToken: user.authToken,
+        user: authSerializer.serialize(user),
+      });
+    }
+  } catch (error) {
+    console.error("Error in guestUser:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "An error occurred while processing your request",
+    });
+  }
+}
+  
+
 async function logoutAuth(req, res) {
 
   try {
@@ -118,5 +179,6 @@ module.exports = {
   loginAuth,
   logoutAuth,
   signUpAuth,
-  deleteAccount
+  deleteAccount,
+  guestUser
 };
