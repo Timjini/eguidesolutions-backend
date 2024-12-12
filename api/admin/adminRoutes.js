@@ -13,6 +13,7 @@ const { upload, uploadToS3 } = require('../../fileUploader');
 const Channel = require('../../models/Channels');
 const sendPasswordResetEmail = require('../../mailer/resetPassword');
 const crypto = require('crypto');
+const initializeDailyJobs = require('../../jobs/DailyJobs');
 
 // #### ALL GET REQUESTS 
 
@@ -182,6 +183,15 @@ router.get('/job-logs', async (req, res) => {
     res.json(logs);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch job logs' });
+  }
+});
+
+router.get('/start-job', async (req, res) => {
+  try {
+    initializeDailyJobs();
+    res.json({ message: 'Job executed successfully' });
+  }catch (error) {
+    res.status(500).json({ error: 'Failed to execute job' });
   }
 });
 
