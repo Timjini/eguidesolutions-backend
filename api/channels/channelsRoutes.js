@@ -142,7 +142,6 @@ router.post("/create", async (req, res) => {
 router.post('/refresh_token',async (req, res) =>  {
   const channelName = req.body.channelName;
   const channel = await Channel.findOne({ code: channelName });
-  console.log("-------------->", channel);
   await handleChannel(channel.code);
   res.json({ message: "Token refreshed successfully", agoraToken: channel.agoraToken });
 });
