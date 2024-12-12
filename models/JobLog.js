@@ -5,6 +5,7 @@ const jobLogSchema = new mongoose.Schema({
   executionTime: { type: Date, default: Date.now },
   status: { type: String, enum: ['success', 'error'], required: true },
   errorMessage: { type: String, default: '' },
+  data: { type: Array, default: [] },
 });
 
 const JobLog = mongoose.model('JobLog', jobLogSchema);
