@@ -23,12 +23,13 @@ async function handleChannel(channelCode) {
     }
   }
 
-  async function logJobExecution(jobName, status, errorMessage = '') {
+  async function logJobExecution(jobName, status, errorMessage = '', data = []) {
     try {
       await JobLog.create({
         jobName,
         status,
         errorMessage,
+        data: [],
       });
       console.log(`Job log saved for ${jobName} with status: ${status}`);
     } catch (err) {
@@ -50,7 +51,17 @@ function initializeDailyJobs() {
       for (const channel of channels) {
         await handleChannel(channel.code);
       }
-      await logJobExecution(jobName, 'success');
+      await logJobExecution(
+        jobName,
+        'success',
+        '',
+        channels.map(channel => ({
+          id: channel._id,
+          code: channel.code,
+          start_date: channel.start_date,
+          end_date: channel.end_date,
+        }))
+      );
       console.log('Daily token refresh job completed successfully.');
     } catch (error) {
       console.error('Error in daily token refresh job:', error);
