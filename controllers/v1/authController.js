@@ -72,7 +72,6 @@ async function signUpAuth(req, res) {
 
 
 async function guestUser(req, res) {
-  console.log("==========>")
   try {
     const { deviceId } = req.body;
 

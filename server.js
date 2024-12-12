@@ -24,6 +24,7 @@ const userProfileRoutesAdminPanel = require("./api/v2/userProfileRoutes");
 const packagesRoutes = require("./api/v2/agencies/packagesRoutes");
 const subscriptionsRoutes = require("./api/v2/agencies/subscriptionsRoutes");
 const paymentsRoutes = require("./api/v2/agencies/paymentsRoutes");
+const initializeDailyJobs = require("./jobs/DailyJobs");
 
 // =================================================================================================
 // ========================================CORS POLICY =============================================[]
@@ -162,5 +163,7 @@ app.get("/token", (req, res) => {
 
   res.json({ key });
 });
+
+initializeDailyJobs();
 
 server.listen(4000);
