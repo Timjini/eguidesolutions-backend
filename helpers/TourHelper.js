@@ -9,7 +9,7 @@ class TourHelper {
       const address = new Address({
         street_1: data?.street_1 ?? "",
         street_2: data?.street_2 ?? "",
-        city: data?.city ?? "",
+        city: data?.city ?? data?.state,
         state: data?.state ?? "",
         country: data?.country ?? "",
         postal_code: data?.postal_code ?? "",
@@ -35,7 +35,7 @@ class TourHelper {
       const addressObject = {
         street_1: address.street_1 ?? "",
         street_2: address.street_2 ?? "",
-        city: address.city ?? "",
+        city: address.city ?? address.state,
         state: address.state ?? "",
         country: address.country ?? "",
         postal_code: address.postal_code ?? "",
@@ -72,7 +72,7 @@ class TourHelper {
     return {
       street_1: data?.street_1?.long_name ?? "",
       street_2: data?.street_2?.long_name ?? "",
-      city: data?.city?.long_name ?? "",
+      city: data?.city?.long_name ?? data?.state?.long_name,
       state: data?.state?.long_name ?? "",
       country: data?.country?.long_name ?? "",
       postal_code: data?.postal_code?.long_name ?? "",

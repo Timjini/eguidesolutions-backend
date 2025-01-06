@@ -132,19 +132,18 @@ router.post("/upload-avatar", verifyToken, async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  console.log("=============>" , req.body);
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ message: "User not found" });
+      return res.status(401).json({ message: "incorrect email" });
       
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res.status(401).json({ message: "Invalid password" });
     }
 
     // Update the user's status to "online" in the database
@@ -318,7 +317,6 @@ router.get("/guides", async function (req, res) {
   }
 
   try {
-    // Find the user based on the authToken
     const user = await User.findOne({ authToken: authToken }).exec();
     const agency = await Agency.findOne({ owner: user._id });
 
@@ -326,21 +324,20 @@ router.get("/guides", async function (req, res) {
       return res.status(401).json({ message: "Invalid token" });
     }
 
-    // Check if the user has necessary permissions (e.g., admin role)
     if (user.type !== "admin" && user.type !== "owner") {
       return res.status(403).json({ message: "Access forbidden" });
     }
 
-    // Fetch all users from the database
-    // const guides = await User.find({type: "guide"}, '-password').exec();
-    // populate with user information
     const guides = await Guide.find({ agency: agency }).populate("user").exec();
 
-    res.status(200).json(guides);
+    const filteredGuides = guides.filter(guide => guide.user != null);
+
+    res.status(200).json(filteredGuides);
   } catch (error) {
     res.status(500).json({ message: "Error processing request" });
   }
 });
+
 
 router.post("/activate", async function (req, res) {
   const password = req.body.password;

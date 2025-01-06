@@ -1,5 +1,6 @@
 const Channel = require("../models/Channels");
 const User = require("../models/Users");
+const ChannelSerializer = require("../serializers/v2/ChannelSerializer");
 
 async function joinChannel(req, res) {
   try {
@@ -17,10 +18,11 @@ async function joinChannel(req, res) {
     channel.participants.addToSet(user._id);
     await channel.save();
 
+    const serializedChannel = await ChannelSerializer.serialize(channel);
     res.status(200).json({
       status: "success",
-      message: "Channel joined successfully",
-      channel: { code: code },
+      message: "Channel details",
+      channel: serializedChannel,
     });
   } catch (error) {}
 }
@@ -75,9 +77,7 @@ async function getChannel(req, res) {
 }
 
 async function fetchChannel(req, res) {
-  console.log("fetchChannel called");
   try {
-    console.log("------>",req.body.channelName)
     const { code } = req.body;
     const authToken = req.headers.authorization?.split(' ')[1];
     if (!authToken) {
@@ -92,11 +92,19 @@ async function fetchChannel(req, res) {
       });
     }
 
+    // user ChannelSerializer
+    const serializedChannel = await ChannelSerializer.serialize(channel);
     res.status(200).json({
       status: "success",
       message: "Channel details",
-      channel: { code: code },
+      channel: serializedChannel,
     });
+
+    // res.status(200).json({
+    //   status: "success",
+    //   message: "Channel details",
+    //   channel: { code: code },
+    // });
   } catch (err) {
     console.error(err);
     res.status(500).json({

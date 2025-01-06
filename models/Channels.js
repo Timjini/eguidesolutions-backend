@@ -42,20 +42,20 @@ function generateChannelCode() {
   return code;
 }
 
-channelSchema.pre('save', async function (next) {
-  try {
-      // Assuming you have a reference to the associated Tour document
-      const tour = await Tour.findById(this.tour);
+// channelSchema.pre('save', async function (next) {
+//   try {
+//       // Assuming you have a reference to the associated Tour document
+//       const tour = await Tour.findById(this.tour);
 
-      // Set starting_date and ending_date based on the associated Tour
-      this.starting_date = tour.starting_date;
-      this.ending_date = tour.ending_date;
+//       // Set starting_date and ending_date based on the associated Tour
+//       this.starting_date = tour.starting_date;
+//       this.ending_date = tour.ending_date;
 
-      next();
-  } catch (error) {
-      next(error);
-  }
-});
+//       next();
+//   } catch (error) {
+//       next(error);
+//   }
+// });
 channelSchema.virtual('channelName').get(function () {
   if (this.tour && this.tour.title) {
       return this.tour.title;
