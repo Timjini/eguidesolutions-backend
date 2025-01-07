@@ -21,7 +21,7 @@ async function joinChannel(req, res) {
     const serializedChannel = await ChannelSerializer.serialize(channel);
     res.status(200).json({
       status: "success",
-      message: "Channel details",
+      message: "Let's get started",
       channel: serializedChannel,
     });
   } catch (error) {}
