@@ -108,11 +108,8 @@ router.post("/create", async (req, res) => {
         .json({ message: "Guide not found for the agency" });
     }
 
-    console.log("----------->",startingDate,endingDate)
-    console.log("Parsed Dates:", new Date(startingDate), new Date(endingDate));
     const starting_date_utc = new Date(startingDate).toISOString();
     const ending_date_utc = new Date(endingDate).toISOString();
-    console.log("UTC Dates:", starting_date_utc, ending_date_utc);
 
     // Create a new channel with the owner set to the found user
     const newChannel = new Channel({
