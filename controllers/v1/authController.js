@@ -151,7 +151,6 @@ async function logoutAuth(req, res) {
 }
 
 async function deleteAccount(req, res) {
-  console.log("-------------->",req.headers.authorization);
   try {
     const authToken = req.headers.authorization?.split(' ')[1];
     const user = await User.findOne({ authToken: authToken });

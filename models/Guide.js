@@ -1,4 +1,5 @@
 const mongoose = require("../db");
+const User = require("./Users");
 
 const guideSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -9,6 +10,8 @@ const guideSchema = new mongoose.Schema({
   },
   name: { type: String, required: false },
   avatar: { type: String },
+  tags: [{ type: String }],
+  ratings : { type: Number, enum: [1, 2, 3, 4, 5], required: true },
 });
 
 const Guide = mongoose.model("Guide", guideSchema);
