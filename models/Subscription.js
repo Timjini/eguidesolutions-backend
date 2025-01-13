@@ -14,7 +14,9 @@ const subscriptionSchema = new mongoose.Schema({
         type: String,
         enum: ['paid', 'pending', 'paid_partially', 'cancelled'],
         default: 'pending'
-    }
+    },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
 });
 
 const Subscription = mongoose.model('Subscription', subscriptionSchema);

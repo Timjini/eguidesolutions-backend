@@ -11,7 +11,7 @@ const { upload, uploadToS3 } = require('../../fileUploader');
 
 router.post('/new_tour', async (req, res) => {
   try {
-    const { title, description, guide, agency, startingDate, endingDate } = req.body;
+    const { title, description, guide, agency, price } = req.body;
     const file = req.file;
     const agencyId = req.body.agency
     const image = await uploadToS3(file);
@@ -25,8 +25,7 @@ router.post('/new_tour', async (req, res) => {
       photo: image.file_name,
       guide: guide,
       agency: agency,
-      starting_date: startingDate,
-      ending_date: endingDate
+      price: price,
     });
 
     // Save the tour document to the database

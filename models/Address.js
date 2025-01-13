@@ -41,8 +41,8 @@ const addressSchema = new mongoose.Schema({
         type: Number,
         enum: [0, 1, 2], // 0: start, 1: end, 2: stop
         required: true
-    }
-});
+    },
+}, { timestamps: true });
 
 const Address = mongoose.model('Address', addressSchema);
 module.exports = Address;

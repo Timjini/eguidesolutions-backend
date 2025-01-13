@@ -23,9 +23,7 @@ const userSchema = new mongoose.Schema({
   avatar: { type: String, required: false },
   isAgencyOwner: { type: Boolean, default: false }, 
   ownedAgency: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency' }, 
-  createdAt: { type: Date, required: true, default: Date.now },
-  updatedAt: { type: Date, required: true, default: Date.now },
-});
+}, { timestamps: true });
 
 
 const User = mongoose.model('User', userSchema);

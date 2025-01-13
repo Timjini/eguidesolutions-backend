@@ -10,7 +10,7 @@ const userProfileSchema = new mongoose.Schema({
   selectedLanguage: { type: String },
   timeZone: { type: String },
   address: { type: mongoose.Schema.Types.ObjectId, ref: 'Address', required: true },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to User model
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
