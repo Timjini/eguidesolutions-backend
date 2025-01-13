@@ -12,8 +12,9 @@ const paymentSchema = new mongoose.Schema({
         default: 'pending' 
     },
     transactionId: { type: String, required: false },
-    photo: { type: String, required: false }, 
-});
+    photo: { type: String, required: false },
+
+}, { timestamps: true });
 
 const Payment = mongoose.model('Payment', paymentSchema);
 module.exports = Payment;
