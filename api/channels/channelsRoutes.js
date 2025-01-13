@@ -49,15 +49,10 @@ async function handleChannel(channelCode) {
   try {
     const agoraChannel = new AgoraChannel(channelCode);
     const token = await agoraChannel.getOrCreateToken();
-
-    console.log(`Agora Token for channel ${channelCode}:`, token);
-
     const isClosed = await agoraChannel.isChannelClosed();
-    console.log(`Is Channel ${channelCode} closed?`, isClosed);
 
     if (isClosed) {
       const newToken = await agoraChannel.ensureChannelActive();
-      console.log(`Regenerated Token:`, newToken);
     }
   } catch (error) {
     console.error('Error handling Agora channel:', error);
