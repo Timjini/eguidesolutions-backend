@@ -8,6 +8,7 @@ const {generateRandomPassword, generateUserCredentials } = require("../../utils/
 const secretKey = process.env.JWT_SECRET_KEY;
 
 async function loginAuth(req, res) {
+  console.log("------------------>")
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email.toLowerCase() });

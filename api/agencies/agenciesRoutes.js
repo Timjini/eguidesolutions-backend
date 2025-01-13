@@ -21,6 +21,7 @@ const crypto = require('crypto');
 // =======================================================================================================================================
 
 router.post('/create_agency', async (req, res) => {
+  consol.log('creating agency', req.body)
     try {
         const { name, description } = req.body;
         const file = req.file;
@@ -51,7 +52,7 @@ router.post('/create_agency', async (req, res) => {
         res.status(201).json({ message: 'Agency created successfully', agency , user:user });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: `Internal server error ${error}` });
     }
 });
 
