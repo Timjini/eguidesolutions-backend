@@ -8,7 +8,6 @@ const {generateRandomPassword, generateUserCredentials } = require("../../utils/
 const secretKey = process.env.JWT_SECRET_KEY;
 
 async function loginAuth(req, res) {
-  console.log("------------------>")
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email.toLowerCase() });
@@ -84,7 +83,6 @@ async function guestUser(req, res) {
     }
 
     const user = await User.findOne({ deviceId });
-    console.log("User found: ", user);
 
     if (!user) {
       const id = uuid.v4();
@@ -159,7 +157,6 @@ async function deleteAccount(req, res) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log(user);
 
     // delete User
     await User.deleteOne({ _id: user._id });
