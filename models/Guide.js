@@ -11,7 +11,7 @@ const guideSchema = new mongoose.Schema({
   name: { type: String, required: false },
   avatar: { type: String },
   tags: [{ type: String }],
-  ratings : { type: Number, enum: [1, 2, 3, 4, 5], required: true },
+  ratings : { type: Number, enum: [1, 2, 3, 4, 5], default: 1},
 });
 
 const Guide = mongoose.model("Guide", guideSchema);
