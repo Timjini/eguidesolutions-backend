@@ -13,7 +13,6 @@ async function getUserProfile(req, res) {
     const authToken = req.headers.authorization?.split(' ')[1];
     const user = await User.findOne({ authToken: authToken });
     const userProfile = await UserProfile.findOne({ id: user.id });
-    console.log('-------->', userProfile);
 
     let serializedData = [];
     if (userProfile) {
@@ -39,7 +38,6 @@ async function createNewAddress(address){
 }
 
 async function createOrUpdateUserProfile(req, res) {
-  console.log(req.body);
   try {
     const authToken = req.headers.authorization?.split(' ')[1];
     const { dob, department, selectedLanguage, timeZone, phoneNumber } = req.body;

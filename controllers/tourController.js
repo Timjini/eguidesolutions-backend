@@ -17,9 +17,15 @@ class TourController {
       const user = await User.findById(userId);
       const tours = await Tour.find();
 
-      const serializedTours = await Promise.all(tours.map(async (tour) => {
-        return await UserToursSerializer.serialize(tour, user);
-      }));
+      if (!tours) {
+        return res.status(404).json({ error: "No tour found" });
+      }
+
+      const serializedTours = await Promise.all(
+        tours.map(async (tour) => {
+          return await UserToursSerializer.serialize(tour, user);
+        })
+      );
 
       return res.status(200).json({
         status: "success",
@@ -34,20 +40,25 @@ class TourController {
       });
     }
   }
-  
 
   static async createNewTour(req, res) {
-    console.log("create tour=======>",req.body);
     try {
-      const { title, description, guide, agency, starting_date, ending_date } = req.body;
-      const start_point = JSON.parse(req.body.start_point);
-      const end_point = JSON.parse(req.body.end_point);
+      const { title, description, guide, agency, price, promoted, tags } =
+        req.body;
       const stops = JSON.parse(req.body.stops);
+      const parsedStartPoint = JSON.parse(req.body.start_point);
+      const parsedEndPoint = JSON.parse(req.body.end_point);
       const file = req.file;
       const agencyId = req.body.agency;
 
       if (!file) {
         return res.status(400).json({ error: "File is required" });
+      }
+
+      const agencyTour = await Agency.findOne({ _id: agencyId });
+
+      if (!agencyTour) {
+        return res.status(404).json({ error: "Agency not found" });
       }
 
       const image = await uploadToS3(file);
@@ -58,18 +69,23 @@ class TourController {
         photo: image.file_name,
         guide,
         agency,
-        start_point,
-        end_point,
-        stops
+        start_point: parsedStartPoint,
+        end_point: parsedEndPoint,
+        stops,
+        price,
+        promoted,
+        tags,
       });
 
-      // Validate required fields
-      if (!start_point || !end_point) {
-        return res.status(400).json({ error: "Start point and end point are required" });
+      // validate required fields
+      if (!parsedStartPoint || !parsedEndPoint) {
+        return res
+          .status(400)
+          .json({ error: "Start point and end point are required" });
       }
-  
-      const startPointAddress = await createAddress(start_point);
-      const endPointAddress = await createAddress(end_point);
+
+      const startPointAddress = await createAddress(parsedStartPoint);
+      const endPointAddress = await createAddress(parsedEndPoint);
 
       const addresses = [];
       if (Array.isArray(stops)) {
@@ -77,35 +93,27 @@ class TourController {
           addresses.push(await createAddress(stop));
         }
       }
-      
-      let start_address =addresses.push(startPointAddress);
-      let end_address = addresses.push(endPointAddress);
 
-      console.log("start_address", start_address);
-      console.log("end_address", end_address);
-      // await tour.save();
-      let new_itinerary = await createItinerary(addresses, tour);
-      console.log("new_itinerary", new_itinerary);
+      addresses.push(startPointAddress, endPointAddress);
 
-      const agencyTour = await Agency.findOne({ _id: agencyId });
-
-      if (!agencyTour) {
-        return res.status(404).json({ error: "Agency not found" });
+      if (!addresses.length) {
+        return res
+          .status(404)
+          .json({ error: "Addresses could not be created" });
       }
 
-      let agencyTours = agencyTour.tours.push(tour);
-      if (!agencyTours) {
-        return res.status(404).json({ error: "Agency not found" });
-      }
-      let newAgencyTour = await agencyTour.save();
-      console.log("agencyTour", newAgencyTour);
+      await createItinerary(addresses, tour);
+      await tour.save();
 
-    //   res.status(201).json({ message: "Tour created successfully", tour });
+      agencyTour.tours.push(tour);
+      await agencyTour.save();
+      res.status(201).json({ message: "Tour created successfully", tour });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "An error occurred while creating the tour" });
+      res
+        .status(500)
+        .json({ error: `An error occurred while creating the tour ${error}` });
     }
-
   }
 
   static async getAgencyTours(req, res) {
@@ -119,14 +127,16 @@ class TourController {
     try {
       const user = await User.findOne({ authToken: authToken }).exec();
 
-      if ((user.type === "admin" && !agencyId)) {
+      if (user.type === "admin" && !agencyId) {
         const allTours = await Tour.find();
         res.status(200).json({ message: "All Tours", tours: allTours });
       } else {
         const agency = await Agency.findOne({ owner: user._id });
 
         if (!agency) {
-          return res.status(404).json({ message: "Agency not found for the user" });
+          return res
+            .status(404)
+            .json({ message: "Agency not found for the user" });
         }
 
         const tours = await Tour.find({ agency: agencyId || agency._id });
@@ -171,7 +181,9 @@ class TourController {
       }
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "An error occurred while fetching the tour" });
+      res
+        .status(500)
+        .json({ error: "An error occurred while fetching the tour" });
     }
   }
 }

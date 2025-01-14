@@ -33,12 +33,12 @@ class TourHelper {
 
     for (const address of addresses) {
       const addressObject = {
-        street_1: address.street_1 ?? "",
-        street_2: address.street_2 ?? "",
-        city: address.city ?? address.state,
-        state: address.state ?? "",
-        country: address.country ?? "",
-        postal_code: address.postal_code ?? "",
+        street_1: address?.street_1 ?? "",
+        street_2: address?.street_2 ?? "",
+        city: address?.city ?? address.state,
+        state: address?.state ?? "",
+        country: address?.country ?? "",
+        postal_code: address?.postal_code ?? "",
         coordinates: {
           lat: address.coordinates.lat,
           lng: address.coordinates.lng,
