@@ -40,6 +40,31 @@ class TourController {
       });
     }
   }
+  static async getPromotedTours(req, res) {
+    try {
+      const userId = req.body.user_id;
+      const user = await User.findById(userId);
+      const tours = await Tour.find({ promoted: true });
+      const serializedTours = await Promise.all(
+        tours.map(async (tour) => {
+          return await UserToursSerializer.serialize(tour, user);
+        })
+      );
+  
+      return res.status(200).json({
+        status: "success",
+        message: "Promoted Tours fetched successfully",
+        data: serializedTours,
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        status: "error",
+        message: err.message,
+      });
+    }
+  }
+  
 
   static async createNewTour(req, res) {
     try {

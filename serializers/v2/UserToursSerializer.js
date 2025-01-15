@@ -34,6 +34,8 @@ class UserToursSerializer {
         end_point: tour?.end_point ?? '',
         stops: tour?.stops ?? [],
         address: tour?.address  ?? '',
+        tags: tour?.tags ?? [],
+        price: tour?.price ?? '',
         favorite: favoriteRecord ? favoriteRecord.isFavorite : false,
       };
   
