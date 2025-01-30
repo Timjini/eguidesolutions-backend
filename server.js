@@ -25,6 +25,7 @@ const packagesRoutes = require("./api/v2/agencies/packagesRoutes");
 const subscriptionsRoutes = require("./api/v2/agencies/subscriptionsRoutes");
 const paymentsRoutes = require("./api/v2/agencies/paymentsRoutes");
 const initializeDailyJobs = require("./jobs/DailyJobs");
+const guideRoutesV2 = require("./api/v2/guideRoutes");
 
 // =================================================================================================
 // ========================================CORS POLICY =============================================[]
@@ -121,6 +122,8 @@ app.use("/api/v1/tours", touristToursRoutes);
 app.use("/api/v1/favorite", favoriteRoutes);
 app.use("/api/v1/channels", touristChannelRoutes);
 app.use("/api/v1/main", mainRoutes);
+// Guide Routes
+app.use("/api/v2/guide", guideRoutesV2);
 
 // =================================================================================================
 // =========================================== Admin's ROUTES =====================================[]
