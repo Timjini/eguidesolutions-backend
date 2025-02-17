@@ -85,7 +85,7 @@ router.post("/sign_up", async (req, res) => {
   try {
     const user = new User({
       id,
-      email,
+      email: email.toLowerCase(),
       password: hashedPassword,
       phone,
       type,
@@ -134,7 +134,7 @@ router.post("/upload-avatar", verifyToken, async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.status(401).json({ message: "incorrect email" });
       
@@ -248,7 +248,7 @@ router.post("/logout", verifyToken, async (req, res) => {
     await user.save();
     res.json({ message: "Logged out successfully" });
   } catch (error) {
-    if (error.name === "TokenExpiredError") {
+    if (error?.name === "TokenExpiredError") {
       return res.status(401).json({ message: "Token expired" });
     }
     res.status(500).json({ error: "An error occurred while logging out" });
