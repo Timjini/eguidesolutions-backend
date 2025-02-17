@@ -222,6 +222,7 @@ async function resetPassword(req, res) {
       resetPasswordTokenExpiration: { $gt: Date.now() },
     });
 
+    console.log("Before update:", user._id);
     if (!user) {
       return res.status(400).json({ error: "Invalid or expired token" });
     }
@@ -232,6 +233,7 @@ async function resetPassword(req, res) {
     user.resetPasswordTokenExpiration = undefined;
     await user.save();
 
+    console.log("After update:", user._id);
     res.status(200).json({ message: "Password reset successfully" });
   } catch (error) {
     res

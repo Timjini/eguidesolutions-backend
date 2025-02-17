@@ -146,8 +146,15 @@ router.get("/agency_channels", async function (req, res) {
 
   try {
     const user = await User.findOne({ authToken: authToken }).exec();
-    const agency = await Agency.findOne({ owner: user._id });
     const tour = await Tour.findOne({ owner: user._id });
+
+    const agency = await Agency.findOne({
+      $or: [
+        { members: { _id: user._id } }, 
+        { ownedAgency: user?.ownedAgency },
+        { userAgency: user?.userAgency }
+      ]
+    }) || null;
 
     if (!agency) {
       return res.status(404).json({ message: "Agency not found for the user" });

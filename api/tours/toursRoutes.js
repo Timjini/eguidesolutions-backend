@@ -58,13 +58,20 @@ router.get('/agency_tours', async function (req, res) {
 
   try {
     const user = await User.findOne({ authToken: authToken }).exec();
+    console.log("-------> ", user)
 
     // Check if the user is an admin and agencyId is null
     if (user.type === 'admin' && agencyId === null || agencyId === undefined) {
       const allTours = await Tour.find();
       res.status(200).json({ message: 'All Tours', tours: allTours });
     } else {
-      const agency = await Agency.findOne({ owner: user._id });
+      const agency = await Agency.findOne({
+        $or: [
+          { members: { _id: user._id } }, 
+          { ownedAgency: user?.ownedAgency },
+          { userAgency: user?.userAgency }
+        ]
+      }) || null;
 
       if (!agency) {
         return res.status(404).json({ message: 'Agency not found for the user' });
