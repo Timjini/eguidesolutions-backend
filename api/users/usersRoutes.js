@@ -139,7 +139,7 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "incorrect email" });
       
     }
-
+    console.log("-------------------> user", user)
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
@@ -150,11 +150,17 @@ router.post("/login", async (req, res) => {
     await User.updateOne({ _id: user._id }, { $set: { status: "online" } });
 
     // Fetch the updated user with the new status from the database
-    const agency =
-      (await Agency.findOne({ members: { _id: user._id } })) || null;
+    const agency = await Agency.findOne({
+      $or: [
+        { members: { _id: user._id } }, 
+        { ownedAgency: user?.ownedAgency },
+        { userAgency: user?.userAgency }
+      ]
+    }) || null;
+    console.log("agency ---------------------->", agency)
+
     const updatedUser = await User.findOne({ _id: user._id });
     const userAvatarUrl = getUserAvatarUrl(updatedUser);
-
     try {
       if (user.authToken) {
         // Verify the existing token
@@ -225,7 +231,7 @@ router.post("/login", async (req, res) => {
       console.error(error);
     }
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while logging in" });
+    res.status(500).json({ error: error });
   }
 });
 

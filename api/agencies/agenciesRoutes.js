@@ -84,6 +84,7 @@ router.post('/create_agent', async (req, res) => {
         avatar: avatar.file_name,
         authToken,
         resetPasswordToken: token,
+        userAgency: agency._id
       });
   
       if (type === 'guide') {
@@ -220,8 +221,14 @@ router.get('/agency_channels', async function (req, res) {
       return res.status(200).json({ message: 'All Channels', channels: allChannels });
     }
 
-    const agency = await Agency.findOne({ owner: user._id });
-
+    const agency = await Agency.findOne({
+      $or: [
+        { members: { _id: user._id } }, 
+        { ownedAgency: user?.ownedAgency },
+        { userAgency: user?.userAgency }
+      ]
+    }) || null;
+    
     if (!agency) {
       return res.status(404).json({ message: 'Agency not found for the user' });
     }

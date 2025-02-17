@@ -4,78 +4,24 @@ const SubscriptionPackage = require("../../models/SubscriptionPackage");
 const Payment = require("../../models/Payment");
 const PaymentSerializer = require("../../serializers/v2/PaymentSerializer");
 const { uploadToS3 } = require("../../fileUploader");
+const PaymentService = require("../../services/PaymentService");
 
-async function createPayment(req, res){
-    try {
-      const { agencyId, packageId, amount } = req.body;
-      // const file = req.file;
-      // const photo = await uploadToS3(file);
-
-
-      const agency = await Agency.findById(agencyId);
-          if (!agency) {
-            return res.status(404).json({ error: "Agency not found" });
-          }
-          const package = await SubscriptionPackage.findById(packageId);
-          if (!package) {
-            return res.status(404).json({ error: "Subscription package not found" });
-          }
-
-    const subscription = await Subscription.findOne({
-      agency: agencyId,
-    }).exec();
-
-      if(!subscription) {
-        try {
-          let today = new Date();
-          let durationToMonth = package.durationInMonths;
-          let startDate = new Date();
-          let endDate = new Date(
-            today.getTime() + durationToMonth * 24 * 60 * 60 * 1000
-          );
-          // create e a new subscription
-          try {
-            let subscription = new Subscription({
-              agency: agencyId,
-              package: packageId,
-              startDate: startDate || new Date(),
-              endDate,
-              status: "pending",
-            });
-            await subscription.save();
-          } catch (err) {
-            console.log("==================",err);
-          }
-        } catch (err) {
-          console.log("==================",err);
-        }
-      }
-
-
-      let newPayment;
-          try {
-            const newPayment = new Payment({
-              agency: agencyId,
-              subscription: subscription?._id,
-              package: packageId,
-              amount,
-              // photo: photo.file_name ?? "",
-              status: "pending",
-            });
-            await newPayment.save();
-          } catch (err) {
-            console.log("==================",err);
-          }
-
-          res.status(201).json(newPayment);
-    } catch (err) {
-      console.log("==================",err);
-    }
+async function createPayment(req, res) {
+  try {
+    const { agencyId, amount } = req.body;
+    const file = req.file;
+    const payment = await PaymentService.processPayment({ agencyId, amount, file });
+    res.status(201).json(payment);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: err.message });
+  }
 }
+
 
 async function getPayments(req, res) {
   try {
-    // Retrieve all payments
+        // Retrieve all payments
     const payments = await Payment.find();
 
     // Serialize all payments
@@ -88,6 +34,19 @@ async function getPayments(req, res) {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to retrieve payments" });
+  }
+}
+
+async function agencyPayments(req,res){
+  try {
+    const { agencyId } = req.query;
+    const payments = await Payment.find({ agency: agencyId });
+    const serializedPayments = await Promise.all(
+      payments.map((payment) => PaymentSerializer.serialize(payment))
+    );
+    res.status(200).json(serializedPayments);
+  } catch (err){
+    res.status(500).json({error: err})
   }
 }
 
@@ -110,4 +69,5 @@ module.exports = {
   createPayment,
   getPayments,
   updatePayment,
+  agencyPayments
 };

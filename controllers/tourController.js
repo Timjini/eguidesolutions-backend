@@ -156,7 +156,13 @@ class TourController {
         const allTours = await Tour.find();
         res.status(200).json({ message: "All Tours", tours: allTours });
       } else {
-        const agency = await Agency.findOne({ owner: user._id });
+        const agency = await Agency.findOne({
+          $or: [
+            { members: { _id: user._id } }, 
+            { ownedAgency: user?.ownedAgency },
+            { userAgency: user?.userAgency }
+          ]
+        }) || null;
 
         if (!agency) {
           return res
@@ -185,6 +191,7 @@ class TourController {
                 agency: populatedTour.agency,
                 starting_date: populatedTour.starting_date,
                 ending_date: populatedTour.ending_date,
+                price: populatedTour?.price
               };
             } catch (error) {
               console.error("Error populating guide for tour:", error);
