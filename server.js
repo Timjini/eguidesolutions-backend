@@ -26,6 +26,7 @@ const subscriptionsRoutes = require("./api/v2/agencies/subscriptionsRoutes");
 const paymentsRoutes = require("./api/v2/agencies/paymentsRoutes");
 const initializeDailyJobs = require("./jobs/DailyJobs");
 const guideRoutesV2 = require("./api/v2/guideRoutes");
+const bookingRequestRoutes = require("./api/v1/bookingRequestRoutes");
 
 // =================================================================================================
 // ========================================CORS POLICY =============================================[]
@@ -119,6 +120,7 @@ app.get("/uploads/:file_name", async (req, res) => {
 app.use("/api/v1/auth", authRoutes);
 // app.use('api/v1/channels', touristChannelsRoutes);
 app.use("/api/v1/tours", touristToursRoutes);
+app.use("/api/v1/requests", bookingRequestRoutes);
 app.use("/api/v1/favorite", favoriteRoutes);
 app.use("/api/v1/channels", touristChannelRoutes);
 app.use("/api/v1/main", mainRoutes);

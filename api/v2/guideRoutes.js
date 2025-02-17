@@ -6,5 +6,6 @@ const verifyToken = require('../../auth/authMiddleware');
 
 
 router.post("/info", GuideController.getGuide);
+router.post("/rating", GuideController.submitRating)
 
 module.exports = router;

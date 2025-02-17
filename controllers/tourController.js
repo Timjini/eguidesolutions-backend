@@ -9,6 +9,7 @@ const Tour = require("../models/Tours");
 const { upload, uploadToS3 } = require("../fileUploader");
 const { createAddress, createItinerary } = require("../helpers/TourHelper");
 const UserToursSerializer = require("../serializers/v2/UserToursSerializer");
+const BookingRequest = require("../models/BookingRequest");
 
 class TourController {
   static async getAllTours(req, res) {
@@ -216,6 +217,35 @@ class TourController {
       res
         .status(500)
         .json({ error: "An error occurred while fetching the tour" });
+    }
+  }
+
+  static async submitRequest(req, res) {
+    try {
+      const { email, phone, numberOfPeople, note, tourId, agency } = req.body;
+      
+      const parsedNumberOfPeople = numberOfPeople ? parseInt(numberOfPeople, 10) : 1;
+
+      const bookingRequest = new BookingRequest({
+        email,
+        phone: phone || '',
+        numberOfPeople: parsedNumberOfPeople,
+        note: note || '',
+        tourId,
+        agency,
+      });
+
+      await bookingRequest.save();
+
+      return res.status(200).json({
+        message: "Booking request submitted successfully.",
+        bookingRequest,
+      });
+    } catch (error) {
+      console.error("Error submitting booking request: ", error);
+      return res.status(500).json({
+        error: "An error occurred while submitting the booking request.",
+      });
     }
   }
 }

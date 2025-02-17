@@ -1,13 +1,13 @@
 const Guide = require("../../models/Guide");
 const GuideSerializer = require("../../serializers/v2/GuideSerializer");
+const RatingService = require('../../services/RatingService');
+
 
 async function getGuide(req, res) {
   try {
     const guideId = req.body.guideId._id;
     console.log(guideId);
     const guide = await Guide.findOne({ _id: guideId });
-    console.log("guide----->", guide);
-
     // Serialize each agency using the updated serializer
     //   const serializedAgencies = await Promise.all(
     //     agencies.map((agency) => AgencySerializer.serialize(agency))
@@ -26,6 +26,36 @@ async function getGuide(req, res) {
   }
 }
 
+async function submitRating(req, res) {
+  const { guideId, user, rating, comment } = req.body;
+  console.log("rating", req.body)
+
+  const ratingInt = parseInt(rating, 10);
+
+  // Validate input
+  if (!guideId || !user || !ratingInt || ratingInt < 1 || ratingInt > 5) {
+    return res.status(400).json({ error: 'Invalid data' });
+  }
+
+  try {
+    const newRating = await RatingService.addRating(guideId, 'Guide', user._id, parseInt(rating), comment);
+
+    const updatedAverageRating = await RatingService.calculateAverageRating(guideId, 'Guide');
+    await Guide.findByIdAndUpdate(guideId, { averageRating: updatedAverageRating });
+
+    return res.status(200).json({
+      status: 'ok',
+      message: 'Rating submitted successfully',
+      rating: newRating,
+      averageRating: updatedAverageRating,
+    });
+  } catch (error) {
+    console.error("Error submitting rating:", error);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   getGuide,
+  submitRating
 };
