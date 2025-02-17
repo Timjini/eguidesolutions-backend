@@ -43,8 +43,9 @@ class PaymentService {
     return newPayment;
   }
 
-  static async processPayment({ agencyId, amount, file }) {
+  static async processPayment({ agencyId, amount, file, agencyPackage= undefined }) {
     const agency = await Agency.findById(agencyId);
+    let totalPayment = 0;
     if (!agency) {
       throw new Error("Agency not found");
     }
@@ -63,15 +64,21 @@ class PaymentService {
       photoUrl = photo.file_name;
     }
 
-    const agencyPackage = await SubscriptionPackage.findOne({package: subscriptionPackage.package});
-    console.log("----->",agencyPackage)
-
     if (!agencyPackage) {
-        throw new Error("Package not found");
+        agencyPackage = await SubscriptionPackage.findOne({ package: subscriptionPackage.package });
+        if (!agencyPackage) {
+          throw new Error("Package not found");
+        }
+    }
+
+    if(!amount){
+        totalPayment += SubscriptionPackage.price;
+    } else {
+        totalPayment += amount;
     }
 
     // Create payment
-    const payment = await this.createPayment(agencyId, subscription?._id, agencyPackage, agencyPackage.price, photoUrl);
+    const payment = await this.createPayment(agencyId, subscription?._id, agencyPackage, totalPayment, photoUrl);
     return payment;
   }
 }

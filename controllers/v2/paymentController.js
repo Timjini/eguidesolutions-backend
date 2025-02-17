@@ -8,9 +8,9 @@ const PaymentService = require("../../services/PaymentService");
 
 async function createPayment(req, res) {
   try {
-    const { agencyId, amount } = req.body;
+    const { agencyId, amount, packageId } = req.body;
     const file = req.file;
-    const payment = await PaymentService.processPayment({ agencyId, amount, file });
+    const payment = await PaymentService.processPayment({ agencyId, amount, file, packageId });
     res.status(201).json(payment);
   } catch (err) {
     console.error(err.message);
