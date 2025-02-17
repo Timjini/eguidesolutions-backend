@@ -15,6 +15,10 @@ const tourSchema = new mongoose.Schema({
     promoted: { type: Boolean, default: false }, // this should be replaced by a table of promotions
     tags: { type: [String], required: false }, // this should be replaced by a table of tags example: ['hiking', 'nature', 'adventure', 'history', 'culture']
     // address:{type: mongoose.Schema.Types.ObjectId, ref: 'Address', required: true},
+    ratings: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Rating"
+      }]
 }, { timestamps: true });
 
 // Create and export the Tour model
