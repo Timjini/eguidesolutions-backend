@@ -2,10 +2,15 @@ const sendWelcomeEmail = require("../../mailer/welcomeUser");
 const User = require("../../models/Users");
 const authSerializer = require("../../serializers/authSerializer");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const uuid = require("uuid");
 const jwt = require("jsonwebtoken");
-const {generateRandomPassword, generateUserCredentials } = require("../../utils/auth/checkUser");
+const {
+  generateRandomPassword,
+  generateUserCredentials,
+} = require("../../utils/auth/checkUser");
 const secretKey = process.env.JWT_SECRET_KEY;
+const sendPasswordResetEmail = require("../../mailer/sendPasswordResetEmail");
 
 async function loginAuth(req, res) {
   try {
@@ -61,24 +66,26 @@ async function signUpAuth(req, res) {
     await user.save();
     res
       .status(201)
-      .json({ message: "User registered successfully", authToken, user: authSerializer.serialize(user) });
+      .json({
+        message: "User registered successfully",
+        authToken,
+        user: authSerializer.serialize(user),
+      });
 
     await sendWelcomeEmail(user);
-
   } catch (error) {
     res.status(500).json({ error: "An error occurred while registering user" });
   }
 }
-
 
 async function guestUser(req, res) {
   try {
     const { deviceId } = req.body;
 
     if (!deviceId) {
-      return res.status(400).json({ 
-        status: "error", 
-        message: "Device ID is required" 
+      return res.status(400).json({
+        status: "error",
+        message: "Device ID is required",
       });
     }
 
@@ -126,10 +133,8 @@ async function guestUser(req, res) {
     });
   }
 }
-  
 
 async function logoutAuth(req, res) {
-
   try {
     const user = await User.findOne({ _id: req.user.userId });
     if (!user) {
@@ -151,12 +156,11 @@ async function logoutAuth(req, res) {
 
 async function deleteAccount(req, res) {
   try {
-    const authToken = req.headers.authorization?.split(' ')[1];
+    const authToken = req.headers.authorization?.split(" ")[1];
     const user = await User.findOne({ authToken: authToken });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
 
     // delete User
     await User.deleteOne({ _id: user._id });
@@ -171,10 +175,78 @@ async function deleteAccount(req, res) {
   }
 }
 
+// password actions
+
+async function forgotPassword(req, res) {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const resetTokenExpiration = Date.now() + 3600000;
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordTokenExpiration = resetTokenExpiration;
+    await user.save();
+    console.log("user", user);
+
+    try {
+      await sendPasswordResetEmail(user);
+    } catch (error) {
+      console.log("error", error);
+    }
+
+    res.status(200).json({ message: "Password reset email sent successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while processing your request" });
+  }
+}
+
+async function resetPassword(req, res) {
+  const { token, password } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ error: "Invalid or expired token" });
+  }
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordTokenExpiration: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: "Invalid or expired token" });
+    }
+
+    console.log("find you",user);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpiration = undefined;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "An error occurred while resetting your password" });
+  }
+}
+
 module.exports = {
   loginAuth,
   logoutAuth,
   signUpAuth,
   deleteAccount,
-  guestUser
+  guestUser,
+  forgotPassword,
+  resetPassword,
 };
