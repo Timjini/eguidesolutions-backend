@@ -324,8 +324,14 @@ router.get("/guides", async function (req, res) {
 
   try {
     const user = await User.findOne({ authToken: authToken }).exec();
-    const agency = await Agency.findOne({ owner: user._id });
-
+    const agency = await Agency.findOne({
+      $or: [
+        { members: { _id: user._id } }, 
+        { ownedAgency: user?.ownedAgency },
+        { userAgency: user?.userAgency }
+      ]
+    }) || null;
+    console.log("find agency ", agency);
     if (!user) {
       return res.status(401).json({ message: "Invalid token" });
     }
