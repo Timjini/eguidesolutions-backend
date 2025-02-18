@@ -5,8 +5,8 @@ const RatingService = require('../../services/RatingService');
 
 async function getGuide(req, res) {
   try {
+    console.log("data", req.body)
     const guideId = req.body.guideId._id;
-    console.log(guideId);
     const guide = await Guide.findOne({ _id: guideId });
     // Serialize each agency using the updated serializer
     //   const serializedAgencies = await Promise.all(
@@ -14,6 +14,8 @@ async function getGuide(req, res) {
     //   );
 
     const serializedGuide = await GuideSerializer.serialize(guide);
+    console.log(serializedGuide);
+
 
     return res.status(200).json({
       status: "success",
