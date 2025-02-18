@@ -39,6 +39,7 @@ async function handleChannel(channelCode) {
 
 function initializeDailyJobs() {
   // Schedule the token refresh job
+  // '0 0 * * *'
   cron.schedule('0 0 * * *', async () => {
     const jobName = 'Daily Token Refresh';
     try {
@@ -58,8 +59,8 @@ function initializeDailyJobs() {
         channels.map(channel => ({
           id: channel._id,
           code: channel.code,
-          start_date: channel.start_date,
-          end_date: channel.end_date,
+          start_date: channel.starting_date,
+          end_date: channel.ending_date,
         }))
       );
       console.log('Daily token refresh job completed successfully.');
