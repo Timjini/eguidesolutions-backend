@@ -23,7 +23,6 @@ async function loginAuth(req, res) {
     if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
-    // Update the user's status to "online" in the database
     await User.updateOne({ _id: user._id }, { $set: { status: "online" } });
 
     return res.status(200).json({
@@ -141,7 +140,6 @@ async function logoutAuth(req, res) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update the user's status to "offline" in the database
     await User.updateOne({ _id: user._id }, { $set: { status: "offline" } });
 
     return res.status(200).json({

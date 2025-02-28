@@ -21,15 +21,12 @@ async function createPayment(req, res) {
 
 async function getPayments(req, res) {
   try {
-        // Retrieve all payments
     const payments = await Payment.find();
 
-    // Serialize all payments
     const serializedPayments = await Promise.all(
       payments.map((payment) => PaymentSerializer.serialize(payment))
     );
 
-    // Send the serialized payments as the response
     res.status(200).json(serializedPayments);
   } catch (err) {
     console.error(err);

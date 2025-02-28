@@ -139,17 +139,14 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "incorrect email" });
       
     }
-    console.log("-------------------> user", user)
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // Update the user's status to "online" in the database
     await User.updateOne({ _id: user._id }, { $set: { status: "online" } });
 
-    // Fetch the updated user with the new status from the database
     const agency = await Agency.findOne({
       $or: [
         { members: { _id: user._id } }, 
@@ -157,7 +154,6 @@ router.post("/login", async (req, res) => {
         { userAgency: user?.userAgency }
       ]
     }) || null;
-    console.log("agency ---------------------->", agency)
 
     const updatedUser = await User.findOne({ _id: user._id });
     const userAvatarUrl = getUserAvatarUrl(updatedUser);
@@ -166,18 +162,15 @@ router.post("/login", async (req, res) => {
         // Verify the existing token
         jwt.verify(user.authToken, secretKey, (err, decoded) => {
           if (err) {
-            // Token is invalid or expired, generate a new one
             const tokenExpiration =
               Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 60; // 2 months
             const newToken = jwt.sign({ userId: user.id }, secretKey, {
               expiresIn: tokenExpiration,
             });
 
-            // Update the user's authToken field in the database
             user.authToken = newToken;
-            user.save(); // Save the updated token to the user record in the database
+            user.save();
 
-            // Send the new token to the client
             if (user.type === "admin") {
               res.json({
                 token: newToken,
@@ -213,21 +206,18 @@ router.post("/login", async (req, res) => {
           }
         });
       } else {
-        // Generate a new token if the user doesn't have a token
         const tokenExpiration =
           Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 60; // 2 months
         const token = jwt.sign({ userId: user.id }, secretKey, {
           expiresIn: tokenExpiration,
         });
 
-        // Update the user's authToken field in the database
         user.authToken = token;
-        user.save(); // Save the new token to the user record in the database
+        user.save();
 
         res.json({ token, user: updatedUser });
       }
     } catch (error) {
-      // Handle other errors as needed
       console.error(error);
     }
   } catch (error) {
@@ -265,7 +255,6 @@ router.post("/logout", verifyToken, async (req, res) => {
 router.get("/users", verifyToken, isAdministrator, async function (req, res) {
   // checkUser(req,res)
   try {
-    // Find the user based on the authToken
     const authToken = req.headers.authorization?.split(' ')[1];
     const user = await User.findOne({ authToken: authToken }).exec();
 
@@ -273,12 +262,10 @@ router.get("/users", verifyToken, isAdministrator, async function (req, res) {
       return res.status(401).json({ message: "Invalid token" });
     }
 
-    // Check if the user has necessary permissions (e.g., admin role)
     if (user.type !== "admin") {
       return res.status(403).json({ message: "Access forbidden" });
     }
 
-    // Fetch all users from the database
     const users = await User.find({}, "-password").exec();
 
     res.status(200).json(users);
@@ -292,7 +279,6 @@ router.delete("/delete_account", async (req, res) => {
   const authToken = req.headers.authorization?.split(" ")[1];
 
   try {
-    // Find the user by ID
     const user = await User.findOne({ authToken: authToken }).exec();
 
     if (!user) {

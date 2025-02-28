@@ -3,7 +3,6 @@ const ErrorLogs = require("../../models/ErrorLogs");
 async function errorLogs(req, res) {
   const { errorMessage, stackTrace } = req.body;
 
-  // Validate input
   if (!errorMessage || !stackTrace) {
     return res.status(400).json({ message: "Invalid error data" });
   }

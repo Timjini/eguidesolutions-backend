@@ -38,7 +38,7 @@ async function handleChannel(channelCode) {
   }
 
 function initializeDailyJobs() {
-  // Schedule the token refresh job
+  //  the token refresh job
   // '0 0 * * *'
   cron.schedule('0 0 * * *', async () => {
     const jobName = 'Daily Token Refresh';

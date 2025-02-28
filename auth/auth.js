@@ -28,7 +28,7 @@ const isAgencyOwner = async (req, res, next) => {
       const user = await User.findOne({ authToken: authToken });
 
       if (user && user.isAgencyOwner) {
-          req.user = user; // Add the user to the request object for later use
+          req.user = user;
           next();
       } else {
           res.status(401).json({ message: 'Unauthorized: Only agency owners can perform this action' });

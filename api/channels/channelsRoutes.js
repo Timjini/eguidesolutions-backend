@@ -76,7 +76,6 @@ router.post("/create", async (req, res) => {
   }
 
   try {
-    // Find the user by authToken
     const user = await User.findOne({ authToken });
     if (!user) {
       return res
@@ -84,13 +83,11 @@ router.post("/create", async (req, res) => {
         .json({ message: "User not found or invalid token" });
     }
 
-    // Find the agency owned by the user
     const agency = await Agency.findById(agencyId);
     if (!agency) {
       return res.status(404).json({ message: "Agency not found for the user" });
     }
 
-    // Find the tour for the agency (assuming you have a proper query logic here)
     const tour = await Tour.findById(tourId);
     if (!tour) {
       return res.status(404).json({ message: "Tour not found for the agency" });
@@ -160,13 +157,12 @@ router.get("/agency_channels", async function (req, res) {
       return res.status(404).json({ message: "Agency not found for the user" });
     }
 
-    // Find all channels belonging to the agency using the agencyId field in the Channel schema
     const channels = await Channel.find({ agency: agency._id })
       .populate({
         path: "guide",
         populate: { path: "user", select: "name avatar" },
       })
-      .populate("tour"); // Assuming 'tour' is the field in your Channel model that references the Tour model
+      .populate("tour");
     res.status(200).json({ message: "Agency Channels", channels: channels });
   } catch (error) {
     console.error(error);
@@ -224,7 +220,6 @@ router.get("/channel", async (req, res) => {
   }
 
   try {
-    // Find the user by authToken
     const user = await User.findOne({ authToken });
     if (!user) {
       return res
@@ -232,13 +227,12 @@ router.get("/channel", async (req, res) => {
         .json({ message: "User not found or invalid token" });
     }
 
-    // Find the channel by code and populate the associated Guide and Tour data
     const channel = await Channel.findOne({ code })
       .populate({
         path: "guide",
         populate: { path: "user", select: "name avatar" },
-      }) // Assuming 'guide' is the field in your Channel model that references the Guide model
-      .populate("tour"); // Assuming 'tour' is the field in your Channel model that references the Tour model
+      }) 
+      .populate("tour");
 
     if (!channel) {
       return res.status(404).json({ message: "Channel not found" });
@@ -270,8 +264,8 @@ router.get("/user_channels", async (req, res) => {
       .populate({
         path: "guide",
         populate: { path: "user", select: "name avatar" },
-      }) // Assuming 'guide' is the field in your Channel model that references the Guide model
-      .populate("tour"); // Assuming 'tour' is the field in your Channel model that references the Tour model
+      })
+      .populate("tour");
 
     res.json({ message: "User channels", channels });
   } catch (err) {

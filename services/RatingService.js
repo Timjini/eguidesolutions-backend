@@ -27,7 +27,6 @@ class RatingService {
 
   static async addRating(refId, refType, userId, ratingValue, comment = "") {
     try {
-      // Create a new Rating document
       const newRating = new Rating({
         refId,
         refType,

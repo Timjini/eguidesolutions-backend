@@ -1,6 +1,6 @@
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const User = require('../models/Users'); // Adjust the path accordingly
+const User = require('../models/Users');
 const secretKey = process.env.JWT_SECRET_KEY;
 
 const authenticationMiddleware = async (socket, next) => {
@@ -20,7 +20,6 @@ const authenticationMiddleware = async (socket, next) => {
       return next(new Error('Authentication failed. User not found.'));
     }
 
-    // Attach user object to socket for further use
     socket.user = user;
     next();
   } catch (error) {
