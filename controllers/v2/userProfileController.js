@@ -42,13 +42,11 @@ async function createOrUpdateUserProfile(req, res) {
     const authToken = req.headers.authorization?.split(' ')[1];
     const { dob, department, selectedLanguage, timeZone, phoneNumber } = req.body;
 
-    // Find the user
     const user = await User.findOne({ authToken: authToken });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Find or create user profile
     let userProfile = await UserProfile.findOne({ user: user._id });
     
     const userAddress = await Address.findOne({ _id: userProfile?.address });
@@ -59,7 +57,6 @@ async function createOrUpdateUserProfile(req, res) {
     }
     
     if (!userProfile) {
-      // Create new user profile
       userProfile = new UserProfile({
         email: user.email,
         user: user._id,
@@ -70,7 +67,6 @@ async function createOrUpdateUserProfile(req, res) {
         selectedLanguage,
       });
     } else {
-      // Update existing user profile
       userProfile.address = userAddress._id;
       userProfile.phone = phoneNumber;
       userProfile.dob = dob;
@@ -81,7 +77,7 @@ async function createOrUpdateUserProfile(req, res) {
     await userProfile.save();
     return res.status(200).json({message:'success', user_profile: userProfile });
   } catch (err) {
-    console.error(err); // Log error details for debugging
+    console.error(err);
     return res.status(500).json({ error: err.message });
   }
 }

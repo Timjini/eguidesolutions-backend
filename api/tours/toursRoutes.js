@@ -28,7 +28,6 @@ router.post('/new_tour', async (req, res) => {
       price: price,
     });
 
-    // Save the tour document to the database
     await tour.save();
 
     const agencyTour = await Agency.findOne({ _id: agencyId });
@@ -37,7 +36,6 @@ router.post('/new_tour', async (req, res) => {
       return res.status(404).json({ error: 'Agency not found' });
     }
 
-    // Update the user's profile to include this new tour (assuming you have a user-tour relationship)
     agencyTour.tours.push(tour);
     await agencyTour.save();
 
@@ -58,9 +56,7 @@ router.get('/agency_tours', async function (req, res) {
 
   try {
     const user = await User.findOne({ authToken: authToken }).exec();
-    console.log("-------> ", user)
 
-    // Check if the user is an admin and agencyId is null
     if (user.type === 'admin' && agencyId === null || agencyId === undefined) {
       const allTours = await Tour.find();
       res.status(200).json({ message: 'All Tours', tours: allTours });
@@ -77,7 +73,6 @@ router.get('/agency_tours', async function (req, res) {
         return res.status(404).json({ message: 'Agency not found for the user' });
       }
 
-      // Use provided agencyId or the agencyId of the user
       const tours = await Tour.find({ agency: agencyId || agency._id });
       const guides = await Guide.find({ agency: agency }).exec();
       const userIDs = guides.map(guide => guide.user);

@@ -77,7 +77,6 @@ class PaymentService {
         totalPayment += amount;
     }
 
-    // Create payment
     const payment = await this.createPayment(agencyId, subscription?._id, agencyPackage, totalPayment, photoUrl);
     return payment;
   }

@@ -25,16 +25,16 @@ class AgoraChannel {
    */
   generateAgoraToken() {
     const currentTime = Math.floor(Date.now() / 1000);
-    const expiryDuration = 1 * 86400; // Token valid for 7 days
+    const expiryDuration = 1 * 86400; // token valid for 7 days
 
     return RtcTokenBuilder.buildTokenWithUid(
       process.env.APP_KEY,
       process.env.APP_CERTIFICATE,
       this.channelCode,
-      0, // UID for the token
+      0,
       RtcRole.PUBLISHER,
-      currentTime + expiryDuration, // Token expiry
-      currentTime + expiryDuration // Privilege expiry
+      currentTime + expiryDuration,
+      currentTime + expiryDuration
     );
   }
 
@@ -48,11 +48,10 @@ class AgoraChannel {
     const tokenExpiry = this.channel.tokenExpiry || 0;
 
     if (currentTime >= tokenExpiry) {
-      // Regenerate token if expired
       const newToken = this.generateAgoraToken();
       this.channel.agoraToken = newToken;
-      this.channel.tokenExpiry = currentTime + 1 * 86400; // Extend expiry
-      await this.channel.save(); // Save updated channel info
+      this.channel.tokenExpiry = currentTime + 1 * 86400; //  expiry
+      await this.channel.save();
     }
 
     return this.channel.agoraToken;
@@ -63,9 +62,7 @@ class AgoraChannel {
    */
   async isChannelClosed() {
     await this.loadChannel();
-    // Add your logic here to determine if the channel is closed
-    // For example, a `closed` flag or `endTime` in your database
-    return this.channel.closed || false; // Adjust field name accordingly
+    return this.channel.closed || false;
   }
 
   /**

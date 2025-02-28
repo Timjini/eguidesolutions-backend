@@ -34,7 +34,6 @@ async function submitRating(req, res) {
 
   const ratingInt = parseInt(rating, 10);
 
-  // Validate input
   if (!guideId || !user || !ratingInt || ratingInt < 1 || ratingInt > 5) {
     return res.status(400).json({ error: 'Invalid data' });
   }

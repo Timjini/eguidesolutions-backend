@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-
-mongoose.connect('mongodb+srv://admin:9T69hsFlCpri4pNu@eguide-db.mtcke3w.mongodb.net/backend_db', {
+const MONGODB_MAIN_URI = process.env.MONGODB_MAIN_URI;
+mongoose.connect(MONGODB_MAIN_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

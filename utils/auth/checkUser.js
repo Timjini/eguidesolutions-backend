@@ -37,7 +37,7 @@ function generateUserCredentials() {
   ];
   const domains = ["example.com", "mail.com", "fakemail.org", "userhub.io"];
 
-  const randomNumber = Math.floor(100 + Math.random() * 900); // 3-digit number
+  const randomNumber = Math.floor(100 + Math.random() * 900);
   const randomAdjective =
     adjectives[Math.floor(Math.random() * adjectives.length)];
   const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
