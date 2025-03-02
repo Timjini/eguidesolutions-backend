@@ -78,7 +78,7 @@ router.post('/create_agent', async (req, res) => {
         id,
         name,
         email,
-        password: '$43$!^^&@',
+        password: '',
         type,
         phone,
         avatar: avatar.file_name,
