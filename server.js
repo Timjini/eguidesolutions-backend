@@ -27,6 +27,8 @@ const paymentsRoutes = require("./api/v2/agencies/paymentsRoutes");
 const initializeDailyJobs = require("./jobs/DailyJobs");
 const guideRoutesV2 = require("./api/v2/guideRoutes");
 const bookingRequestRoutes = require("./api/v1/bookingRequestRoutes");
+const marokoEkspertRoutes = require("./api/v3/marokoEkspertRoutes");
+
 
 // =================================================================================================
 // ========================================CORS POLICY =============================================[]
@@ -141,6 +143,9 @@ app.use("/api/v2/payments", paymentsRoutes);
 // =================================================================================================
 // =================================== AGORA CHANNEL GENERATE TOKEN ===============================[]
 // =================================================================================================
+
+app.use("/api/v3/maroko-ekspert", marokoEkspertRoutes);
+
 
 // Agora Token Generator
 app.get("/token", (req, res) => {
