@@ -6,7 +6,7 @@ const User = require('../../models/Users');
 const Agency = require('../../models/Agency');
 const Guide = require('../../models/Guide');
 const Tour = require('../../models/Tours');
-const { upload, uploadToS3 } = require('../../fileUploader');
+const { upload, uploadToS3 } = require('../../utils/fileUploader');
 
 
 router.post('/new_tour', async (req, res) => {

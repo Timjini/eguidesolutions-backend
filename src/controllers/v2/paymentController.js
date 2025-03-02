@@ -3,7 +3,7 @@ const Subscription = require("../../models/Subscription");
 const SubscriptionPackage = require("../../models/SubscriptionPackage");
 const Payment = require("../../models/Payment");
 const PaymentSerializer = require("../../serializers/v2/PaymentSerializer");
-const { uploadToS3 } = require("../../fileUploader");
+const { uploadToS3 } = require("../../utils/fileUploader");
 const PaymentService = require("../../services/PaymentService");
 
 async function createPayment(req, res) {
