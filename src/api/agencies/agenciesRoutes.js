@@ -8,7 +8,7 @@ const { isAgencyOwner, isAdministrator } = require('../../auth/auth');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
-const { upload, uploadToS3 } = require('../../fileUploader');
+const { upload, uploadToS3 } = require('../../utils/fileUploader');
 const Channel = require('../../models/Channels');
 const sendPasswordResetEmail = require('../../mailer/resetPassword');
 const crypto = require('crypto');
@@ -78,7 +78,7 @@ router.post('/create_agent', async (req, res) => {
         id,
         name,
         email,
-        password: '$43$!^^&@',
+        password: '',
         type,
         phone,
         avatar: avatar.file_name,

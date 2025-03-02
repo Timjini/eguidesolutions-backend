@@ -4,7 +4,7 @@ const Agency = require("../models/Agency");
 const SubscriptionPackage = require("../models/SubscriptionPackage");
 const Subscription = require("../models/Subscription");
 const Payment = require("../models/Payment");
-const { uploadToS3 } = require("../fileUploader");
+const { uploadToS3 } = require("../utils/fileUploader");
 
 
 class PaymentService {
