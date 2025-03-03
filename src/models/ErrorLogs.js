@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require('../db');
 
 const errorLogsSchema = new mongoose.Schema({
   error_message: { type: String, required: true },
