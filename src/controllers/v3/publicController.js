@@ -6,7 +6,17 @@ const { serializeExcursions } = require("../../serializers/v3/excursionsSerializ
 class publicController {
   static async index(req, res) {
     try {
-      const allExcursions = await excursions(); 
+      const { type, city, include, duration, price } = req.query;
+      console.log("Received query params:", { type, city, include, duration, price });
+
+      const filter = {};
+      if (type) filter.type = type;
+      if (city) filter.city = city;
+      if (include) filter.include = include;
+      if (duration) filter.duration = duration;
+      if (price) filter.price = price;
+  
+      const allExcursions = await excursions(filter); 
       const serializedExcursions = serializeExcursions(allExcursions);
       return res.status(200).json({
         message: 'excursions fetched successfully',
