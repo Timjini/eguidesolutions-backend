@@ -18,9 +18,9 @@ function save(data){
     return result;
 }
 
-function excursions(){
+function excursions(filter = {}){
     // const allExcursions = Excursion.find({ include: 'breakfast' });
-    const allExcursions = Excursion.find();
+    const allExcursions = Excursion.find(filter);
     return allExcursions;
 }
 
