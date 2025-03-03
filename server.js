@@ -27,7 +27,7 @@ const paymentsRoutes = require("./src/api/v2/agencies/paymentsRoutes");
 const initializeDailyJobs = require("./src/jobs/DailyJobs");
 const guideRoutesV2 = require("./src/api/v2/guideRoutes");
 const bookingRequestRoutes = require("./src/api/v1/bookingRequestRoutes");
-const marokoEkspertRoutes = require("./api/v3/marokoEkspertRoutes");
+const marokoEkspertRoutes = require("./src/api/v3/marokoEkspertRoutes");
 
 
 // =================================================================================================
