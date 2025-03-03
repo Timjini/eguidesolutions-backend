@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const MONGODB_MAIN_URI = process.env.MONGODB_URI;
+const MONGODB_MAIN_URI = process.env.MONGODB_MAIN_URI;
 mongoose.connect(MONGODB_MAIN_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
