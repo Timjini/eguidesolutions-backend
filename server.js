@@ -39,6 +39,7 @@ const allowedOrigins = [
   "https://admin.e-guidesolutions.com",
   "http://localhost:5173",
   "http://localhost:3000",
+  "https://maroko-ekspert.vercel.app"
 ];
 
 app.use(
