@@ -6,8 +6,8 @@ const { serializeExcursions } = require("../../serializers/v3/excursionsSerializ
 class publicController {
   static async index(req, res) {
     try {
-      const { type, city, include, duration, price } = req.query;
-      console.log("Received query params:", { type, city, include, duration, price });
+      const { type, city, include, duration, price, _id } = req.query;
+      console.log("Received query params:", { type, city, include, duration, price, _id });
 
       const filter = {};
       if (type) filter.type = type;
@@ -15,6 +15,7 @@ class publicController {
       if (include) filter.include = include;
       if (duration) filter.duration = duration;
       if (price) filter.price = price;
+      if (_id) filter._id = _id;
   
       const allExcursions = await excursions(filter); 
       const serializedExcursions = serializeExcursions(allExcursions);

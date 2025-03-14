@@ -5,6 +5,15 @@ const excursionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  imageUrls: {
+    type: [String],
+    validate: {
+      validator: function (value) {
+        return value.every(url => /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url));
+      },
+      message: 'Invalid image URL format'
+    }
+  },
   city: {
     type: String,
     required: true
