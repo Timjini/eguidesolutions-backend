@@ -6,8 +6,8 @@ const { serializeExcursions } = require("../../serializers/v3/excursionsSerializ
 class publicController {
   static async index(req, res) {
     try {
-      const { type, city, include, duration, price, _id } = req.query;
-      console.log("Received query params:", { type, city, include, duration, price, _id });
+      const { type, city, include, duration, price, _id, coverImage, imageUrls} = req.query;
+      console.log("Received query params:", { type, city, include, duration, price, _id, coverImage, imageUrls });
 
       const filter = {};
       if (type) filter.type = type;
@@ -16,6 +16,8 @@ class publicController {
       if (duration) filter.duration = duration;
       if (price) filter.price = price;
       if (_id) filter._id = _id;
+      if (coverImage) filter.coverImage = coverImage;
+      if(imageUrls) filter.imageUrls = imageUrls;
   
       const allExcursions = await excursions(filter); 
       const serializedExcursions = serializeExcursions(allExcursions);
@@ -45,7 +47,7 @@ class publicController {
 
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ error: 'Error uploading CSV' });
+      return res.status(500).json({ error: 'Error uploading Json' });
     }
   }
 }
