@@ -28,6 +28,8 @@ services:
       - "27017:27017"
     networks:
       - app_network
+    volumes:
+      - mongo_data:/data/db
 
   mongo_express:
     image: mongo-express:latest
