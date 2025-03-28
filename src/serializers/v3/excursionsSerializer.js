@@ -14,6 +14,9 @@ function serializeExcursion(excursion) {
       content_pl: excursion.content_pl,
       highlights_en: excursion.highlights_en,
       highlights_pl: excursion.highlights_pl,
+      imageUrls: excursion.imageUrls,
+      description_en: excursion.description_en,
+      description_pl: excursion.description_pl
     };
   }
   

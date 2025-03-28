@@ -3,6 +3,8 @@ function save(data){
     const mappedData = data.map(item => ({
         type: item.type,
         city: item.city,
+        // coverImages: item?.coverImages,
+        imageUrls: item?.imageUrls,
         include: item.include,
         duration: item.duration,
         price: item.price,
@@ -13,6 +15,8 @@ function save(data){
         content_pl: item.content_pl,
         highlights_en: item.highlights_en,
         highlights_pl: item.highlights_pl,
+        description_en: item.description_en,
+        description_pl: item.description_pl
       }));
     const result = Excursion.insertMany(mappedData); 
     return result;

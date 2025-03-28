@@ -5,14 +5,17 @@ const excursionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  coverImages:{
+    type: [String],
+  },
   imageUrls: {
     type: [String],
-    validate: {
-      validator: function (value) {
-        return value.every(url => /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url));
-      },
-      message: 'Invalid image URL format'
-    }
+    // validate: {
+    //   validator: function (value) {
+    //     return value.every(url => /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url));
+    //   },
+    //   message: 'Invalid image URL format'
+    // }
   },
   city: {
     type: String,
@@ -39,6 +42,14 @@ const excursionSchema = new mongoose.Schema({
     required: true
   },
   title_pl: {
+    type: String,
+    required: true
+  },
+  description_en:{
+    type: String,
+    required: true
+  },
+  description_pl:{
     type: String,
     required: true
   },
