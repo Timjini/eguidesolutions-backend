@@ -1,4 +1,3 @@
-
 function serializeExcursion(excursion) {
     return {
       _id: excursion._id,

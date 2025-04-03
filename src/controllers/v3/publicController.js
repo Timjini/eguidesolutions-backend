@@ -19,11 +19,19 @@ class publicController {
       if (coverImage) filter.coverImage = coverImage;
       if(imageUrls) filter.imageUrls = imageUrls;
   
-      const allExcursions = await excursions(filter); 
+      const allExcursions = await excursions(filter);
+      
+      const excursionsWithSimilar = await Excursion.find({
+        city: allExcursions[0].city,
+      })
+      .limit(3)
+      .select('_id title_en title_pl duration price imageUrls')
+      .lean();
       const serializedExcursions = serializeExcursions(allExcursions);
       return res.status(200).json({
         message: 'excursions fetched successfully',
-        data: serializedExcursions
+        data: serializedExcursions,
+        excursionsWithSimilar: excursionsWithSimilar
       });
     } catch (err) {
       console.log(err);
@@ -47,7 +55,7 @@ class publicController {
 
     } catch (err) {
       console.log(err);
-      return res.status(500).json({ error: 'Error uploading Json' });
+      return res.status(500).json({ error: `Error uploading Json ${err}` });
     }
   }
 }
