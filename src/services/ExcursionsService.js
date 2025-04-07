@@ -1,4 +1,6 @@
 const Excursion = require("../models/Excursion");
+const ExcursionBooking = require("../models/ExcursionBooking");
+
 function save(data){
     const mappedData = data.map(item => ({
         type: item.type,
@@ -22,10 +24,25 @@ function save(data){
     return result;
 }
 
+function saveExcursionRequest(data){
+    const mappedData = {
+        excursion: data.tourId,
+        fullName: data.name,
+        email: data.email,
+        phone: data.phone,
+        numberOfPeople: data.people,
+        desiredDate: data.date,
+        note: data.message || `Booking request for ${data.tourName}`
+      };
+    const result = ExcursionBooking.insertMany(mappedData); 
+    return result;
+}
+
 function excursions(filter = {}){
     // const allExcursions = Excursion.find({ include: 'breakfast' });
     const allExcursions = Excursion.find(filter);
     return allExcursions;
 }
 
-module.exports = { excursions, save };
+
+module.exports = { excursions, save, saveExcursionRequest };
