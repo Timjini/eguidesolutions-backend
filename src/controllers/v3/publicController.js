@@ -22,7 +22,7 @@ class publicController {
       const allExcursions = await excursions(filter);
       
       const excursionsWithSimilar = await Excursion.find({
-        city: allExcursions[0].city,
+        city: allExcursions[0]?.city,
       })
       .limit(3)
       .select('_id title_en title_pl duration price imageUrls')
